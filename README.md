@@ -16,4 +16,4 @@ A React Native (JavaScript) mobile typing practice app built with Expo.
 ## Project Structure
 - `App.js` - Main app component
 - `src/components/` - Reusable UI components
-- `src/screens/` - App screens
+- `src/screens/` - App screens"# typing_app" 
