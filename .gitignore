@@ -1,0 +1,7 @@
+// .gitignore - गिट में न भेजी जाने वाली files
+node_modules/
+.expo/
+dist/
+web-build/
+*.log
+.DS_Store
