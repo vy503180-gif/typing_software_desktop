@@ -159,13 +159,13 @@ export default function LessonsScreen({
           <View style={styles.progressCard}>
             <BlurView intensity={25} tint="dark" style={styles.progressInner}>
               <Text style={styles.progressTitle}>
-                {countUnlocked(lessons)} of {lessons.length} Lessons Unlocked
+                {countUnlocked} of {lessons.length} Lessons Unlocked
               </Text>
               <View style={styles.progressTrack}>
                 <View
                   style={[
                     styles.progressFill,
-                    { width: `${(countUnlocked(lessons) / lessons.length) * 100}%` },
+                    { width: `${(countUnlocked / lessons.length) * 100}%` },
                   ]}
                 />
               </View>

@@ -71,6 +71,7 @@ export default function NameEntryScreen({ onSubmit }) {
                   <Ionicons name="person-outline" size={20} color="#A78BFA" />
                   <TextInput
                     style={styles.input}
+                    autoFocus
                     placeholder="Student name"
                     placeholderTextColor="rgba(255,255,255,0.45)"
                     value={name}
@@ -183,6 +184,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
     paddingVertical: 14,
     marginLeft: 10,
+    outlineWidth: 0,
+    outlineColor: 'transparent',
+    outlineStyle: 'none',
   },
   enterBtn: {
     flexDirection: 'row',

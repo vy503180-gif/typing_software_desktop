@@ -7,6 +7,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import {
+  Alert,
   Animated,
   Image,
   SafeAreaView,
@@ -35,6 +36,18 @@ const PROFILE_STATS = [
   { label: 'Best WPM', value: '68', icon: 'speedometer-outline', color: '#60A5FA' },
   { label: 'Best Accuracy', value: '98%', icon: 'checkmark-circle-outline', color: '#4ADE80' },
   { label: 'Completed Lessons', value: '12', icon: 'book-outline', color: '#A78BFA' },
+];
+
+// Top bar के ⋮ menu में दिखने वाले options
+const PROFILE_MENU = [
+  { id: 'course', label: 'Course', icon: 'book-outline', color: '#93C5FD' },
+  { id: 'review', label: 'Review', icon: 'star-outline', color: '#FBBF24' },
+  { id: 'typingtest', label: 'Typing Test', icon: 'keyboard-outline', color: '#4ADE80' },
+  { id: 'games', label: 'Games', icon: 'game-controller-outline', color: '#F472B6' },
+  { id: 'statistics', label: 'Statistics', icon: 'stats-chart-outline', color: '#67E8F9' },
+  { id: 'satellite', label: 'Satellite', icon: 'satellite-outline', color: '#A78BFA' },
+  { id: 'setting', label: 'Setting', icon: 'settings-outline', color: '#60A5FA' },
+  { id: 'information', label: 'Information', icon: 'information-circle-outline', color: '#F87171' },
 ];
 
 // एक छोटा animation hook -
@@ -85,6 +98,10 @@ export default function HomeScreen({ studentName, onStartTyping, onContinueLesso
   const startAnim = useFadeInUp(300);
   const continueAnim = useFadeInUp(400);
 
+  const handleMenuPress = (menuItem) => {
+    Alert.alert('Coming Soon', `${menuItem.label} screen is coming soon!`);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
@@ -102,10 +119,27 @@ export default function HomeScreen({ studentName, onStartTyping, onContinueLesso
         >
           {/* App Logo + नाम */}
           <View style={styles.logoWrap}>
-            <View style={styles.logoCircle}>
-              <Ionicons name="rocket" size={26} color="#ffffff" />
+            <View style={styles.logoLeft}>
+              <View style={styles.logoCircle}>
+                <Ionicons name="rocket" size={26} color="#ffffff" />
+              </View>
+              <Text style={styles.appName}>ANTRIKSH TYPING MASTER</Text>
             </View>
-            <Text style={styles.appName}>ANTRIKSH TYPING MASTER</Text>
+          </View>
+
+          {/* Top menu - responsive, width के हिसाब से auto wrap */}
+          <View style={styles.menuBar}>
+            {PROFILE_MENU.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.menuChip}
+                onPress={() => handleMenuPress(item)}
+                activeOpacity={0.7}
+              >
+                <Ionicons name={item.icon} size={16} color={item.color} />
+                <Text style={styles.menuChipText}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* Student Profile card - Photo + Name + Current Level */}
@@ -231,10 +265,17 @@ const styles = StyleSheet.create({
 
   // Logo section
   logoWrap: {
+    width: '100%',
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  logoLeft: {
     alignItems: 'center',
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 6,
+    flexShrink: 1,
   },
   logoCircle: {
     width: 42,
@@ -338,6 +379,29 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.65)',
     fontSize: 11,
     marginTop: 4,
+  },
+  menuBar: {
+    marginTop: 10,
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  menuChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.22)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  menuChipText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '600',
   },
 
   // ----- Live practice bar -----
