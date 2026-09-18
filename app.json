@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Antriksh Typing Master",
+    "name": "Typing Master",
     "slug": "antriksh-typing-master",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,15 +23,6 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#1a1a2e",
-          "image": "./assets/splash.png",
-          "imageWidth": 200,
-          "resizeMode": "contain"
-        }
-      ],
       "expo-font"
     ]
   }

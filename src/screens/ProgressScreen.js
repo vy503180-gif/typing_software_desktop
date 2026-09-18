@@ -10,16 +10,16 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
 
 const STATS = [
-  { label: 'Avg WPM', value: '42', icon: 'speedometer-outline', color: '#60A5FA' },
-  { label: 'Best WPM', value: '68', icon: 'trophy-outline', color: '#FBBF24' },
-  { label: 'Accuracy', value: '94%', icon: 'checkmark-circle-outline', color: '#4ADE80' },
-  { label: 'Tests Done', value: '47', icon: 'document-text-outline', color: '#A78BFA' },
-  { label: 'Total Time', value: '5.2h', icon: 'time-outline', color: '#F472B6' },
-  { label: 'Streak', value: '7 days', icon: 'flame-outline', color: '#FB923C' },
+  { label: 'Avg WPM', value: '42', icon: 'speedometer-outline', color: COLORS.teal },
+  { label: 'Best WPM', value: '68', icon: 'trophy-outline', color: COLORS.amber },
+  { label: 'Accuracy', value: '94%', icon: 'checkmark-circle-outline', color: COLORS.green },
+  { label: 'Tests Done', value: '47', icon: 'document-text-outline', color: COLORS.rose },
+  { label: 'Total Time', value: '5.2h', icon: 'time-outline', color: COLORS.teal },
+  { label: 'Streak', value: '7 days', icon: 'flame-outline', color: COLORS.amber },
 ];
 
 const RECENT_TESTS = [
@@ -33,15 +33,12 @@ export default function ProgressScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
-      <LinearGradient
-        colors={['#1D4ED8', '#6D28D9', '#7C3AED']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+      <View
         style={styles.gradient}
       >
         <ScrollView contentContainerStyle={styles.container}>
           <Text style={styles.title}>Progress</Text>
-          <Text style={styles.subtitle}>WPM और Accuracy Tracking</Text>
+          <Text style={styles.subtitle}>WPM aur Accuracy Tracking</Text>
 
           {/* Main Stats Grid */}
           <View style={styles.statsGrid}>
@@ -84,34 +81,34 @@ export default function ProgressScreen() {
             ))}
           </View>
         </ScrollView>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#1D4ED8' },
+  safeArea: { flex: 1, backgroundColor: '#0a0a0a' },
   gradient: { flex: 1 },
-  container: { padding: 20, paddingBottom: 120 },
-  title: { color: '#fff', fontSize: 28, fontWeight: '800', textAlign: 'center' },
-  subtitle: { color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginTop: 4, marginBottom: 24 },
+  container: { padding: scaleSize(20), paddingBottom: scaleSize(120) },
+  title: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(28), textAlign: 'center' },
+  subtitle: { fontFamily: 'Calibri', color: COLORS.textMuted, textAlign: 'center', marginTop: scaleSize(4), marginBottom: scaleSize(24) },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  statCard: { width: '48%', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', alignItems: 'center' },
-  statValue: { color: '#fff', fontSize: 24, fontWeight: '800', marginTop: 8 },
-  statLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 4 },
-  chartCard: { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, marginTop: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  chartTitle: { color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 16 },
+  statCard: { width: '48%', backgroundColor: COLORS.cardBg, borderRadius: scaleSize(16), padding: scaleSize(16), marginBottom: scaleSize(12), borderWidth: 1, borderColor: COLORS.cardBorder, alignItems: 'center' },
+  statValue: { color: COLORS.textWhite, fontSize: scaleFont(24), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(8) },
+  statLabel: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: scaleFont(12), marginTop: scaleSize(4) },
+  chartCard: { backgroundColor: COLORS.cardBg, borderRadius: scaleSize(16), padding: scaleSize(16), marginTop: scaleSize(8), borderWidth: 1, borderColor: COLORS.cardBorder },
+  chartTitle: { color: COLORS.textWhite, fontSize: scaleFont(18), fontFamily: 'Calibri', fontWeight: '700', marginBottom: scaleSize(16) },
   chartBars: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 100 },
   barContainer: { alignItems: 'center', flex: 1 },
-  bar: { width: 24, backgroundColor: '#A78BFA', borderRadius: 6 },
-  barLabel: { color: 'rgba(255,255,255,0.6)', fontSize: 10, marginTop: 6 },
-  recentCard: { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 16, padding: 16, marginTop: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
-  recentTitle: { color: '#fff', fontSize: 18, fontWeight: '700', marginBottom: 12 },
-  testRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)' },
-  testLang: { backgroundColor: 'rgba(167,139,250,0.3)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  testLangText: { color: '#A78BFA', fontSize: 12, fontWeight: '600' },
-  testStats: { flex: 1, marginLeft: 12 },
-  testWpm: { color: '#fff', fontSize: 14, fontWeight: '600' },
-  testAccuracy: { color: 'rgba(255,255,255,0.6)', fontSize: 12 },
-  testTime: { color: 'rgba(255,255,255,0.5)', fontSize: 12 },
+  bar: { width: scaleSize(24), backgroundColor: COLORS.teal, borderRadius: scaleSize(6) },
+  barLabel: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: scaleFont(10), marginTop: scaleSize(6) },
+  recentCard: { backgroundColor: COLORS.cardBg, borderRadius: scaleSize(16), padding: scaleSize(16), marginTop: scaleSize(12), borderWidth: 1, borderColor: COLORS.cardBorder },
+  recentTitle: { color: COLORS.textWhite, fontSize: scaleFont(18), fontFamily: 'Calibri', fontWeight: '700', marginBottom: scaleSize(12) },
+  testRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: scaleSize(12), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder },
+  testLang: { backgroundColor: COLORS.teal + '30', paddingHorizontal: scaleSize(10), paddingVertical: scaleSize(4), borderRadius: scaleSize(8) },
+  testLangText: { color: COLORS.teal, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700'},
+  testStats: { flex: 1, marginLeft: scaleSize(12) },
+  testWpm: { color: COLORS.textWhite, fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700'},
+  testAccuracy: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: scaleFont(12) },
+  testTime: { fontFamily: 'Calibri', color: COLORS.textDim, fontSize: scaleFont(12) },
 });

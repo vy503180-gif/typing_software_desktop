@@ -1,15 +1,7 @@
-// src/screens/HomeScreen.js
-// यह app का modern home screen है।
-// इसमें student profile (photo, name, current level),
-// Total Practice Time / Best WPM / Best Accuracy / Completed Lessons की stats,
-// Start Typing button और Continue Last Lesson दिखते हैं।
-// Design blue + purple gradient और glassmorphism (blur) पर आधारित है।
-
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
-  Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -18,43 +10,29 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Student profile का demo data
-// (बाद में इसे real user data / storage से बदला जा सकता है)
+const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+
 const STUDENT = {
   level: 'Intermediate',
-  levelProgress: 65, // अगले level तक का progress %
-  photo: null, // photo न होने पर person icon दिखेगा
+  levelProgress: 65,
+  photo: null,
 };
 
-// Home page पर दिखने वाली student stats
-const PROFILE_STATS = [
-  { label: 'Total Practice Time', value: '5.2h', icon: 'time-outline', color: '#67E8F9' },
-  { label: 'Best WPM', value: '68', icon: 'speedometer-outline', color: '#60A5FA' },
-  { label: 'Best Accuracy', value: '98%', icon: 'checkmark-circle-outline', color: '#4ADE80' },
-  { label: 'Completed Lessons', value: '12', icon: 'book-outline', color: '#A78BFA' },
-];
-
-// Top bar के ⋮ menu में दिखने वाले options
 const PROFILE_MENU = [
-  { id: 'course', label: 'Course', icon: 'book-outline', color: '#93C5FD' },
-  { id: 'review', label: 'Review', icon: 'star-outline', color: '#FBBF24' },
-  { id: 'typingtest', label: 'Typing Test', icon: 'keyboard-outline', color: '#4ADE80' },
-  { id: 'games', label: 'Games', icon: 'game-controller-outline', color: '#F472B6' },
-  { id: 'statistics', label: 'Statistics', icon: 'stats-chart-outline', color: '#67E8F9' },
-  { id: 'satellite', label: 'Satellite', icon: 'satellite-outline', color: '#A78BFA' },
-  { id: 'setting', label: 'Setting', icon: 'settings-outline', color: '#60A5FA' },
-  { id: 'information', label: 'Information', icon: 'information-circle-outline', color: '#F87171' },
+  { id: 'course', label: 'Course', icon: 'book', color: COLORS.teal },
+  { id: 'review', label: 'Review', icon: 'star', color: COLORS.amber },
+  { id: 'games', label: 'Games', icon: 'game-controller', color: COLORS.green },
+  { id: 'satellite', label: 'Explore', icon: 'compass', color: COLORS.rose },
+  { id: 'setting', label: 'Setting', icon: 'settings', color: COLORS.teal },
+  { id: 'information', label: 'Info', icon: 'information-circle', color: COLORS.teal },
 ];
 
-// एक छोटा animation hook -
-// card को fade + slight slide-up के साथ दिखाता है
 function useFadeInUp(delay = 0) {
   const value = useRef(new Animated.Value(0)).current;
-
   useEffect(() => {
     Animated.timing(value, {
       toValue: 1,
@@ -63,432 +41,421 @@ function useFadeInUp(delay = 0) {
       useNativeDriver: true,
     }).start();
   }, [value, delay]);
-
   return {
     opacity: value,
-    transform: [
-      {
-        translateY: value.interpolate({
-          inputRange: [0, 1],
-          outputRange: [30, 0],
-        }),
-      },
-    ],
+    transform: [{ translateY: value.interpolate({ inputRange: [0, 1], outputRange: [30, 0] }) }],
   };
 }
 
-// Reusable glass card
-function GlassCard({ children, style, delay = 0 }) {
-  const animStyle = useFadeInUp(delay);
-  return (
-    <Animated.View style={[animStyle, style]}>
-      <View style={styles.glassWrap}>
-        <BlurView intensity={25} tint="dark" style={styles.glassInner}>
-          {children}
-        </BlurView>
-      </View>
-    </Animated.View>
-  );
-}
-
-// Home screen का मुख्य component
-export default function HomeScreen({ studentName, onStartTyping, onContinueLesson }) {
+export default function HomeScreen({ studentName, onStartTyping, onContinueLesson, onCourse, onReview, onGames, onSetting, onSwitchUser }) {
   const profileAnim = useFadeInUp(0);
   const statsAnim = useFadeInUp(150);
   const startAnim = useFadeInUp(300);
   const continueAnim = useFadeInUp(400);
 
+  // Menu grid responsiveness: wide screen = single row, small = wrapped rows
+  const [menuWidth, setMenuWidth] = useState(0);
+  const MENU_GAP = scaleSize(6);
+  const isWide = menuWidth >= 520;
+  const menuChipWidth = menuWidth > 0
+    ? isWide
+      ? (menuWidth - MENU_GAP * (PROFILE_MENU.length - 1)) / PROFILE_MENU.length
+      : (menuWidth - MENU_GAP * 2) / 3
+    : '31%';
+
   const handleMenuPress = (menuItem) => {
-    Alert.alert('Coming Soon', `${menuItem.label} screen is coming soon!`);
+    if (menuItem.id === 'course' && onCourse) onCourse();
+    else if (menuItem.id === 'review' && onReview) onReview();
+    else if (menuItem.id === 'games' && onGames) onGames();
+    else if (menuItem.id === 'setting' && onSetting) onSetting();
+    else Alert.alert('Coming Soon', `${menuItem.label} screen is coming soon!`);
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
+  const [dailyStats, setDailyStats] = useState({
+    practiceTime: '0m',
+    bestWpm: 0,
+    bestAccuracy: 0,
+    testsDone: 0,
+  });
 
-      {/* Blue + Purple gradient background */}
-      <LinearGradient
-        colors={['#1D4ED8', '#6D28D9', '#7C3AED']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradient}
+  useEffect(() => {
+    const today = new Date().toLocaleDateString();
+    AsyncStorage.getItem(getHistoryKey(studentName))
+      .then((raw) => {
+        try {
+          const all = raw ? JSON.parse(raw) : [];
+          const todays = all.filter((r) => r.date === today);
+          const totalSec = todays.reduce((s, r) => s + (r.timeTaken || 0), 0);
+          const h = Math.floor(totalSec / 3600);
+          const m = Math.floor((totalSec % 3600) / 60);
+          setDailyStats({
+            practiceTime: totalSec > 0 ? (h > 0 ? `${h}h ${m}m` : `${m}m`) : '0m',
+            bestWpm: todays.length > 0 ? Math.max(...todays.map((r) => r.wpm)) : 0,
+            bestAccuracy: todays.length > 0 ? Math.max(...todays.map((r) => r.accuracy)) : 0,
+            testsDone: todays.length,
+          });
+        } catch {}
+      })
+      .catch(() => {});
+  }, [studentName]);
+
+  const PROFILE_STATS = [
+    { label: 'Practice Time', value: dailyStats.practiceTime, icon: 'time', color: COLORS.teal },
+    { label: 'Best WPM', value: dailyStats.bestWpm, icon: 'speedometer', color: COLORS.amber },
+    { label: 'Accuracy', value: `${dailyStats.bestAccuracy}%`, icon: 'checkmark-circle', color: COLORS.green },
+    { label: 'Tests Done', value: dailyStats.testsDone, icon: 'library', color: COLORS.teal },
+  ];
+
+  return (
+    <SafeAreaView style={s.safeArea}>
+      <StatusBar barStyle="light-content" />
+      <ScrollView
+        contentContainerStyle={s.scrollContainer}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* App Logo + नाम */}
-          <View style={styles.logoWrap}>
-            <View style={styles.logoLeft}>
-              <View style={styles.logoCircle}>
-                <Ionicons name="rocket" size={26} color="#ffffff" />
+        <View style={s.content}>
+          {/* Logo + Name */}
+          <View style={s.logoWrap}>
+            <View style={s.logoLeft}>
+              <View style={s.logoCircle}>
+                <Text style={s.logoLetter}>T</Text>
               </View>
-              <Text style={styles.appName}>ANTRIKSH TYPING MASTER</Text>
+              <Text style={s.appName}>Typing Master</Text>
             </View>
+            {onSwitchUser && (
+              <TouchableOpacity style={s.switchBtn} onPress={onSwitchUser} activeOpacity={0.7}>
+                <Ionicons name="people" size={14} color={COLORS.teal} />
+                <Text style={s.switchBtnText}>Switch</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
-          {/* Top menu - responsive, width के हिसाब से auto wrap */}
-          <View style={styles.menuBar}>
+          {/* Menu chips - single row on wide screens, wraps on small screens */}
+          <View
+            style={s.menuBar}
+            onLayout={(e) => setMenuWidth(e.nativeEvent.layout.width)}
+          >
             {PROFILE_MENU.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                style={styles.menuChip}
+                style={[s.menuChip, { width: menuChipWidth, borderColor: item.color + '50', backgroundColor: item.color + '1c' }]}
                 onPress={() => handleMenuPress(item)}
                 activeOpacity={0.7}
               >
-                <Ionicons name={item.icon} size={16} color={item.color} />
-                <Text style={styles.menuChipText}>{item.label}</Text>
+                <Ionicons name={item.icon} size={14} color={item.color} />
+                <Text style={[s.menuChipText, { color: item.color }]}>{item.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          {/* Student Profile card - Photo + Name + Current Level */}
-          <GlassCard style={styles.fullWidth} delay={0}>
-            <Animated.View style={[styles.profileRow, profileAnim]}>
-              {/* Photo - circular avatar */}
-              <View style={styles.avatarWrap}>
-                {STUDENT.photo ? (
-                  <Image source={{ uri: STUDENT.photo }} style={styles.avatar} />
-                ) : (
-                  <Ionicons name="person" size={52} color="#ffffff" />
-                )}
-                <View style={styles.onlineDot} />
+          {/* Profile card */}
+          <View style={[s.card, { marginTop: scaleSize(12) }]}>
+            <Animated.View style={[s.profileRow, profileAnim]}>
+              <View style={s.avatarWrap}>
+                <Ionicons name="person" size={36} color="#fff" />
+                <View style={s.onlineDot} />
               </View>
-
-              {/* Student Name + Level */}
-              <View style={styles.profileInfo}>
-                <Text style={styles.studentName}>{studentName}</Text>
-
-                <View style={styles.levelBadge}>
-                  <Ionicons name="star" size={14} color="#FBBF24" />
-                  <Text style={styles.levelText}>Current Level: {STUDENT.level}</Text>
+              <View style={s.profileInfo}>
+                <Text style={s.studentName}>{studentName}</Text>
+                <View style={s.levelBadge}>
+                  <Ionicons name="star" size={12} color={COLORS.amber} />
+                  <Text style={s.levelText}>{STUDENT.level}</Text>
                 </View>
-
-                {/* Level progress bar */}
-                <View style={styles.progressTrack}>
-                  <View
-                    style={[styles.progressFill, { width: `${STUDENT.levelProgress}%` }]}
-                  />
+                <View style={s.progressTrack}>
+                  <View style={[s.progressFill, { width: `${STUDENT.levelProgress}%` }]} />
                 </View>
-                <Text style={styles.progressLabel}>
-                  {STUDENT.levelProgress}% to next level
-                </Text>
+                <Text style={s.progressLabel}>{STUDENT.levelProgress}% to next level</Text>
               </View>
             </Animated.View>
-          </GlassCard>
+          </View>
 
           {/* Live practice time */}
-          <GlassCard style={styles.fullWidth} delay={100}>
-            <Animated.View style={[styles.practiceRow, statsAnim]}>
-              <Ionicons name="pulse" size={24} color="#4ADE80" />
-              <View style={styles.practiceInfo}>
-                <Text style={styles.practiceValue}>05:12:40</Text>
-                <Text style={styles.practiceLabel}>Today's Live Practice</Text>
+          <View style={[s.card, { marginTop: scaleSize(12) }]}>
+            <Animated.View style={[s.practiceRow, statsAnim]}>
+              <View style={s.pulseIcon}>
+                <Ionicons name="pulse" size={22} color={COLORS.green} />
               </View>
-              <TouchableOpacity style={styles.practiceBtn} onPress={onStartTyping}>
-                <Text style={styles.practiceBtnText}>Continue</Text>
+              <View style={s.practiceInfo}>
+                <Text style={s.practiceValue}>{dailyStats.practiceTime}</Text>
+                <Text style={s.practiceLabel}>Today's Practice</Text>
+              </View>
+              <TouchableOpacity style={s.practiceBtn} onPress={onStartTyping}>
+                <Text style={s.practiceBtnText}>Continue</Text>
               </TouchableOpacity>
             </Animated.View>
-          </GlassCard>
+          </View>
 
-          {/* Start Typing - big main gradient button */}
-          <Animated.View style={[styles.fullWidth, startAnim]}>
+          {/* Start Typing - big button */}
+          <Animated.View style={[{ marginTop: scaleSize(12), width: '100%' }, startAnim]}>
             <TouchableOpacity onPress={onStartTyping} activeOpacity={0.85}>
-              <LinearGradient
-                colors={['#FFFFFF', '#E0E7FF']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.startButton}
-              >
-                <Ionicons name="play" size={20} color="#4338CA" />
-                <Text style={styles.startButtonText}>Start Typing</Text>
-              </LinearGradient>
+              <View style={s.startButton}>
+                <Ionicons name="play" size={20} color="#fff" />
+                <Text style={s.startButtonText}>Start Typing</Text>
+                <Ionicons name="arrow-forward" size={18} color="#fff" />
+              </View>
             </TouchableOpacity>
           </Animated.View>
 
-          {/* Continue Last Lesson - glass card button */}
-          <GlassCard style={styles.fullWidth} delay={400}>
-            <TouchableOpacity
-              onPress={onContinueLesson}
-              style={styles.continueRow}
-              activeOpacity={0.8}
-            >
-              <View style={styles.continueIcon}>
-                <Ionicons name="book" size={22} color="#A78BFA" />
-              </View>
-              <View style={styles.continueText}>
-                <Text style={styles.continueTitle}>Continue Last Lesson</Text>
-                <Text style={styles.continueSub}>Lesson 3 • Basic Words</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.55)" />
-            </TouchableOpacity>
-          </GlassCard>
+          {/* Continue Last Lesson */}
+          <View style={[s.card, { marginTop: scaleSize(12) }]}>
+            <Animated.View style={continueAnim}>
+              <TouchableOpacity onPress={onContinueLesson} style={s.continueRow} activeOpacity={0.8}>
+                <View style={s.continueIcon}>
+                  <Ionicons name="book" size={20} color={COLORS.teal} />
+                </View>
+                <View style={s.continueText}>
+                  <Text style={s.continueTitle}>Continue Last Lesson</Text>
+                  <Text style={s.continueSub}>Lesson 3 - Basic Words</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#666" />
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
 
-          {/* Student Stats - Best WPM, Best Accuracy, etc. */}
-          <GlassCard style={styles.fullWidth} delay={500}>
-            <Text style={styles.sectionTitle}>Your Stats</Text>
-            <View style={styles.grid}>
+          {/* Stats grid */}
+          <View style={[s.card, { marginTop: scaleSize(12), marginBottom: scaleSize(120) }]}>
+            <Text style={s.sectionTitle}>Today's Stats</Text>
+            <View style={s.grid}>
               {PROFILE_STATS.map((stat) => (
-                <View key={stat.label} style={styles.gridItem}>
+                <View key={stat.label} style={[s.gridItem, { borderLeftColor: stat.color }]}>
                   <Ionicons name={stat.icon} size={20} color={stat.color} />
-                  <Text style={styles.gridValue}>{stat.value}</Text>
-                  <Text style={styles.gridLabel}>{stat.label}</Text>
+                  <Text style={s.gridValue}>{stat.value}</Text>
+                  <Text style={s.gridLabel}>{stat.label}</Text>
                 </View>
               ))}
             </View>
-          </GlassCard>
-        </ScrollView>
-      </LinearGradient>
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
-// ----- Styles -----
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#1D4ED8',
+const s = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: BG },
+  scrollContainer: {
+    flexGrow: 1,
+    backgroundColor: BG,
   },
-  gradient: {
-    flex: 1,
-  },
-  container: {
+  content: {
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 120, // bottom navigation के लिए जगह
-  },
-  fullWidth: {
+    paddingHorizontal: scaleSize(16),
+    paddingTop: scaleSize(16),
     width: '100%',
-    marginTop: 14,
   },
 
-  // Logo section
+  // Logo
   logoWrap: {
     width: '100%',
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: scaleSize(8),
   },
   logoLeft: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 10,
-    flexShrink: 1,
+    gap: scaleSize(10),
   },
   logoCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: scaleSize(38),
+    height: scaleSize(38),
+    borderRadius: scaleSize(19),
+    backgroundColor: COLORS.teal,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.35)',
+  },
+  logoLetter: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#ffffff',
+    fontSize: scaleFont(20),
   },
   appName: {
+    fontFamily: 'Calibri', fontWeight: '700',
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 2,
-    flexShrink: 1,
+    fontSize: scaleFont(18),
+    letterSpacing: 3,
   },
-
-  // Glass card styling (glassmorphism)
-  glassWrap: {
-    borderRadius: 20,
-    overflow: 'hidden',
+  switchBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scaleSize(5),
+    borderRadius: scaleSize(10),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderColor: COLORS.teal + '50',
+    backgroundColor: COLORS.teal + '15',
+    paddingHorizontal: scaleSize(10),
+    paddingVertical: scaleSize(6),
   },
-  glassInner: {
-    padding: 16,
+  switchBtnText: {
+    color: COLORS.teal,
+    fontSize: scaleFont(11),
+    fontFamily: 'Calibri', fontWeight: '700'
   },
 
-  // ----- Student Profile card -----
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatarWrap: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.5)',
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  onlineDot: {
-    position: 'absolute',
-    right: 2,
-    bottom: 4,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#4ADE80',
-    borderWidth: 2,
-    borderColor: '#6D28D9',
-  },
-  profileInfo: {
-    flex: 1,
-    marginLeft: 16,
-  },
-  studentName: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  levelBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginTop: 8,
-  },
-  levelText: {
-    color: '#FBBF24',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  progressTrack: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    marginTop: 10,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 3,
-    backgroundColor: '#FBBF24',
-  },
-  progressLabel: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 11,
-    marginTop: 4,
-  },
+  // Menu
   menuBar: {
-    marginTop: 10,
     width: '100%',
+    maxWidth: scaleSize(620),
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: scaleSize(6),
+    marginTop: scaleSize(8),
   },
   menuChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    borderRadius: 10,
+    justifyContent: 'center',
+    gap: scaleSize(4),
+    borderRadius: scaleSize(10),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: scaleSize(4),
+    paddingVertical: scaleSize(7),
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+    elevation: 3,
   },
   menuChipText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: scaleFont(12),
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
 
-  // ----- Live practice bar -----
-  practiceRow: {
+  // Cards
+  card: {
+    width: '100%',
+    backgroundColor: '#141414',
+    borderRadius: scaleSize(16),
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    padding: scaleSize(14),
+  },
+
+  // Profile
+  profileRow: { flexDirection: 'row', alignItems: 'center' },
+  avatarWrap: {
+    width: scaleSize(72),
+    height: scaleSize(72),
+    borderRadius: scaleSize(36),
+    backgroundColor: COLORS.green,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  onlineDot: {
+    position: 'absolute',
+    right: 0,
+    bottom: 2,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: COLORS.green,
+    borderWidth: 2,
+    borderColor: '#141414',
+  },
+  profileInfo: { flex: 1, marginLeft: scaleSize(14) },
+  studentName: {
+    color: '#ffffff',
+    fontSize: scaleFont(20),
+    fontFamily: 'Calibri', fontWeight: '700'
+  },
+  levelBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: scaleSize(5),
+    alignSelf: 'flex-start',
+    borderRadius: scaleSize(8),
+    backgroundColor: COLORS.amber + '25',
+    paddingHorizontal: scaleSize(8),
+    paddingVertical: scaleSize(3),
+    marginTop: scaleSize(6),
   },
-  practiceInfo: {
-    flex: 1,
-    marginLeft: 12,
+  levelText: { fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.amber },
+  progressTrack: {
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    marginTop: scaleSize(8),
+    overflow: 'hidden',
   },
+  progressFill: { height: '100%', borderRadius: 3, backgroundColor: COLORS.green },
+  progressLabel: { fontFamily: 'Calibri', color: '#b0b0b0', fontSize: scaleFont(10), marginTop: 3 },
+
+  // Practice
+  practiceRow: { flexDirection: 'row', alignItems: 'center' },
+  pulseIcon: {
+    width: scaleSize(40),
+    height: scaleSize(40),
+    borderRadius: scaleSize(12),
+    backgroundColor: COLORS.green + '25',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  practiceInfo: { flex: 1, marginLeft: scaleSize(10) },
   practiceValue: {
     color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: scaleFont(18),
+    fontFamily: 'Calibri', fontWeight: '700'
   },
-  practiceLabel: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 12,
-    marginTop: 2,
-  },
+  practiceLabel: { fontFamily: 'Calibri', color: '#b0b0b0', fontSize: scaleFont(11), marginTop: 1 },
   practiceBtn: {
-    backgroundColor: 'rgba(74,222,128,0.25)',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    borderRadius: scaleSize(10),
+    backgroundColor: COLORS.teal + '25',
+    paddingHorizontal: scaleSize(14),
+    paddingVertical: scaleSize(8),
   },
-  practiceBtnText: {
-    color: '#4ADE80',
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  practiceBtnText: { fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.teal },
 
-  // Start typing button
+  // Start button
   startButton: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 16,
-    paddingVertical: 16,
-    gap: 8,
-    shadowColor: '#A78BFA',
+    backgroundColor: '#16a34a',
+    borderRadius: scaleSize(16),
+    paddingVertical: scaleSize(16),
+    gap: scaleSize(8),
+    shadowColor: '#16a34a',
     shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: 4 },
     shadowRadius: 12,
-    elevation: 8,
+    elevation: 6,
   },
   startButtonText: {
-    color: '#4338CA',
-    fontSize: 18,
-    fontWeight: '800',
+    color: '#fff',
+    fontSize: scaleFont(17),
+    fontFamily: 'Calibri', fontWeight: '700'
   },
 
-  // Continue last lesson
-  continueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  // Continue
+  continueRow: { flexDirection: 'row', alignItems: 'center' },
   continueIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+    width: scaleSize(40),
+    height: scaleSize(40),
+    borderRadius: scaleSize(12),
+    backgroundColor: COLORS.teal + '25',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(167,139,250,0.25)',
   },
-  continueText: {
-    flex: 1,
-    marginLeft: 12,
-  },
+  continueText: { flex: 1, marginLeft: scaleSize(10) },
   continueTitle: {
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: scaleFont(15),
+    fontFamily: 'Calibri', fontWeight: '700'
   },
-  continueSub: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: 12,
-    marginTop: 2,
-  },
+  continueSub: { fontFamily: 'Calibri', color: '#b0b0b0', fontSize: scaleFont(11), marginTop: 2 },
 
-  // Stats card
+  // Stats
   sectionTitle: {
     color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 12,
+    fontSize: scaleFont(15),
+    fontFamily: 'Calibri', fontWeight: '700',
+    marginBottom: scaleSize(10),
   },
   grid: {
     flexDirection: 'row',
@@ -497,20 +464,17 @@ const styles = StyleSheet.create({
   },
   gridItem: {
     width: '48%',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 10,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: scaleSize(12),
+    padding: scaleSize(12),
+    marginBottom: scaleSize(8),
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderLeftWidth: 3,
   },
   gridValue: {
     color: '#ffffff',
-    fontSize: 22,
-    fontWeight: '800',
-    marginTop: 6,
+    fontSize: scaleFont(20),
+    fontFamily: 'Calibri', fontWeight: '700',
+    marginTop: scaleSize(6),
   },
-  gridLabel: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 12,
-    marginTop: 2,
-  },
+  gridLabel: { fontFamily: 'Calibri', color: '#b0b0b0', fontSize: scaleFont(11), marginTop: 2 },
 });
