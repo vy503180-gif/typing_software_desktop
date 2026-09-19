@@ -9,13 +9,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  TextInput,
   KeyboardAvoidingView,
-  Pressable,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const GAMES = [
   { id: 'abc', label: 'ABC Speed Race', icon: 'rocket', color: COLORS.teal, desc: 'A se Z tak type karo, time se race' },
@@ -71,7 +69,7 @@ export default function GamesMenuScreen({ onBack, onStartABC, onStartBubbles }) 
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
       <View style={styles.gradient}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.flex, IS_DESKTOP && styles.flexDesktop]}>
           {/* Header */}
           <View style={styles.headerRow}>
             {onBack && (
@@ -208,6 +206,13 @@ const styles = StyleSheet.create({
     zIndex: 15,
   },
   flex: { flex: 1, padding: scaleSize(16) },
+  flexDesktop: {
+    flex: 1,
+    padding: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginTop: scaleSize(8) },
   backIconBtn: {

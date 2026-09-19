@@ -7,14 +7,13 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
-  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
 
-export default function LessonDetailScreen({ lesson, course, onStartSubLesson, onBack, onNextLesson, onSelectLesson, completedSubLessons = [] }) {
+export default function LessonDetailScreen({ lesson, course, onStartSubLesson, onBack, onSelectLesson, completedSubLessons = [] }) {
   const lessonIndex = course.lessons.findIndex((l) => l.id === lesson.id);
 
   const isLessonComplete = (l) => l.subLessons.every((s) => completedSubLessons.includes(s.id));
@@ -32,7 +31,7 @@ export default function LessonDetailScreen({ lesson, course, onStartSubLesson, o
     <SafeAreaView style={[styles.safeArea, { backgroundColor: BG }]}>
       <StatusBar barStyle="light-content" />
       <View style={styles.gradient}>
-        <View style={styles.container}>
+        <View style={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
@@ -148,6 +147,13 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
   container: { flex: 1, paddingHorizontal: scaleSize(16), paddingTop: scaleSize(8) },
+  containerDesktop: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(6) },
   backBtn: {
@@ -158,7 +164,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(18), color: COLORS.textWhite, flex: 1 },
 
-  tabRow: { flexDirection: 'row', gap: scaleSize(5), marginBottom: scaleSize(8) },
+  tabRow: { flexDirection: 'row', gap: scaleSize(5), marginBottom: scaleSize(8), marginTop: scaleSize(8) },
   tab: {
     width: scaleSize(28), height: scaleSize(28), borderRadius: scaleSize(6),
     alignItems: 'center', justifyContent: 'center',
@@ -179,8 +185,8 @@ const styles = StyleSheet.create({
     borderWidth: 2, alignItems: 'center', justifyContent: 'center',
     zIndex: 10, backgroundColor: '#0f0c29',
   },
-  sideNavLeft: { left: 20, top: 180 },
-  sideNavRight: { right: 20, top: 180 },
+  sideNavLeft: { left: 20, top: 460 },
+  sideNavRight: { right: 20, top: 460 },
   sideNavDisabled: { opacity: 0.3 },
   sideNavLabel: { fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(2) },
 

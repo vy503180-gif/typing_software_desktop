@@ -9,8 +9,10 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
+  Dimensions,
 } from 'react-native';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -47,13 +49,12 @@ function useFadeInUp(delay = 0) {
   };
 }
 
-export default function HomeScreen({ studentName, onStartTyping, onContinueLesson, onCourse, onReview, onGames, onSetting, onSwitchUser }) {
+export default function HomeScreen({ studentName, onStartTyping, onContinueLesson, onCourse, onReview, onGames, onSetting, onExplore, onInfo, onSwitchUser }) {
   const profileAnim = useFadeInUp(0);
   const statsAnim = useFadeInUp(150);
   const startAnim = useFadeInUp(300);
   const continueAnim = useFadeInUp(400);
 
-  // Menu grid responsiveness: wide screen = single row, small = wrapped rows
   const [menuWidth, setMenuWidth] = useState(0);
   const MENU_GAP = scaleSize(6);
   const isWide = menuWidth >= 520;
@@ -68,6 +69,8 @@ export default function HomeScreen({ studentName, onStartTyping, onContinueLesso
     else if (menuItem.id === 'review' && onReview) onReview();
     else if (menuItem.id === 'games' && onGames) onGames();
     else if (menuItem.id === 'setting' && onSetting) onSetting();
+    else if (menuItem.id === 'satellite' && onExplore) onExplore();
+    else if (menuItem.id === 'information' && onInfo) onInfo();
     else Alert.alert('Coming Soon', `${menuItem.label} screen is coming soon!`);
   };
 
@@ -106,39 +109,59 @@ export default function HomeScreen({ studentName, onStartTyping, onContinueLesso
     { label: 'Tests Done', value: dailyStats.testsDone, icon: 'library', color: COLORS.teal },
   ];
 
+  const Container = IS_DESKTOP ? View : SafeAreaView;
+  const containerProps = IS_DESKTOP ? { style: s.desktopContainer } : { style: s.safeArea };
+
   return (
-    <SafeAreaView style={s.safeArea}>
-      <StatusBar barStyle="light-content" />
+    <Container {...containerProps}>
+      {!IS_DESKTOP && <StatusBar barStyle="light-content" />}
       <ScrollView
-        contentContainerStyle={s.scrollContainer}
+        contentContainerStyle={[s.scrollContainer, IS_DESKTOP && s.desktopScroll]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={s.content}>
-          {/* Logo + Name */}
-          <View style={s.logoWrap}>
-            <View style={s.logoLeft}>
-              <View style={s.logoCircle}>
-                <Text style={s.logoLetter}>T</Text>
+        <View style={[s.content, IS_DESKTOP && s.desktopContent]}>
+          {/* Logo + Name - hidden on desktop (shown in sidebar header) */}
+          {!IS_DESKTOP && (
+            <View style={s.logoWrap}>
+              <View style={s.logoLeft}>
+                <View style={s.logoCircle}>
+                  <Text style={s.logoLetter}>T</Text>
+                </View>
+                <Text style={s.appName}>Typing Master</Text>
               </View>
-              <Text style={s.appName}>Typing Master</Text>
+              {onSwitchUser && (
+                <TouchableOpacity style={s.switchBtn} onPress={onSwitchUser} activeOpacity={0.7}>
+                  <Ionicons name="people" size={14} color={COLORS.teal} />
+                  <Text style={s.switchBtnText}>Switch</Text>
+                </TouchableOpacity>
+              )}
             </View>
-            {onSwitchUser && (
-              <TouchableOpacity style={s.switchBtn} onPress={onSwitchUser} activeOpacity={0.7}>
-                <Ionicons name="people" size={14} color={COLORS.teal} />
-                <Text style={s.switchBtnText}>Switch</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          )}
 
-          {/* Menu chips - single row on wide screens, wraps on small screens */}
+          {/* Welcome text on desktop */}
+          {IS_DESKTOP && (
+            <View style={s.desktopWelcome}>
+              <Text style={s.desktopWelcomeText}>
+                Welcome back{studentName ? `, ${studentName}` : ''}! Ready to type?
+              </Text>
+              {onSwitchUser && (
+                <TouchableOpacity style={s.switchBtn} onPress={onSwitchUser} activeOpacity={0.7}>
+                  <Ionicons name="people" size={14} color={COLORS.teal} />
+                  <Text style={s.switchBtnText}>Switch User</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
+          {/* Menu chips */}
           <View
-            style={s.menuBar}
+            style={[s.menuBar, IS_DESKTOP && s.menuBarDesktop]}
             onLayout={(e) => setMenuWidth(e.nativeEvent.layout.width)}
           >
             {PROFILE_MENU.map((item) => (
               <TouchableOpacity
                 key={item.id}
-                style={[s.menuChip, { width: menuChipWidth, borderColor: item.color + '50', backgroundColor: item.color + '1c' }]}
+                style={[s.menuChip, { width: IS_DESKTOP ? undefined : menuChipWidth, borderColor: item.color + '50', backgroundColor: item.color + '1c' }, IS_DESKTOP && s.menuChipDesktop]}
                 onPress={() => handleMenuPress(item)}
                 activeOpacity={0.7}
               >
@@ -148,100 +171,207 @@ export default function HomeScreen({ studentName, onStartTyping, onContinueLesso
             ))}
           </View>
 
-          {/* Profile card */}
-          <View style={[s.card, { marginTop: scaleSize(12) }]}>
-            <Animated.View style={[s.profileRow, profileAnim]}>
-              <View style={s.avatarWrap}>
-                <Ionicons name="person" size={36} color="#fff" />
-                <View style={s.onlineDot} />
-              </View>
-              <View style={s.profileInfo}>
-                <Text style={s.studentName}>{studentName}</Text>
-                <View style={s.levelBadge}>
-                  <Ionicons name="star" size={12} color={COLORS.amber} />
-                  <Text style={s.levelText}>{STUDENT.level}</Text>
+          {/* Desktop: two-column layout for profile + stats */}
+          {IS_DESKTOP ? (
+            <View style={s.desktopGrid}>
+              {/* Left column: Profile + Start */}
+              <View style={s.desktopGridCol}>
+                <View style={[s.card, { marginTop: scaleSize(12) }]}>
+                  <Animated.View style={[s.profileRow, profileAnim]}>
+                    <View style={s.avatarWrap}>
+                      <Ionicons name="person" size={36} color="#fff" />
+                      <View style={s.onlineDot} />
+                    </View>
+                    <View style={s.profileInfo}>
+                      <Text style={s.studentName}>{studentName}</Text>
+                      <View style={s.levelBadge}>
+                        <Ionicons name="star" size={12} color={COLORS.amber} />
+                        <Text style={s.levelText}>{STUDENT.level}</Text>
+                      </View>
+                      <View style={s.progressTrack}>
+                        <View style={[s.progressFill, { width: `${STUDENT.levelProgress}%` }]} />
+                      </View>
+                      <Text style={s.progressLabel}>{STUDENT.levelProgress}% to next level</Text>
+                    </View>
+                  </Animated.View>
                 </View>
-                <View style={s.progressTrack}>
-                  <View style={[s.progressFill, { width: `${STUDENT.levelProgress}%` }]} />
-                </View>
-                <Text style={s.progressLabel}>{STUDENT.levelProgress}% to next level</Text>
-              </View>
-            </Animated.View>
-          </View>
 
-          {/* Live practice time */}
-          <View style={[s.card, { marginTop: scaleSize(12) }]}>
-            <Animated.View style={[s.practiceRow, statsAnim]}>
-              <View style={s.pulseIcon}>
-                <Ionicons name="pulse" size={22} color={COLORS.green} />
-              </View>
-              <View style={s.practiceInfo}>
-                <Text style={s.practiceValue}>{dailyStats.practiceTime}</Text>
-                <Text style={s.practiceLabel}>Today's Practice</Text>
-              </View>
-              <TouchableOpacity style={s.practiceBtn} onPress={onStartTyping}>
-                <Text style={s.practiceBtnText}>Continue</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
-
-          {/* Start Typing - big button */}
-          <Animated.View style={[{ marginTop: scaleSize(12), width: '100%' }, startAnim]}>
-            <TouchableOpacity onPress={onStartTyping} activeOpacity={0.85}>
-              <View style={s.startButton}>
-                <Ionicons name="play" size={20} color="#fff" />
-                <Text style={s.startButtonText}>Start Typing</Text>
-                <Ionicons name="arrow-forward" size={18} color="#fff" />
-              </View>
-            </TouchableOpacity>
-          </Animated.View>
-
-          {/* Continue Last Lesson */}
-          <View style={[s.card, { marginTop: scaleSize(12) }]}>
-            <Animated.View style={continueAnim}>
-              <TouchableOpacity onPress={onContinueLesson} style={s.continueRow} activeOpacity={0.8}>
-                <View style={s.continueIcon}>
-                  <Ionicons name="book" size={20} color={COLORS.teal} />
+                <View style={[s.card, { marginTop: scaleSize(12) }]}>
+                  <Animated.View style={[s.practiceRow, statsAnim]}>
+                    <View style={s.pulseIcon}>
+                      <Ionicons name="pulse" size={22} color={COLORS.green} />
+                    </View>
+                    <View style={s.practiceInfo}>
+                      <Text style={s.practiceValue}>{dailyStats.practiceTime}</Text>
+                      <Text style={s.practiceLabel}>Today's Practice</Text>
+                    </View>
+                    <TouchableOpacity style={s.practiceBtn} onPress={onStartTyping}>
+                      <Text style={s.practiceBtnText}>Continue</Text>
+                    </TouchableOpacity>
+                  </Animated.View>
                 </View>
-                <View style={s.continueText}>
-                  <Text style={s.continueTitle}>Continue Last Lesson</Text>
-                  <Text style={s.continueSub}>Lesson 3 - Basic Words</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color="#666" />
-              </TouchableOpacity>
-            </Animated.View>
-          </View>
 
-          {/* Stats grid */}
-          <View style={[s.card, { marginTop: scaleSize(12), marginBottom: scaleSize(120) }]}>
-            <Text style={s.sectionTitle}>Today's Stats</Text>
-            <View style={s.grid}>
-              {PROFILE_STATS.map((stat) => (
-                <View key={stat.label} style={[s.gridItem, { borderLeftColor: stat.color }]}>
-                  <Ionicons name={stat.icon} size={20} color={stat.color} />
-                  <Text style={s.gridValue}>{stat.value}</Text>
-                  <Text style={s.gridLabel}>{stat.label}</Text>
+                <Animated.View style={[{ marginTop: scaleSize(12), width: '100%' }, startAnim]}>
+                  <TouchableOpacity onPress={onStartTyping} activeOpacity={0.85}>
+                    <View style={s.startButton}>
+                      <Ionicons name="play" size={20} color="#fff" />
+                      <Text style={s.startButtonText}>Start Typing</Text>
+                      <Ionicons name="arrow-forward" size={18} color="#fff" />
+                    </View>
+                  </TouchableOpacity>
+                </Animated.View>
+
+                <View style={[s.card, { marginTop: scaleSize(12) }]}>
+                  <Animated.View style={continueAnim}>
+                    <TouchableOpacity onPress={onContinueLesson} style={s.continueRow} activeOpacity={0.8}>
+                      <View style={s.continueIcon}>
+                        <Ionicons name="book" size={20} color={COLORS.teal} />
+                      </View>
+                      <View style={s.continueText}>
+                        <Text style={s.continueTitle}>Continue Last Lesson</Text>
+                        <Text style={s.continueSub}>Lesson 3 - Basic Words</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={18} color="#666" />
+                    </TouchableOpacity>
+                  </Animated.View>
                 </View>
-              ))}
+              </View>
+
+              {/* Right column: Stats */}
+              <View style={s.desktopGridCol}>
+                <View style={[s.card, { marginTop: scaleSize(12) }]}>
+                  <Text style={s.sectionTitle}>Today's Stats</Text>
+                  <View style={s.desktopStatsGrid}>
+                    {PROFILE_STATS.map((stat) => (
+                      <View key={stat.label} style={[s.desktopStatItem, { borderLeftColor: stat.color }]}>
+                        <Ionicons name={stat.icon} size={20} color={stat.color} />
+                        <Text style={s.gridValue}>{stat.value}</Text>
+                        <Text style={s.gridLabel}>{stat.label}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              </View>
             </View>
-          </View>
+          ) : (
+            /* Mobile: single-column layout */
+            <>
+              <View style={[s.card, { marginTop: scaleSize(12) }]}>
+                <Animated.View style={[s.profileRow, profileAnim]}>
+                  <View style={s.avatarWrap}>
+                    <Ionicons name="person" size={36} color="#fff" />
+                    <View style={s.onlineDot} />
+                  </View>
+                  <View style={s.profileInfo}>
+                    <Text style={s.studentName}>{studentName}</Text>
+                    <View style={s.levelBadge}>
+                      <Ionicons name="star" size={12} color={COLORS.amber} />
+                      <Text style={s.levelText}>{STUDENT.level}</Text>
+                    </View>
+                    <View style={s.progressTrack}>
+                      <View style={[s.progressFill, { width: `${STUDENT.levelProgress}%` }]} />
+                    </View>
+                    <Text style={s.progressLabel}>{STUDENT.levelProgress}% to next level</Text>
+                  </View>
+                </Animated.View>
+              </View>
+
+              <View style={[s.card, { marginTop: scaleSize(12) }]}>
+                <Animated.View style={[s.practiceRow, statsAnim]}>
+                  <View style={s.pulseIcon}>
+                    <Ionicons name="pulse" size={22} color={COLORS.green} />
+                  </View>
+                  <View style={s.practiceInfo}>
+                    <Text style={s.practiceValue}>{dailyStats.practiceTime}</Text>
+                    <Text style={s.practiceLabel}>Today's Practice</Text>
+                  </View>
+                  <TouchableOpacity style={s.practiceBtn} onPress={onStartTyping}>
+                    <Text style={s.practiceBtnText}>Continue</Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
+
+              <Animated.View style={[{ marginTop: scaleSize(12), width: '100%' }, startAnim]}>
+                <TouchableOpacity onPress={onStartTyping} activeOpacity={0.85}>
+                  <View style={s.startButton}>
+                    <Ionicons name="play" size={20} color="#fff" />
+                    <Text style={s.startButtonText}>Start Typing</Text>
+                    <Ionicons name="arrow-forward" size={18} color="#fff" />
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
+
+              <View style={[s.card, { marginTop: scaleSize(12) }]}>
+                <Animated.View style={continueAnim}>
+                  <TouchableOpacity onPress={onContinueLesson} style={s.continueRow} activeOpacity={0.8}>
+                    <View style={s.continueIcon}>
+                      <Ionicons name="book" size={20} color={COLORS.teal} />
+                    </View>
+                    <View style={s.continueText}>
+                      <Text style={s.continueTitle}>Continue Last Lesson</Text>
+                      <Text style={s.continueSub}>Lesson 3 - Basic Words</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={18} color="#666" />
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
+
+              <View style={[s.card, { marginTop: scaleSize(12), marginBottom: IS_DESKTOP ? scaleSize(20) : scaleSize(120) }]}>
+                <Text style={s.sectionTitle}>Today's Stats</Text>
+                <View style={s.grid}>
+                  {PROFILE_STATS.map((stat) => (
+                    <View key={stat.label} style={[s.gridItem, { borderLeftColor: stat.color }]}>
+                      <Ionicons name={stat.icon} size={20} color={stat.color} />
+                      <Text style={s.gridValue}>{stat.value}</Text>
+                      <Text style={s.gridLabel}>{stat.label}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </Container>
   );
 }
 
 const s = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
+  desktopContainer: { flex: 1, backgroundColor: BG },
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: BG,
+  },
+  desktopScroll: {
+    paddingVertical: 16,
   },
   content: {
     alignItems: 'center',
     paddingHorizontal: scaleSize(16),
     paddingTop: scaleSize(16),
     width: '100%',
+  },
+  desktopContent: {
+    paddingHorizontal: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
+
+  // Desktop welcome
+  desktopWelcome: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: scaleSize(8),
+    width: '100%',
+  },
+  desktopWelcomeText: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: COLORS.textWhite,
+    fontSize: scaleFont(20),
   },
 
   // Logo
@@ -266,8 +396,7 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   logoLetter: {
-    fontFamily: 'Calibri',
-    fontWeight: '700',
+    fontFamily: 'Calibri', fontWeight: '700',
     color: '#ffffff',
     fontSize: scaleFont(20),
   },
@@ -304,6 +433,10 @@ const s = StyleSheet.create({
     gap: scaleSize(6),
     marginTop: scaleSize(8),
   },
+  menuBarDesktop: {
+    maxWidth: '100%',
+    flexWrap: 'nowrap',
+  },
   menuChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -313,11 +446,10 @@ const s = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: scaleSize(4),
     paddingVertical: scaleSize(7),
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 3,
-    elevation: 3,
+  },
+  menuChipDesktop: {
+    flex: 1,
+    paddingVertical: scaleSize(10),
   },
   menuChipText: {
     fontSize: scaleFont(12),
@@ -334,6 +466,28 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
     padding: scaleSize(14),
+  },
+
+  // Desktop grid
+  desktopGrid: {
+    flexDirection: 'row',
+    gap: scaleSize(12),
+    width: '100%',
+  },
+  desktopGridCol: {
+    flex: 1,
+  },
+  desktopStatsGrid: {
+    gap: scaleSize(8),
+  },
+  desktopStatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scaleSize(10),
+    padding: scaleSize(12),
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: scaleSize(10),
+    borderLeftWidth: 3,
   },
 
   // Profile
@@ -420,11 +574,6 @@ const s = StyleSheet.create({
     borderRadius: scaleSize(16),
     paddingVertical: scaleSize(16),
     gap: scaleSize(8),
-    shadowColor: '#16a34a',
-    shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 12,
-    elevation: 6,
   },
   startButtonText: {
     color: '#fff',

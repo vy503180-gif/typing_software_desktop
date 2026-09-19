@@ -11,7 +11,7 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -133,7 +133,7 @@ export default function StatsScreen({ studentName, onBack }) {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
       <View style={styles.gradient}>
-        <ScrollView contentContainerStyle={styles.container}>
+          <ScrollView contentContainerStyle={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
@@ -261,6 +261,13 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
   container: { flexGrow: 1, padding: scaleFont(16), paddingBottom: 40 },
+  containerDesktop: {
+    padding: 24,
+    paddingBottom: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginBottom: scaleFont(14) },
   backBtn: {

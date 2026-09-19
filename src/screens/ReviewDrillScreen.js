@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
 
@@ -229,7 +229,7 @@ export default function ReviewDrillScreen({ onBack, keyOption = 'Difficult Keys'
       <View
         style={styles.gradient}
       >
-        <View style={styles.container}>
+        <View style={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
@@ -374,6 +374,12 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
   container: { flex: 1, padding: scaleSize(20) },
+  containerDesktop: {
+    padding: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: {
     flexDirection: 'row',
@@ -438,7 +444,7 @@ const styles = StyleSheet.create({
   },
   bigLetterCorrect: { fontFamily: 'Calibri', color: COLORS.teal,
   },
-  bigLetterWrong: { fontFamily: 'Calibri', color: COLORS.teal,
+  bigLetterWrong: { fontFamily: 'Calibri', color: COLORS.rose,
   },
 
   groupCells: {
@@ -492,7 +498,7 @@ const styles = StyleSheet.create({
   },
   groupCellTextTyped: { fontFamily: 'Calibri', color: COLORS.teal,
   },
-  groupCellTextWrong: { fontFamily: 'Calibri', color: COLORS.teal,
+  groupCellTextWrong: { fontFamily: 'Calibri', color: COLORS.rose,
   },
   letterHint: {
     color: 'rgba(255,255,255,0.7)',

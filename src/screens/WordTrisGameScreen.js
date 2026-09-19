@@ -12,7 +12,7 @@ import {
   Easing,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP } from '../theme';
 
 const MAX_MISSES = 8;
 // Sabse lambe word ki width bhi andar rahe is liye approx width
@@ -716,7 +716,7 @@ const styles = StyleSheet.create({
   },
   typedCharDone: { fontFamily: 'Calibri', color: COLORS.teal,
   },
-  typedCharWrong: { fontFamily: 'Calibri', color: COLORS.teal,
+  typedCharWrong: { fontFamily: 'Calibri', color: COLORS.rose,
   },
   typedHint: {
     color: 'rgba(255,255,255,0.6)',

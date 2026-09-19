@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
 
@@ -21,7 +21,7 @@ export default function ResultScreen({ course, onBack }) {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
       <View style={styles.gradient}>
-        <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={[styles.container, IS_DESKTOP && styles.containerDesktop]} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
@@ -93,6 +93,12 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
   container: { flexGrow: 1, padding: scaleSize(16) },
+  containerDesktop: {
+    padding: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginBottom: scaleSize(16) },
   backBtn: {

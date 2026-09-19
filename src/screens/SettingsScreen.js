@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const APP_VERSION = '1.0.0';
 
@@ -29,10 +29,17 @@ const DURATIONS = [
   { label: '10 min', value: 600 },
 ];
 
+const HINDI_LAYOUTS = [
+  { label: 'Mangal', value: 'mangal' },
+  { label: 'Kruti Dev', value: 'krutidev' },
+];
+
 export default function SettingsScreen({
   studentName,
   practiceTimeSec = 300,
   onChangePracticeTime,
+  hindiLayout = 'mangal',
+  onChangeHindiLayout,
   onSwitchUser,
   onBack,
   onResetAll,
@@ -196,6 +203,40 @@ export default function SettingsScreen({
             </View>
           </View>
 
+          {/* Hindi Typing */}
+          <Text style={styles.sectionTitle}>Hindi Typing</Text>
+          <View style={styles.card}>
+            <View style={styles.rowBetween}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.dataTitle}>Typing layout</Text>
+                <Text style={styles.dataSub}>Hindi lessons kaunse keyboard layout se type karein</Text>
+              </View>
+              <Ionicons name="keypad-outline" size={18} color={COLORS.teal} />
+            </View>
+            <View style={styles.segment}>
+              {HINDI_LAYOUTS.map((d) => {
+                const sel = hindiLayout === d.value;
+                return (
+                  <TouchableOpacity
+                    key={d.value}
+                    style={[styles.segmentItem, sel && { backgroundColor: COLORS.teal + '22', borderColor: COLORS.teal }]}
+                    onPress={() => onChangeHindiLayout && onChangeHindiLayout(d.value)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.segmentText, sel && { color: COLORS.teal }]}>
+                      {d.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            <Text style={styles.layoutHint}>
+              {hindiLayout === 'krutidev'
+                ? 'Kruti Dev keyboard se type karo, app use Unicode Devanagari me badal dega (display Mangal me).'
+                : 'Normal Unicode (Mangal) keyboard se type karo - jaise phone/computer ka Hindi keyboard.'}
+            </Text>
+          </View>
+
           {/* Data & Storage */}
           <Text style={styles.sectionTitle}>Data & Storage</Text>
           <View style={styles.card}>
@@ -252,7 +293,12 @@ export default function SettingsScreen({
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
-  scroll: { padding: scaleSize(16), width: '100%', maxWidth: scaleSize(640), alignSelf: 'center' },
+  scroll: {
+    padding: scaleSize(16),
+    width: '100%',
+    maxWidth: IS_DESKTOP ? CONTENT_MAX_WIDTH : scaleSize(640),
+    alignSelf: 'center'
+  },
 
   headerRow: {
     flexDirection: 'row',
@@ -372,6 +418,7 @@ const styles = StyleSheet.create({
   dataInfo: { flex: 1 },
   dataTitle: { color: COLORS.textWhite, fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700' },
   dataSub: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
+  layoutHint: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(10), lineHeight: scaleFont(16) },
 
   confirmRow: {
     flexDirection: 'row',

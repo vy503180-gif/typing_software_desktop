@@ -7,20 +7,13 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
   Keyboard,
 } from 'react-native';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { BackHandler } from 'react-native';
-
-const MAX_W = Math.min(SCREEN.width - 48, 440);
-
-const BRAND_COLORS = [COLORS.green, COLORS.amber, COLORS.rose, COLORS.teal];
-
-const AVATAR_COLORS = ['#16a34a', '#d97706', '#e11d48', '#0d9488'];
 
 export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
   const [name, setName] = useState('');
@@ -42,63 +35,167 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
 
   const initial = (user) => (user && user.trim() ? user.trim()[0].toUpperCase() : '?');
 
+  // Mobile layout (original feel)
+  if (!IS_DESKTOP) {
+    return (
+      <SafeAreaView style={s.safe}>
+        <StatusBar barStyle="light-content" />
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={s.mobileRoot}>
+            <View style={s.mobileLeft}>
+              <View style={s.mobileLogoCircle}>
+                <Text style={s.mobileLogoLetter}>T</Text>
+              </View>
+              <Text style={s.mobileAppName}>Antriksh{'\n'}Typing Master</Text>
+              <Text style={s.mobileTagline}>Hindi Typing Sikhein</Text>
+              <View style={s.mobileFeatures}>
+                <View style={s.mobileFeatureRow}>
+                  <Ionicons name="checkmark-circle" size={16} color={COLORS.teal} />
+                  <Text style={s.mobileFeatureText}>Krutidev / Unicode support</Text>
+                </View>
+                <View style={s.mobileFeatureRow}>
+                  <Ionicons name="checkmark-circle" size={16} color={COLORS.teal} />
+                  <Text style={s.mobileFeatureText}>Real-time feedback</Text>
+                </View>
+                <View style={s.mobileFeatureRow}>
+                  <Ionicons name="checkmark-circle" size={16} color={COLORS.teal} />
+                  <Text style={s.mobileFeatureText}>Progress tracking</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={s.mobileFormCard}>
+              <Text style={s.mobileFormTitle}>Get Started</Text>
+              <Text style={s.mobileFormSubtitle}>Enter your name to begin</Text>
+
+              <TextInput
+                style={s.mobileInput}
+                placeholder="Your name"
+                placeholderTextColor="#555"
+                value={name}
+                onChangeText={setName}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                autoCapitalize="words"
+                autoCorrect={false}
+                returnKeyType="done"
+                onSubmitEditing={handleSubmit}
+                maxLength={40}
+              />
+
+              <TouchableOpacity
+                style={[s.mobileBtn, canSubmit && s.mobileBtnActive]}
+                onPress={handleSubmit}
+                disabled={!canSubmit}
+                activeOpacity={0.8}
+              >
+                <Text style={[s.mobileBtnText, canSubmit && s.mobileBtnTextActive]}>
+                  {canSubmit ? 'Start Typing' : 'Enter your name first'}
+                </Text>
+                {canSubmit && <Ionicons name="arrow-forward" size={16} color="#fff" />}
+              </TouchableOpacity>
+
+              {users.length > 0 && (
+                <View style={s.mobileUsersSection}>
+                  <Text style={s.mobileUsersTitle}>OR CONTINUE AS</Text>
+                  <View style={s.mobileUsersList}>
+                    {users.slice(0, 3).map((user, idx) => (
+                      <TouchableOpacity
+                        key={user}
+                        style={s.mobileUserChip}
+                        onPress={() => setName(user)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={[s.mobileUserAvatar, { backgroundColor: ['#16a34a', '#d97706', '#e11d48'][idx % 3] }]}>
+                          <Text style={s.mobileUserAvatarText}>{initial(user)}</Text>
+                        </View>
+                        <Text style={s.mobileUserName} numberOfLines={1}>{user}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              <TouchableOpacity onPress={handleCancel} activeOpacity={0.7} style={s.mobileSkipBtn}>
+                <Text style={s.mobileSkipText}>Skip for now</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    );
+  }
+
+  // Desktop layout - Clean split
   return (
     <SafeAreaView style={s.safe}>
       <StatusBar barStyle="light-content" />
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <ScrollView
-          contentContainerStyle={s.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          keyboardDismissMode="on-drag"
+      <View style={s.desktopRoot}>
+        {/* Left - Branding */}
+        <View style={s.desktopLeft}>
+          <View style={s.desktopLeftContent}>
+            <View style={s.desktopLogoWrap}>
+              <View style={s.desktopLogoCircle}>
+                <Text style={s.desktopLogoLetter}>T</Text>
+              </View>
+            </View>
+
+            <Text style={s.desktopAppName}>Antriksh{'\n'}Typing Master</Text>
+            <Text style={s.desktopVersion}>v1.0</Text>
+
+            <View style={s.desktopDivider} />
+
+            <Text style={s.desktopTagline}>Professional Hindi Typing Software</Text>
+
+            <View style={s.desktopFeatures}>
+              <View style={s.desktopFeatureRow}>
+                <View style={s.desktopFeatureDot} />
+                <Text style={s.desktopFeatureText}>Krutidev & Unicode Layouts</Text>
+              </View>
+              <View style={s.desktopFeatureRow}>
+                <View style={s.desktopFeatureDot} />
+                <Text style={s.desktopFeatureText}>Real-time Accuracy Feedback</Text>
+              </View>
+              <View style={s.desktopFeatureRow}>
+                <View style={s.desktopFeatureDot} />
+                <Text style={s.desktopFeatureText}>WPM & Progress Tracking</Text>
+              </View>
+              <View style={s.desktopFeatureRow}>
+                <View style={s.desktopFeatureDot} />
+                <Text style={s.desktopFeatureText}>50+ Practice Lessons</Text>
+              </View>
+            </View>
+          </View>
+
+          <Text style={s.desktopCopyright}>2024 Antriksh. All rights reserved.</Text>
+        </View>
+
+        {/* Right - Form */}
+        <KeyboardAvoidingView
+          style={s.desktopRight}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-          <View style={s.container}>
-            {/* Decorative glow blobs */}
-            <View pointerEvents="none" style={[s.glow, s.glowGreen]} />
-            <View pointerEvents="none" style={[s.glow, s.glowRose]} />
-
-            {/* Logo */}
-            <View style={s.logoWrap}>
-              <View style={[s.logoRing, { borderColor: COLORS.teal + 'aa' }]}>
-                <View style={s.logo}>
-                  <Text style={s.logoLetter}>T</Text>
-                </View>
-              </View>
+          <View style={s.desktopFormArea}>
+            <View style={s.desktopFormHeader}>
+              <Text style={s.desktopFormTitle}>Welcome</Text>
+              <Text style={s.desktopFormSubtitle}>Enter your name to get started</Text>
             </View>
 
-            {/* Title */}
-            <Text style={s.title}>Typing Master</Text>
-            <Text style={s.tagline}>Fast fingers, sharp mind</Text>
-
-            {/* 4-color brand bar */}
-            <View style={s.brandBar}>
-              {BRAND_COLORS.map((c, i) => (
-                <View key={i} style={[s.brandSeg, { backgroundColor: c }]} />
-              ))}
-            </View>
-
-            {/* Card */}
-            <View style={s.card}>
-              <View style={s.strip}>
-                {BRAND_COLORS.map((c, i) => (
-                  <View key={i} style={[s.stripSeg, { backgroundColor: c }]} />
-                ))}
-              </View>
-
-              <Text style={s.heading}>What's your name?</Text>
-
-              {/* Input */}
-              <View style={[s.inputRow, (focused || canSubmit) && s.inputRowActive]}>
-                <View style={s.inputIcon}>
-                  <Ionicons name="person" size={18} color={focused || canSubmit ? '#16a34a' : '#8a8a8a'} />
-                </View>
+            <View style={s.desktopInputGroup}>
+              <Text style={s.desktopInputLabel}>YOUR NAME</Text>
+              <View style={[s.desktopInputWrap, (focused || name.length > 0) && s.desktopInputWrapActive]}>
+                <Ionicons
+                  name="person-outline"
+                  size={18}
+                  color={focused ? COLORS.teal : '#555'}
+                />
                 <TextInput
-                  style={s.input}
-                  placeholder="Type your name"
-                  placeholderTextColor="#666"
+                  style={s.desktopInput}
+                  placeholder="Type your name here"
+                  placeholderTextColor="#444"
                   value={name}
                   onChangeText={setName}
                   onFocus={() => setFocused(true)}
@@ -108,319 +205,490 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
                   returnKeyType="done"
                   onSubmitEditing={handleSubmit}
                   maxLength={40}
+                  autoFocus
                 />
                 {name.length > 0 && (
                   <TouchableOpacity onPress={() => setName('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                    <Ionicons name="close-circle" size={20} color="#777" />
+                    <Ionicons name="close-circle" size={18} color="#555" />
                   </TouchableOpacity>
                 )}
               </View>
-
-              {/* Button */}
-              <TouchableOpacity
-                style={[s.btn, canSubmit && s.btnActive]}
-                onPress={handleSubmit}
-                disabled={!canSubmit}
-                activeOpacity={0.85}
-              >
-                {canSubmit ? (
-                  <Ionicons name="play" size={18} color="#fff" />
-                ) : (
-                  <Ionicons name="lock-closed" size={16} color="#888" />
-                )}
-                <Text style={[s.btnText, canSubmit && s.btnTextActive]}>Start Typing</Text>
-                {canSubmit ? (
-                  <Ionicons name="arrow-forward" size={18} color="#fff" />
-                ) : (
-                  <View style={s.btnIconPlaceholder} />
-                )}
-              </TouchableOpacity>
-
-              {/* Previous users */}
-              {users.length > 0 && (
-                <View style={s.usersSection}>
-                  <Text style={s.usersTitle}>Continue as</Text>
-                  <View style={s.chipWrap}>
-                    {users.map((user, idx) => {
-                      const match = name.trim().length > 0 && user.toLowerCase().includes(name.trim().toLowerCase());
-                      if (name.trim().length > 0 && !match) return null;
-                      const avColor = AVATAR_COLORS[idx % AVATAR_COLORS.length];
-                      return (
-                        <TouchableOpacity
-                          key={user}
-                          style={[s.userChip, match && s.userChipActive]}
-                          onPress={() => setName(user)}
-                          activeOpacity={0.7}
-                        >
-                          <View style={[s.miniAvatar, { backgroundColor: avColor }]}>
-                            <Text style={s.miniAvatarText}>{initial(user)}</Text>
-                          </View>
-                          <Text style={[s.userChipName, match && { color: COLORS.green }]} numberOfLines={1}>{user}</Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                </View>
-              )}
             </View>
 
-            {/* Skip */}
-            <TouchableOpacity onPress={handleCancel} activeOpacity={0.7} style={s.skipBtn}>
-              <Text style={s.skipText}>Skip for now</Text>
+            <TouchableOpacity
+              style={[s.desktopBtn, canSubmit && s.desktopBtnActive]}
+              onPress={handleSubmit}
+              disabled={!canSubmit}
+              activeOpacity={0.85}
+            >
+              <Text style={[s.desktopBtnText, canSubmit && s.desktopBtnTextActive]}>
+                Start Typing
+              </Text>
+              <Ionicons
+                name={canSubmit ? 'arrow-forward' : 'lock-closed'}
+                size={16}
+                color={canSubmit ? '#fff' : '#555'}
+              />
+            </TouchableOpacity>
+
+            {users.length > 0 && (
+              <View style={s.desktopUsersSection}>
+                <View style={s.desktopUsersDivider}>
+                  <View style={s.desktopUsersDividerLine} />
+                  <Text style={s.desktopUsersDividerText}>OR</Text>
+                  <View style={s.desktopUsersDividerLine} />
+                </View>
+
+                <View style={s.desktopUsersList}>
+                  {users.slice(0, 4).map((user, idx) => (
+                    <TouchableOpacity
+                      key={user}
+                      style={s.desktopUserChip}
+                      onPress={() => setName(user)}
+                      activeOpacity={0.7}
+                    >
+                      <View style={[s.desktopUserAvatar, { backgroundColor: ['#16a34a', '#d97706', '#e11d48', '#0d9488'][idx % 4] }]}>
+                        <Text style={s.desktopUserAvatarText}>{initial(user)}</Text>
+                      </View>
+                      <Text style={s.desktopUserName} numberOfLines={1}>{user}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            <TouchableOpacity onPress={handleCancel} activeOpacity={0.7} style={s.desktopSkipBtn}>
+              <Text style={s.desktopSkipText}>Skip for now</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: BG },
-  scroll: { flexGrow: 1, justifyContent: 'center' },
-  container: {
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 40,
-    width: '100%',
-    maxWidth: MAX_W,
-    alignSelf: 'center',
-  },
+  safe: { flex: 1, backgroundColor: '#0a0a0a' },
 
-  // Decorative glows
-  glow: {
-    position: 'absolute',
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    opacity: 0.16,
-  },
-  glowGreen: {
-    backgroundColor: COLORS.green,
-    top: -80,
-    right: -60,
-  },
-  glowRose: {
-    backgroundColor: COLORS.rose,
-    bottom: 40,
-    left: -90,
-  },
-
-  // Logo
-  logoWrap: {
-    alignItems: 'center',
+  // ---- MOBILE ----
+  mobileRoot: {
+    flex: 1,
     justifyContent: 'center',
-  },
-  logoRing: {
-    width: 108,
-    height: 108,
-    borderRadius: 54,
-    borderWidth: 3,
     alignItems: 'center',
-    justifyContent: 'center',
+    padding: 24,
   },
-  logo: {
-    width: 82,
-    height: 82,
-    borderRadius: 26,
+  mobileLeft: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  mobileLogoCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 16,
     backgroundColor: COLORS.teal,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: COLORS.teal,
-    shadowOpacity: 0.55,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 16,
-    elevation: 10,
+    marginBottom: 16,
   },
-  logoLetter: {
-    fontFamily: 'Calibri', fontWeight: '700',
-    color: '#ffffff',
-    fontSize: scaleFont(44),
+  mobileLogoLetter: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#fff',
+    fontSize: 32,
   },
-
-  // Title
-  title: {
-    fontFamily: 'Calibri', fontWeight: '700',
+  mobileAppName: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
     color: COLORS.textWhite,
-    fontSize: scaleFont(34),
-    letterSpacing: 1,
+    fontSize: 22,
     textAlign: 'center',
-    marginTop: scaleSize(26),
+    lineHeight: 28,
   },
-  tagline: {
-    fontFamily: 'Calibri', fontWeight: '700',
-    color: COLORS.amber,
-    fontSize: scaleFont(13),
-    marginTop: scaleSize(8),
+  mobileTagline: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: COLORS.teal,
+    fontSize: 13,
+    marginTop: 6,
   },
-
-  // Brand bar
-  brandBar: {
+  mobileFeatures: {
+    marginTop: 16,
+    gap: 6,
+  },
+  mobileFeatureRow: {
     flexDirection: 'row',
-    gap: scaleSize(8),
     alignItems: 'center',
-    marginTop: scaleSize(16),
+    gap: 8,
   },
-  brandSeg: {
-    width: scaleSize(22),
-    height: scaleSize(4),
-    borderRadius: 2,
+  mobileFeatureText: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#888',
+    fontSize: 12,
   },
-
-  // Card
-  card: {
+  mobileFormCard: {
     width: '100%',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 18,
+    maxWidth: 380,
+    backgroundColor: '#141414',
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.09)',
-    padding: scaleSize(22),
-    marginTop: scaleSize(30),
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.4,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 18,
-    elevation: 8,
+    borderColor: '#222',
+    padding: 24,
   },
-  strip: {
-    flexDirection: 'row',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-  },
-  stripSeg: {
-    flex: 1,
-    height: 4,
-  },
-  heading: {
-    fontFamily: 'Calibri', fontWeight: '700',
+  mobileFormTitle: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
     color: COLORS.textWhite,
-    fontSize: scaleFont(17),
-    textAlign: 'center',
-    marginBottom: scaleSize(20),
+    fontSize: 20,
   },
-
-  // Input
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#111111',
-    borderRadius: 14,
-    borderWidth: 2,
-    borderColor: '#2a2a2a',
-    paddingHorizontal: scaleSize(12),
+  mobileFormSubtitle: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#666',
+    fontSize: 13,
+    marginTop: 4,
+    marginBottom: 20,
   },
-  inputRowActive: {
-    borderColor: COLORS.teal,
-  },
-  inputIcon: {
-    width: scaleSize(34),
-    height: scaleSize(34),
+  mobileInput: {
+    backgroundColor: '#0e0e0e',
     borderRadius: 10,
-    backgroundColor: '#222',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  input: {
-    flex: 1,
-    fontFamily: 'Calibri', fontWeight: '700',
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    fontFamily: 'Calibri',
+    fontWeight: '600',
     color: COLORS.textWhite,
-    fontSize: scaleFont(16),
-    paddingVertical: scaleSize(14),
-    marginLeft: scaleSize(10),
-    outlineWidth: 0,
-    outlineStyle: 'none',
+    fontSize: 15,
   },
-
-  // Button
-  btn: {
+  mobileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#222',
-    borderRadius: 14,
-    paddingVertical: scaleSize(15),
-    marginTop: scaleSize(16),
+    backgroundColor: '#1e1e1e',
+    borderRadius: 10,
+    paddingVertical: 14,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
   },
-  btnActive: {
-    backgroundColor: '#16a34a',
-    shadowColor: '#16a34a',
-    shadowOpacity: 0.5,
-    shadowOffset: { width: 0, height: 5 },
-    shadowRadius: 12,
-    elevation: 8,
+  mobileBtnActive: {
+    backgroundColor: COLORS.teal,
+    borderColor: COLORS.teal,
   },
-  btnText: {
-    fontFamily: 'Calibri', fontWeight: '700',
-    color: '#8a8a8a',
-    fontSize: scaleFont(16),
+  mobileBtnText: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#555',
+    fontSize: 15,
   },
-  btnTextActive: {
-    color: '#ffffff',
+  mobileBtnTextActive: {
+    color: '#fff',
   },
-  btnIconPlaceholder: {
-    width: 16,
-    height: 16,
+  mobileUsersSection: {
+    marginTop: 20,
   },
-
-  // Users
-  usersSection: { marginTop: scaleSize(20) },
-  usersTitle: {
-    fontFamily: 'Calibri', fontWeight: '700',
-    color: COLORS.textMuted,
-    fontSize: scaleFont(12),
-    marginBottom: scaleSize(10),
-    textTransform: 'uppercase',
-    letterSpacing: 2,
+  mobileUsersTitle: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#444',
+    fontSize: 10,
+    letterSpacing: 1.5,
+    marginBottom: 10,
   },
-  chipWrap: {
+  mobileUsersList: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: scaleSize(8),
+    gap: 8,
   },
-  userChip: {
+  mobileUserChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: scaleSize(7),
-    paddingVertical: scaleSize(5),
-    paddingHorizontal: scaleSize(10),
-    borderRadius: scaleSize(18),
-    backgroundColor: '#111111',
+    gap: 6,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderWidth: 1,
-    borderColor: '#242424',
-    maxWidth: '100%',
+    borderColor: '#252525',
   },
-  userChipActive: {
-    borderColor: '#16a34a66',
-    backgroundColor: 'rgba(22,163,74,0.08)',
-  },
-  miniAvatar: {
-    width: scaleSize(24),
-    height: scaleSize(24),
-    borderRadius: scaleSize(12),
+  mobileUserAvatar: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  miniAvatarText: {
-    fontFamily: 'Calibri', fontWeight: '700',
+  mobileUserAvatarText: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
     color: '#fff',
-    fontSize: scaleFont(12),
+    fontSize: 11,
   },
-  userChipName: {
-    fontFamily: 'Calibri', fontWeight: '700',
-    color: COLORS.textWhite,
-    fontSize: scaleFont(13),
-    flexShrink: 1,
+  mobileUserName: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#999',
+    fontSize: 12,
+    maxWidth: 80,
+  },
+  mobileSkipBtn: {
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  mobileSkipText: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#444',
+    fontSize: 13,
   },
 
-  // Skip
-  skipBtn: { marginTop: scaleSize(22) },
-  skipText: {
-    fontFamily: 'Calibri', fontWeight: '700',
-    color: COLORS.textDim,
-    fontSize: scaleFont(14),
+  // ---- DESKTOP ----
+  desktopRoot: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#0a0a0a',
+  },
+  desktopLeft: {
+    flex: 1,
+    backgroundColor: '#0e0e0e',
+    borderRightWidth: 1,
+    borderRightColor: '#1a1a1a',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 48,
+  },
+  desktopLeftContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    maxWidth: 360,
+  },
+  desktopLogoWrap: {
+    marginBottom: 32,
+  },
+  desktopLogoCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 18,
+    backgroundColor: COLORS.teal,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  desktopLogoLetter: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#fff',
+    fontSize: 36,
+  },
+  desktopAppName: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: COLORS.textWhite,
+    fontSize: 26,
+    textAlign: 'center',
+    lineHeight: 34,
+  },
+  desktopVersion: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#333',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  desktopDivider: {
+    width: 40,
+    height: 2,
+    backgroundColor: COLORS.teal,
+    marginVertical: 24,
+    borderRadius: 1,
+  },
+  desktopTagline: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#666',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  desktopFeatures: {
+    marginTop: 32,
+    gap: 12,
+  },
+  desktopFeatureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  desktopFeatureDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.teal,
+  },
+  desktopFeatureText: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#555',
+    fontSize: 13,
+  },
+  desktopCopyright: {
+    fontFamily: 'Calibri',
+    fontWeight: '500',
+    color: '#2a2a2a',
+    fontSize: 11,
+  },
+
+  desktopRight: {
+    width: 440,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 48,
+  },
+  desktopFormArea: {
+    width: '100%',
+    maxWidth: 340,
+  },
+  desktopFormHeader: {
+    marginBottom: 36,
+  },
+  desktopFormTitle: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: COLORS.textWhite,
+    fontSize: 28,
+  },
+  desktopFormSubtitle: {
+    fontFamily: 'Calibri',
+    fontWeight: '500',
+    color: '#555',
+    fontSize: 14,
+    marginTop: 6,
+  },
+
+  desktopInputGroup: {
+    marginBottom: 20,
+  },
+  desktopInputLabel: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#444',
+    fontSize: 11,
+    letterSpacing: 1.2,
+    marginBottom: 8,
+  },
+  desktopInputWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#111',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#252525',
+    paddingHorizontal: 14,
+    gap: 10,
+  },
+  desktopInputWrapActive: {
+    borderColor: COLORS.teal,
+  },
+  desktopInput: {
+    flex: 1,
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: COLORS.textWhite,
+    fontSize: 15,
+    paddingVertical: 14,
+  },
+
+  desktopBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 10,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+  },
+  desktopBtnActive: {
+    backgroundColor: COLORS.teal,
+    borderColor: COLORS.teal,
+  },
+  desktopBtnText: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#444',
+    fontSize: 15,
+  },
+  desktopBtnTextActive: {
+    color: '#fff',
+  },
+
+  desktopUsersSection: {
+    marginTop: 32,
+  },
+  desktopUsersDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  desktopUsersDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#1e1e1e',
+  },
+  desktopUsersDividerText: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#333',
+    fontSize: 10,
+    letterSpacing: 1.5,
+  },
+  desktopUsersList: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  desktopUserChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#111',
+    borderRadius: 20,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#1e1e1e',
+  },
+  desktopUserAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  desktopUserAvatarText: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: '#fff',
+    fontSize: 11,
+  },
+  desktopUserName: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#777',
+    fontSize: 13,
+    maxWidth: 100,
+  },
+
+  desktopSkipBtn: {
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  desktopSkipText: {
+    fontFamily: 'Calibri',
+    fontWeight: '600',
+    color: '#333',
+    fontSize: 13,
   },
 });

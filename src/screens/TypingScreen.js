@@ -15,10 +15,11 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
 import { LESSON_TEXTS, LESSON_DIFFICULTY } from '../data/lessons';
+import { krutiToUnicode } from '../utils/krutiToUnicode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -40,12 +41,15 @@ const shuffleText = (text) => {
   return words.join(' ');
 };
 
-export default function TypingScreen({ lesson = null, onComplete = null, studentName = null, onBack = null }) {
+export default function TypingScreen({ lesson = null, onComplete = null, studentName = null, onBack = null, hindiLayout = 'mangal' }) {
   const lessonText = lesson?.practiceText || (lesson ? LESSON_TEXTS[lesson.lang]?.[lesson.id] || null : null);
+
+  const isKrutiLayout = lesson?.lang === 'hindi' && hindiLayout === 'krutidev';
 
   const [currentText, setCurrentText] = useState(
     lessonText || SAMPLE_TEXTS[Math.floor(Math.random() * SAMPLE_TEXTS.length)]
   );
+  const [rawInput, setRawInput] = useState('');
   const [userInput, setUserInput] = useState('');
   const [isStarted, setIsStarted] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -54,6 +58,7 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
   const [seconds, setSeconds] = useState(0);
   const [countdown, setCountdown] = useState(lesson?.timeSec || 0);
   const [result, setResult] = useState({ wpm: 0, accuracy: 0 });
+  const [containerWidth, setContainerWidth] = useState(SCREEN_W);
 
   const timeLimit = lesson?.timeSec || 0;
 
@@ -102,17 +107,18 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
 
   useEffect(() => {
     if (!isStarted || isPaused || isFinished || !scrollRef.current) return;
-    const charsPerRow = Math.max(1, Math.floor((SCREEN_W - 72) / scaleFont(18)));
+    const charsPerRow = Math.max(1, Math.floor((containerWidth - 72) / scaleFont(18)));
     const row = Math.floor(userInput.length / charsPerRow);
     if (row > lastScrollRow.current && userInput.length > 0) {
       lastScrollRow.current = row;
       scrollRef.current.scrollTo({ y: row * scaleFont(32), animated: true });
     }
-  }, [userInput, isStarted, isPaused, isFinished]);
+  }, [userInput, isStarted, isPaused, isFinished, containerWidth]);
 
   const startNewTest = () => {
     if (lessonText) setCurrentText(shuffleText(lessonText));
     else setCurrentText(SAMPLE_TEXTS[Math.floor(Math.random() * SAMPLE_TEXTS.length)]);
+    setRawInput('');
     setUserInput('');
     lastScrollRow.current = 0;
     if (scrollRef.current) scrollRef.current.scrollTo({ y: 0, animated: false });
@@ -134,7 +140,7 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
     const wpm = seconds > 0 ? Math.round((words / seconds) * 60) : 0;
     let correctChars = 0;
     for (let i = 0; i < currentText.length; i++) {
-      if (userInput[i] === currentText[i]) correctChars++;
+      if (isCharCorrect(userInput[i], currentText[i])) correctChars++;
     }
     const accuracy = Math.round((correctChars / currentText.length) * 100);
     const mistakes = currentText.length - correctChars;
@@ -166,13 +172,26 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
       .catch(() => {});
   };
 
+  // KrutiDev me partial sequences halant dete hain (ख् vs ख)
+  // Returns: 'correct' | 'partial' | 'wrong' | null (not typed)
+  const getCharStatus = (typed, target) => {
+    if (typed === undefined || typed === null) return null;
+    if (!isKrutiLayout) return typed === target ? 'correct' : 'wrong';
+    if (typed === target) return 'correct';
+    if (typed.endsWith('\u094d') && typed.slice(0, -1) === target) return 'partial';
+    return 'wrong';
+  };
+
+  const isCharCorrect = (typed, target) => getCharStatus(typed, target) === 'correct';
+  const isCharPartial = (typed, target) => getCharStatus(typed, target) === 'partial';
+
   const stats = (() => {
     const elapsed = seconds > 0 ? seconds : 1;
     const wordsTyped = userInput.trim().split(/\s+/).filter((w) => w !== '').length;
     const wpm = isStarted ? Math.round((wordsTyped / elapsed) * 60) : 0;
     let correct = 0;
     for (let i = 0; i < userInput.length; i++) {
-      if (userInput[i] === currentText[i]) correct++;
+      if (isCharCorrect(userInput[i], currentText[i])) correct++;
     }
     const accuracy = userInput.length > 0 ? Math.round((correct / userInput.length) * 100) : 100;
     const mistakes = userInput.length - correct;
@@ -195,16 +214,21 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
     if (inputRef.current) inputRef.current.focus();
   };
 
+  const handleInputChange = (text) => {
+    setRawInput(text);
+    setUserInput(isKrutiLayout ? krutiToUnicode(text) : text);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
       <View style={styles.gradient}>
-        <ScrollView ref={scrollRef} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <ScrollView ref={scrollRef} contentContainerStyle={[styles.container, IS_DESKTOP && styles.containerDesktop]} keyboardShouldPersistTaps="handled" onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}>
           {/* Header */}
           <View style={styles.header}>
             {onBack ? (
               <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+                <Ionicons name={IS_DESKTOP ? 'close' : 'arrow-back'} size={20} color={COLORS.textWhite} />
               </TouchableOpacity>
             ) : null}
             <View style={styles.headerTextWrap}>
@@ -222,7 +246,16 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
             <View style={[styles.lessonTag, { backgroundColor: COLORS.teal + '15', borderColor: COLORS.teal + '40' }]}>
               <Ionicons name="school" size={12} color={COLORS.teal} />
               <Text style={[styles.lessonTagText, { color: COLORS.teal }]}>
-                {lesson.title} - {LESSON_DIFFICULTY[lesson.id]}
+                {lesson.title}{LESSON_DIFFICULTY[lesson.id] ? ` - ${LESSON_DIFFICULTY[lesson.id]}` : ''}
+              </Text>
+            </View>
+          )}
+
+          {isKrutiLayout && (
+            <View style={[styles.layoutTag, { backgroundColor: COLORS.amber + '15', borderColor: COLORS.amber + '40' }]}>
+              <Ionicons name="keypad" size={12} color={COLORS.amber} />
+              <Text style={[styles.layoutTagText, { color: COLORS.amber }]}>
+                Kruti Dev 010 layout
               </Text>
             </View>
           )}
@@ -297,15 +330,15 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
           <Text style={styles.progressText}>{userInput.length}/{currentText.length} characters</Text>
 
           {/* Target text */}
-          <TouchableOpacity style={styles.textBox} onPress={handleCharPress} activeOpacity={1}>
+          <TouchableOpacity style={[styles.textBox, IS_DESKTOP && styles.textBoxDesktop]} onPress={handleCharPress} activeOpacity={1}>
             <View style={styles.charRow}>
               {currentText.split('').map((char, i) => {
                 const typed = userInput[i];
+                const status = getCharStatus(typed, char);
                 let color = COLORS.textMuted;
-                const isFixated = i < userInput.length;
-                if (isFixated) {
-                  color = typed === char ? COLORS.green : COLORS.rose;
-                }
+                if (status === 'correct') color = COLORS.green;
+                else if (status === 'partial') color = COLORS.amber;
+                else if (status === 'wrong') color = COLORS.rose;
                 const isCursorHere = i === userInput.length && !isFinished;
                 return (
                   <View key={i} style={styles.charWrap}>
@@ -323,8 +356,8 @@ export default function TypingScreen({ lesson = null, onComplete = null, student
           <TextInput
             ref={inputRef}
             style={styles.hiddenInput}
-            value={userInput}
-            onChangeText={setUserInput}
+            value={rawInput}
+            onChangeText={handleInputChange}
             autoCapitalize="none"
             autoCorrect={false}
             autoFocus
@@ -360,6 +393,13 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
   container: { flexGrow: 1, padding: scaleSize(16), paddingBottom: scaleSize(40), justifyContent: 'center' },
+  containerDesktop: {
+    padding: 24,
+    paddingBottom: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(10) },
   backBtn: {
@@ -390,6 +430,19 @@ const styles = StyleSheet.create({
     marginBottom: scaleSize(12),
   },
   lessonTagText: { fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700'},
+
+  layoutTag: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: scaleSize(6),
+    borderWidth: 1,
+    borderRadius: scaleSize(20),
+    paddingHorizontal: scaleSize(12),
+    paddingVertical: scaleSize(5),
+    marginBottom: scaleSize(12),
+  },
+  layoutTagText: { fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700' },
 
   instruction: { fontFamily: 'Calibri', color: COLORS.textMuted, textAlign: 'center', marginTop: scaleSize(10), fontSize: scaleFont(12) },
   pausedText: { color: COLORS.amber, textAlign: 'center', marginTop: scaleSize(10), fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(13) },
@@ -447,6 +500,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: scaleSize(4) },
     shadowRadius: scaleSize(10),
     elevation: 4,
+  },
+  textBoxDesktop: {
+    padding: 20,
+    marginBottom: 16,
   },
   charRow: { flexDirection: 'row', flexWrap: 'wrap' },
   charWrap: { flexDirection: 'row', alignItems: 'center' },

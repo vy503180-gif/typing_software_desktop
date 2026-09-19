@@ -1,19 +1,21 @@
-# Antriksh Typing Master
+# typing_software_desktop
 
-A React Native (JavaScript) mobile typing practice app built with Expo.
+Professional Hindi Typing Software - Antriksh Typing Master
+
+React Native + Expo based typing practice software with desktop-optimized UI.
 
 ## Features
-- Typing test with a sample sentence
-- WPM (words per minute) calculation
-- Accuracy percentage tracking
-- Restart button
+- Krutidev & Unicode Hindi layout support
+- 30 English + 15 Hindi practice lessons
+- Real-time accuracy feedback
+- WPM & progress tracking
+- Games (Alphabet, Bubbles, Clouds, WordTris)
+- Word & Review drills
+- Multi-user support
+- Desktop sidebar navigation
 
-## How to run
-1. `npm install`
-2. `npx expo start`
-3. Scan the QR code with the Expo Go app on your phone.
-
-## Project Structure
-- `App.js` - Main app component
-- `src/components/` - Reusable UI components
-- `src/screens/` - App screens"# typing_app" 
+## Run
+```bash
+npm install
+npx expo start --web
+```

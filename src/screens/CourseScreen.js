@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
 
@@ -89,7 +89,7 @@ const COURSES = [
 
 export { COURSES };
 
-export default function CourseScreen({ onBack, onStartCourse, onStartLesson, completedSubLessons = [], onViewResult }) {
+export default function CourseScreen({ onBack, onStartLesson, completedSubLessons = [], onViewResult }) {
   const [selectedCourse, setSelectedCourse] = useState(COURSES[0]);
 
   const isLessonComplete = (lesson) => lesson.subLessons.every((s) => completedSubLessons.includes(s.id));
@@ -105,7 +105,7 @@ export default function CourseScreen({ onBack, onStartCourse, onStartLesson, com
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
       <View style={styles.gradient}>
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
@@ -183,6 +183,13 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
   container: { flexGrow: 1, padding: scaleSize(16), paddingBottom: scaleSize(20) },
+  containerDesktop: {
+    padding: 24,
+    paddingBottom: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginBottom: scaleSize(12) },
   backBtn: {
@@ -213,6 +220,7 @@ const styles = StyleSheet.create({
   lessonsCard: {
     backgroundColor: COLORS.cardBgSolid, borderRadius: scaleSize(14),
     borderWidth: 1, borderColor: COLORS.cardBorder, padding: scaleSize(12),
+    marginTop: scaleSize(10),
   },
   sectionTitle: { fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },
   lessonItem: {

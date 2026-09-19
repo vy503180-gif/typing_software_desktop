@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
 import { Ionicons } from '@expo/vector-icons';
@@ -57,7 +57,7 @@ export default function HistoryScreen({ studentName, onBack }) {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.container}>
+      <View style={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
         {/* Header */}
         <View style={styles.header}>
           {onBack ? (
@@ -152,6 +152,12 @@ export default function HistoryScreen({ studentName, onBack }) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   container: { flex: 1, padding: scaleSize(16) },
+  containerDesktop: {
+    padding: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(14) },
   backBtn: {

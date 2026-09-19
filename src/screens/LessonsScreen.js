@@ -9,8 +9,9 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
+  Modal,
 } from 'react-native';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { LESSON_DIFFICULTY } from '../data/lessons';
 
@@ -48,15 +49,63 @@ const LESSONS = {
     { id: 30, title: 'Final Exam', desc: 'typing fast and...', time: '10 min', characters: 118 },
   ],
   hindi: [
-    { id: 1, title: 'क, ख, ग', desc: 'वर्णमाला अभ्यास', time: '2 min', characters: 12 },
-    { id: 2, title: 'स्वर', desc: 'अ आ इ ई', time: '3 min', characters: 13 },
-    { id: 3, title: 'शब्द अभ्यास', desc: 'नमस्ते, धन्यवाद', time: '5 min', characters: 16 },
-    { id: 4, title: 'पैराग्राफ', desc: 'लंबा पाठ अभ्यास', time: '10 min', characters: 48 },
-    { id: 5, title: 'परीक्षा', desc: 'समय परीक्षा', time: '15 min', characters: 68 },
+    { id: 1, title: 'क, ख, ग', desc: 'वर्णमाला अभ्यास', time: '2 min', characters: 48 },
+    { id: 2, title: 'स्वर', desc: 'अ आ इ ई', time: '2 min', characters: 28 },
+    { id: 3, title: 'शब्द अभ्यास', desc: 'नमस्ते, धन्यवाद', time: '3 min', characters: 48 },
+    { id: 4, title: 'वाक्य लेखन', desc: 'छोटे वाक्य टाइप करो', time: '5 min', characters: 90 },
+    { id: 5, title: 'पैराग्राफ', desc: 'लंबा पाठ अभ्यास', time: '5 min', characters: 100 },
+    { id: 6, title: 'च, छ, ज, झ, ञ', desc: 'दूसरा वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 7, title: 'ट, ठ, ड, ढ, ण', desc: 'तीसरा वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 8, title: 'त, थ, द, ध, न', desc: 'चौथा वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 9, title: 'प, फ, ब, भ, म', desc: 'पाँचवाँ वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 10, title: 'य, र, ल, व, श, ष, स, ह', desc: 'अंतिम वर्ण समूह', time: '3 min', characters: 40 },
+    { id: 11, title: 'छोटे वाक्य', desc: 'रोज़मर्रा के वाक्य', time: '4 min', characters: 88 },
+    { id: 12, title: 'संवाद अभ्यास', desc: 'बातचीत के वाक्य', time: '5 min', characters: 104 },
+    { id: 13, title: 'भारत परिचय', desc: 'देश के बारे में', time: '5 min', characters: 96 },
+    { id: 14, title: 'प्रौद्योगिकी', desc: 'तकनीक पर निबंध', time: '6 min', characters: 120 },
+    { id: 15, title: 'अभ्यास परीक्षा', desc: 'लंबा पाठ — समय सीमा', time: '8 min', characters: 160 },
   ],
 };
 
 const LESSON_COLORS = [COLORS.green, COLORS.amber, COLORS.teal, COLORS.rose];
+
+// Hindi Character Map data
+const CHARMAP_CONSONANTS = [
+  { unicode: 'क', kruti: 'd' }, { unicode: 'ख', kruti: '[k' }, { unicode: 'ग', kruti: 'x' },
+  { unicode: 'घ', kruti: '?k' }, { unicode: 'ङ', kruti: '\xb3' }, { unicode: 'च', kruti: 'p' },
+  { unicode: 'छ', kruti: 'N' }, { unicode: 'ज', kruti: 't' }, { unicode: 'झ', kruti: '>' },
+  { unicode: 'ञ', kruti: '\xa5' }, { unicode: 'ट', kruti: 'V' }, { unicode: 'ठ', kruti: 'B' },
+  { unicode: 'ड', kruti: 'M' }, { unicode: 'ढ', kruti: '<' }, { unicode: 'ण', kruti: '.k' },
+  { unicode: 'त', kruti: 'r' }, { unicode: 'थ', kruti: 'Fk' }, { unicode: 'द', kruti: 'n' },
+  { unicode: 'ध', kruti: '/k' }, { unicode: 'न', kruti: 'u' }, { unicode: 'प', kruti: 'i' },
+  { unicode: 'फ', kruti: 'Q' }, { unicode: 'ब', kruti: 'c' }, { unicode: 'भ', kruti: 'Hk' },
+  { unicode: 'म', kruti: 'e' }, { unicode: 'य', kruti: ';' }, { unicode: 'र', kruti: 'j' },
+  { unicode: 'ल', kruti: 'y' }, { unicode: 'व', kruti: 'o' }, { unicode: 'श', kruti: "'k" },
+  { unicode: 'ष', kruti: '"k' }, { unicode: 'स', kruti: 'l' }, { unicode: 'ह', kruti: 'g' },
+];
+
+const CHARMAP_VOWELS = [
+  { unicode: 'अ', kruti: 'v' }, { unicode: 'आ', kruti: 'vk' }, { unicode: 'इ', kruti: 'b' },
+  { unicode: 'ई', kruti: 'bZ' }, { unicode: 'उ', kruti: 'm' }, { unicode: 'ऊ', kruti: '\xc5' },
+  { unicode: 'ए', kruti: ',' }, { unicode: 'ऐ', kruti: ',s' }, { unicode: 'ओ', kruti: 'vks' },
+  { unicode: 'औ', kruti: 'vkS' },
+];
+
+const CHARMAP_MATRAS = [
+  { unicode: 'ा', kruti: 'k' }, { unicode: 'ि', kruti: 'f' }, { unicode: 'ी', kruti: 'h' },
+  { unicode: 'ु', kruti: 'q' }, { unicode: 'ू', kruti: 'w' }, { unicode: 'ृ', kruti: '`' },
+  { unicode: 'े', kruti: 's' }, { unicode: 'ै', kruti: 'S' }, { unicode: 'ो', kruti: 'ks' },
+  { unicode: 'ौ', kruti: 'kS' }, { unicode: 'ं', kruti: 'a' }, { unicode: 'ः', kruti: '%' },
+  { unicode: 'ँ', kruti: '\xa1' }, { unicode: 'ॅ', kruti: 'W' },
+];
+
+const CHARMAP_NUMBERS = [
+  { unicode: '०', kruti: '\xe5' }, { unicode: '१', kruti: '\x0192' },
+  { unicode: '२', kruti: '\u201e' }, { unicode: '३', kruti: '\u2026' },
+  { unicode: '४', kruti: '\u2020' }, { unicode: '५', kruti: '\u2021' },
+  { unicode: '६', kruti: '\u02c6' }, { unicode: '७', kruti: '\u2030' },
+  { unicode: '८', kruti: '\u0160' }, { unicode: '९', kruti: '\u2039' },
+];
 
 const getDifficultyColor = (diff) => {
   switch (diff) {
@@ -70,17 +119,26 @@ const getDifficultyColor = (diff) => {
 export default function LessonsScreen({
   onStartLesson,
   onBack,
-  unlockedLessons = { english: [1, 2], hindi: [1, 2] },
+  unlockedLessons = { english: [1], hindi: [1] },
+  hindiLayout = 'mangal',
+  onChangeHindiLayout,
 }) {
   const [selectedLang, setSelectedLang] = useState('english');
+  const [chosenLayout, setChosenLayout] = useState(hindiLayout);
+  const [showCharMap, setShowCharMap] = useState(false);
+  const [charMapTab, setCharMapTab] = useState('mangal');
   const lessons = LESSONS[selectedLang];
   const unlocked = unlockedLessons[selectedLang] || [];
   const countUnlocked = lessons.filter((l) => unlocked.includes(l.id)).length;
 
+  const handleLessonPress = (lesson) => {
+    onStartLesson(selectedLang, lesson.id, lesson.title, parseInt(lesson.time) * 60);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.container}>
+      <View style={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
@@ -110,6 +168,50 @@ export default function LessonsScreen({
           </TouchableOpacity>
         </View>
 
+        {/* Hindi Typing Layout */}
+        {selectedLang === 'hindi' && (
+          <View style={styles.layoutCard}>
+            <View style={styles.layoutHeader}>
+              <Ionicons name="keypad" size={16} color={COLORS.teal} />
+              <Text style={styles.layoutTitle}>Typing Layout</Text>
+            </View>
+            <View style={styles.layoutSegment}>
+              {[
+                { label: 'Mangal', value: 'mangal' },
+                { label: 'Kruti Dev', value: 'krutidev' },
+              ].map((d) => {
+                const sel = hindiLayout === d.value;
+                return (
+                  <TouchableOpacity
+                    key={d.value}
+                    style={[styles.layoutItem, sel && styles.layoutItemActive]}
+                    onPress={() => onChangeHindiLayout && onChangeHindiLayout(d.value)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.layoutItemText, sel && styles.layoutItemTextActive]}>
+                      {d.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+            <Text style={styles.layoutHint}>
+              {hindiLayout === 'krutidev'
+                ? 'Kruti Dev keyboard se type karo, display Unicode (Mangal) me hoga.'
+                : 'Normal Unicode (Mangal) Hindi keyboard se type karo.'}
+            </Text>
+            <TouchableOpacity
+              style={styles.charMapBtn}
+              onPress={() => { setCharMapTab(hindiLayout); setShowCharMap(true); }}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="grid" size={14} color={COLORS.teal} />
+              <Text style={styles.charMapBtnText}>View Character Map</Text>
+              <Ionicons name="chevron-forward" size={14} color={COLORS.textMuted} />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Progress */}
         <View style={styles.progressCard}>
           <View style={styles.progressHeader}>
@@ -133,7 +235,7 @@ export default function LessonsScreen({
               <TouchableOpacity
                 key={lesson.id}
                 style={[styles.lessonCard, locked && styles.lessonCardLocked]}
-                onPress={() => !locked && onStartLesson(selectedLang, lesson.id, lesson.title, parseInt(lesson.time) * 60)}
+                onPress={() => !locked && handleLessonPress(lesson)}
                 activeOpacity={locked ? 1 : 0.8}
                 disabled={locked}
               >
@@ -176,6 +278,108 @@ export default function LessonsScreen({
             );
           })}
         </ScrollView>
+
+        {/* Character Map Modal */}
+        <Modal
+          visible={showCharMap}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowCharMap(false)}
+        >
+          <View style={styles.cmOverlay}>
+            <View style={styles.cmCard}>
+              {/* Header */}
+              <View style={styles.cmHeader}>
+                <Text style={styles.cmTitle}>Hindi Character Map</Text>
+                <TouchableOpacity onPress={() => setShowCharMap(false)} style={styles.cmClose}>
+                  <Ionicons name="close" size={20} color={COLORS.textWhite} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Tabs */}
+              <View style={styles.cmTabs}>
+                {[
+                  { label: 'Mangal (Unicode)', value: 'mangal' },
+                  { label: 'Kruti Dev', value: 'krutidev' },
+                ].map((t) => {
+                  const sel = charMapTab === t.value;
+                  return (
+                    <TouchableOpacity
+                      key={t.value}
+                      style={[styles.cmTab, sel && styles.cmTabActive]}
+                      onPress={() => setCharMapTab(t.value)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[styles.cmTabText, sel && styles.cmTabTextActive]}>{t.label}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              <ScrollView style={styles.cmScroll} contentContainerStyle={styles.cmScrollContent}>
+                {/* Consonants */}
+                <Text style={styles.cmSectionTitle}>व्यंजन (Consonants)</Text>
+                <View style={styles.cmGrid}>
+                  {CHARMAP_CONSONANTS.map((c, i) => (
+                    <View key={i} style={styles.cmItem}>
+                      <Text style={styles.cmUnicode}>{c.unicode}</Text>
+                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : c.unicode}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Vowels */}
+                <Text style={styles.cmSectionTitle}>स्वर (Vowels)</Text>
+                <View style={styles.cmGrid}>
+                  {CHARMAP_VOWELS.map((c, i) => (
+                    <View key={i} style={styles.cmItem}>
+                      <Text style={styles.cmUnicode}>{c.unicode}</Text>
+                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : c.unicode}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Matras */}
+                <Text style={styles.cmSectionTitle}>मात्राएँ (Matras)</Text>
+                <View style={styles.cmGrid}>
+                  {CHARMAP_MATRAS.map((c, i) => (
+                    <View key={i} style={styles.cmItem}>
+                      <Text style={styles.cmUnicode}>{'अ' + c.unicode}</Text>
+                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : c.unicode}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Numbers */}
+                <Text style={styles.cmSectionTitle}>अंक (Numbers)</Text>
+                <View style={styles.cmGrid}>
+                  {CHARMAP_NUMBERS.map((c, i) => (
+                    <View key={i} style={styles.cmItem}>
+                      <Text style={styles.cmUnicode}>{c.unicode}</Text>
+                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : String(i)}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Special */}
+                <Text style={styles.cmSectionTitle}>विशेष</Text>
+                <View style={styles.cmGrid}>
+                  {[
+                    { unicode: '्', label: 'halant', kruti: '~' },
+                    { unicode: '़', label: 'nukta', kruti: '+' },
+                    { unicode: 'ॐ', label: 'om', kruti: '=\u0915\u094d\u0930' },
+                    { unicode: '।', label: 'purna viram', kruti: 'A' },
+                  ].map((c, i) => (
+                    <View key={i} style={styles.cmItem}>
+                      <Text style={styles.cmUnicode}>{c.unicode}</Text>
+                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : c.label}</Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
       </View>
     </SafeAreaView>
   );
@@ -184,6 +388,12 @@ export default function LessonsScreen({
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   container: { flex: 1, padding: scaleSize(16) },
+  containerDesktop: {
+    padding: 24,
+    maxWidth: CONTENT_MAX_WIDTH,
+    alignSelf: 'center',
+    width: '100%',
+  },
 
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(16) },
   backBtn: {
@@ -249,4 +459,78 @@ const styles = StyleSheet.create({
     width: scaleSize(32), height: scaleSize(32), borderRadius: scaleSize(16),
     alignItems: 'center', justifyContent: 'center',
   },
+
+  layoutCard: {
+    borderRadius: scaleSize(14), borderWidth: 1, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.cardBg, padding: scaleSize(12), marginBottom: scaleSize(14),
+  },
+  layoutHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(6), marginBottom: scaleSize(10) },
+  layoutTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
+  layoutSegment: { flexDirection: 'row', gap: scaleSize(8) },
+  layoutItem: {
+    flex: 1, paddingVertical: scaleSize(9), borderRadius: scaleSize(10), alignItems: 'center',
+    borderWidth: 1, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  layoutItemActive: { backgroundColor: COLORS.teal + '22', borderColor: COLORS.teal },
+  layoutItemText: { color: COLORS.textMuted, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
+  layoutItemTextActive: { color: COLORS.teal },
+  layoutHint: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(9), lineHeight: scaleFont(15) },
+
+  // CharMap button
+  charMapBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: scaleSize(6),
+    marginTop: scaleSize(10), paddingVertical: scaleSize(8), paddingHorizontal: scaleSize(12),
+    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(10),
+    borderWidth: 1, borderColor: COLORS.teal + '30',
+  },
+  charMapBtnText: { flex: 1, color: COLORS.teal, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700' },
+
+  // CharMap Modal
+  cmOverlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.75)',
+    justifyContent: 'flex-end',
+  },
+  cmCard: {
+    height: '85%', backgroundColor: '#1a1a1a',
+    borderTopLeftRadius: scaleSize(20), borderTopRightRadius: scaleSize(20),
+    borderWidth: 1, borderBottomWidth: 0, borderColor: COLORS.cardBorder,
+    overflow: 'hidden',
+  },
+  cmHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    padding: scaleSize(16), paddingBottom: scaleSize(10),
+  },
+  cmTitle: { color: COLORS.textWhite, fontSize: scaleFont(18), fontFamily: 'Calibri', fontWeight: '700' },
+  cmClose: {
+    width: scaleSize(32), height: scaleSize(32), borderRadius: scaleSize(16),
+    backgroundColor: COLORS.cardBg, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: COLORS.cardBorder,
+  },
+  cmTabs: {
+    flexDirection: 'row', marginHorizontal: scaleSize(16), gap: scaleSize(8),
+    marginBottom: scaleSize(12),
+  },
+  cmTab: {
+    flex: 1, paddingVertical: scaleSize(9), borderRadius: scaleSize(10), alignItems: 'center',
+    borderWidth: 1, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  cmTabActive: { backgroundColor: COLORS.teal + '22', borderColor: COLORS.teal },
+  cmTabText: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700' },
+  cmTabTextActive: { color: COLORS.teal },
+  cmScroll: { flex: 1 },
+  cmScrollContent: { padding: scaleSize(16), paddingBottom: scaleSize(40) },
+  cmSectionTitle: {
+    color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700',
+    marginBottom: scaleSize(8), marginTop: scaleSize(14),
+  },
+  cmGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(6),
+  },
+  cmItem: {
+    width: scaleSize(58), alignItems: 'center', paddingVertical: scaleSize(8),
+    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(8),
+    borderWidth: 1, borderColor: COLORS.cardBorder,
+  },
+  cmUnicode: { color: COLORS.textWhite, fontSize: scaleFont(18), fontFamily: 'Calibri', fontWeight: '700' },
+  cmKey: { color: COLORS.textMuted, fontSize: scaleFont(9), fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
 });
