@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Typing Master",
+    "name": "Antriksh Typing Master",
     "slug": "antriksh-typing-master",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,12 +15,18 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1a1a2e"
+        "backgroundColor": "#0a0a0a"
       },
       "package": "com.antriksh.typingmaster"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png",
+      "name": "Antriksh Typing Master",
+      "shortName": "Typing Master",
+      "description": "Professional Hindi Typing Software",
+      "backgroundColor": "#0a0a0a",
+      "themeColor": "#0d9488"
     },
     "plugins": [
       "expo-font"

@@ -1,0 +1,40 @@
+appId: com.antriksh.typingmaster
+productName: Antriksh Typing Master
+copyright: Copyright © 2024 Antriksh
+
+directories:
+  output: release
+
+extraMetadata:
+  main: electron.js
+
+files:
+  - "dist/**/*"
+  - "electron.js"
+  - "assets/icon.ico"
+  - "assets/icon.png"
+
+asarUnpack:
+  - "assets/icon.ico"
+  - "assets/icon.png"
+
+win:
+  icon: assets/icon.ico
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: "AntrikshTypingMaster-Setup-${version}-win.${ext}"
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Antriksh Typing Master
+  deleteAppDataOnUninstall: false
+  runAfterFinish: true
+
+portable:
+  artifactName: "AntrikshTypingMaster-${version}-portable.${ext}"

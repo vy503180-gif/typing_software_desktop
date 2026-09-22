@@ -2,11 +2,18 @@
   "name": "antriksh-typing-master",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
+  "description": "Professional Hindi Typing Software - Learn Krutidev & Unicode layouts with real-time feedback",
+  "author": "Antriksh",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "expo start --web --port 8081",
+    "web": "expo start --web",
+    "build:web": "npx expo export --platform web",
+    "electron:dev": "npx expo start --web --port 8081 & node scripts/wait-and-electron.js",
+    "electron:start": "electron electron.js",
+    "pack": "npm run build:web && electron-builder --dir",
+    "dist": "npm run build:web && electron-builder --win",
+    "dist:portable": "npm run build:web && electron-builder --win portable",
+    "dist:nsis": "npm run build:web && electron-builder --win nsis"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.4.1",
@@ -18,13 +25,18 @@
     "expo-font": "~57.0.3",
     "expo-linear-gradient": "~57.0.1",
     "expo-splash-screen": "~57.0.9",
+    "metro-resolver": "^0.87.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
     "react-native-web": "^0.21.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "electron": "^44.4.3",
+    "electron-builder": "^26.15.3",
+    "png-to-ico": "^3.0.2",
+    "sharp": "^0.35.4"
   },
   "private": true
 }

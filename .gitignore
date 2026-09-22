@@ -3,6 +3,7 @@ node_modules/
 .expo/
 dist/
 web-build/
+release/
 *.log
 check*.ps1
 .DS_Store
