@@ -129,139 +129,99 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
     );
   }
 
-  // Desktop layout - Clean split
+  // Desktop layout - Single centered card (500 x 500)
   return (
     <SafeAreaView style={s.safe}>
       <StatusBar barStyle="light-content" />
-      <View style={s.desktopRoot}>
-        {/* Left - Branding */}
-        <View style={s.desktopLeft}>
-          <View style={s.desktopLeftContent}>
-            <View style={s.desktopLogoWrap}>
-              <View style={s.desktopLogoCircle}>
-                <Text style={s.desktopLogoLetter}>T</Text>
-              </View>
-            </View>
-
-            <Text style={s.desktopAppName}>Antriksh{'\n'}Typing Master</Text>
-            <Text style={s.desktopVersion}>v1.0</Text>
-
-            <View style={s.desktopDivider} />
-
-            <Text style={s.desktopTagline}>Professional Hindi Typing Software</Text>
-
-            <View style={s.desktopFeatures}>
-              <View style={s.desktopFeatureRow}>
-                <View style={s.desktopFeatureDot} />
-                <Text style={s.desktopFeatureText}>Krutidev & Unicode Layouts</Text>
-              </View>
-              <View style={s.desktopFeatureRow}>
-                <View style={s.desktopFeatureDot} />
-                <Text style={s.desktopFeatureText}>Real-time Accuracy Feedback</Text>
-              </View>
-              <View style={s.desktopFeatureRow}>
-                <View style={s.desktopFeatureDot} />
-                <Text style={s.desktopFeatureText}>WPM & Progress Tracking</Text>
-              </View>
-              <View style={s.desktopFeatureRow}>
-                <View style={s.desktopFeatureDot} />
-                <Text style={s.desktopFeatureText}>50+ Practice Lessons</Text>
-              </View>
-            </View>
+      <View style={s.desktopCenter}>
+        <View style={s.desktopCard}>
+          <View style={s.desktopLogoCircle}>
+            <Text style={s.desktopLogoLetter}>T</Text>
           </View>
+
+          <Text style={s.desktopAppName}>Antriksh Typing Master</Text>
+          <Text style={s.desktopTagline}>Professional Hindi Typing Software</Text>
+
+          <View style={s.desktopDivider} />
+
+          <Text style={s.desktopFormTitle}>Welcome</Text>
+          <Text style={s.desktopFormSubtitle}>Enter your name to get started</Text>
+
+          <View style={[s.desktopInputWrap, (focused || name.length > 0) && s.desktopInputWrapActive]}>
+            <Ionicons
+              name="person-outline"
+              size={18}
+              color={focused ? COLORS.teal : '#666'}
+            />
+            <TextInput
+              style={s.desktopInput}
+              placeholder="Type your name here"
+              placeholderTextColor="#555"
+              value={name}
+              onChangeText={setName}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              autoCapitalize="words"
+              autoCorrect={false}
+              returnKeyType="done"
+              onSubmitEditing={handleSubmit}
+              maxLength={40}
+              autoFocus
+            />
+            {name.length > 0 && (
+              <TouchableOpacity onPress={() => setName('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Ionicons name="close-circle" size={18} color="#666" />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <TouchableOpacity
+            style={[s.desktopBtn, canSubmit && s.desktopBtnActive]}
+            onPress={handleSubmit}
+            disabled={!canSubmit}
+            activeOpacity={0.85}
+          >
+            <Text style={[s.desktopBtnText, canSubmit && s.desktopBtnTextActive]}>
+              Start Typing
+            </Text>
+            <Ionicons
+              name={canSubmit ? 'arrow-forward' : 'lock-closed'}
+              size={16}
+              color={canSubmit ? '#fff' : '#666'}
+            />
+          </TouchableOpacity>
+
+          {users.length > 0 && (
+            <View style={s.desktopUsersSection}>
+              <View style={s.desktopUsersDivider}>
+                <View style={s.desktopUsersDividerLine} />
+                <Text style={s.desktopUsersDividerText}>OR CONTINUE AS</Text>
+                <View style={s.desktopUsersDividerLine} />
+              </View>
+              <View style={s.desktopUsersList}>
+                {users.slice(0, 4).map((user, idx) => (
+                  <TouchableOpacity
+                    key={user}
+                    style={s.desktopUserChip}
+                    onPress={() => setName(user)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[s.desktopUserAvatar, { backgroundColor: ['#16a34a', '#d97706', '#e11d48', '#0d9488'][idx % 4] }]}>
+                      <Text style={s.desktopUserAvatarText}>{initial(user)}</Text>
+                    </View>
+                    <Text style={s.desktopUserName} numberOfLines={1}>{user}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          <TouchableOpacity onPress={handleCancel} activeOpacity={0.7} style={s.desktopSkipBtn}>
+            <Text style={s.desktopSkipText}>Skip for now</Text>
+          </TouchableOpacity>
 
           <Text style={s.desktopCopyright}>2024 Antriksh. All rights reserved.</Text>
         </View>
-
-        {/* Right - Form */}
-        <KeyboardAvoidingView
-          style={s.desktopRight}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-          <View style={s.desktopFormArea}>
-            <View style={s.desktopFormHeader}>
-              <Text style={s.desktopFormTitle}>Welcome</Text>
-              <Text style={s.desktopFormSubtitle}>Enter your name to get started</Text>
-            </View>
-
-            <View style={s.desktopInputGroup}>
-              <Text style={s.desktopInputLabel}>YOUR NAME</Text>
-              <View style={[s.desktopInputWrap, (focused || name.length > 0) && s.desktopInputWrapActive]}>
-                <Ionicons
-                  name="person-outline"
-                  size={18}
-                  color={focused ? COLORS.teal : '#555'}
-                />
-                <TextInput
-                  style={s.desktopInput}
-                  placeholder="Type your name here"
-                  placeholderTextColor="#444"
-                  value={name}
-                  onChangeText={setName}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
-                  autoCapitalize="words"
-                  autoCorrect={false}
-                  returnKeyType="done"
-                  onSubmitEditing={handleSubmit}
-                  maxLength={40}
-                  autoFocus
-                />
-                {name.length > 0 && (
-                  <TouchableOpacity onPress={() => setName('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                    <Ionicons name="close-circle" size={18} color="#555" />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={[s.desktopBtn, canSubmit && s.desktopBtnActive]}
-              onPress={handleSubmit}
-              disabled={!canSubmit}
-              activeOpacity={0.85}
-            >
-              <Text style={[s.desktopBtnText, canSubmit && s.desktopBtnTextActive]}>
-                Start Typing
-              </Text>
-              <Ionicons
-                name={canSubmit ? 'arrow-forward' : 'lock-closed'}
-                size={16}
-                color={canSubmit ? '#fff' : '#555'}
-              />
-            </TouchableOpacity>
-
-            {users.length > 0 && (
-              <View style={s.desktopUsersSection}>
-                <View style={s.desktopUsersDivider}>
-                  <View style={s.desktopUsersDividerLine} />
-                  <Text style={s.desktopUsersDividerText}>OR</Text>
-                  <View style={s.desktopUsersDividerLine} />
-                </View>
-
-                <View style={s.desktopUsersList}>
-                  {users.slice(0, 4).map((user, idx) => (
-                    <TouchableOpacity
-                      key={user}
-                      style={s.desktopUserChip}
-                      onPress={() => setName(user)}
-                      activeOpacity={0.7}
-                    >
-                      <View style={[s.desktopUserAvatar, { backgroundColor: ['#16a34a', '#d97706', '#e11d48', '#0d9488'][idx % 4] }]}>
-                        <Text style={s.desktopUserAvatarText}>{initial(user)}</Text>
-                      </View>
-                      <Text style={s.desktopUserName} numberOfLines={1}>{user}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            )}
-
-            <TouchableOpacity onPress={handleCancel} activeOpacity={0.7} style={s.desktopSkipBtn}>
-              <Text style={s.desktopSkipText}>Skip for now</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
   );
@@ -360,6 +320,8 @@ const s = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.textWhite,
     fontSize: 15,
+    outlineStyle: 'none',
+    outlineWidth: 0,
   },
   mobileBtn: {
     flexDirection: 'row',
@@ -444,150 +406,106 @@ const s = StyleSheet.create({
   },
 
   // ---- DESKTOP ----
-  desktopRoot: {
+  desktopCenter: {
     flex: 1,
-    flexDirection: 'row',
     backgroundColor: '#0a0a0a',
-  },
-  desktopLeft: {
-    flex: 1,
-    backgroundColor: '#0e0e0e',
-    borderRightWidth: 1,
-    borderRightColor: '#1a1a1a',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 48,
-  },
-  desktopLeftContent: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    maxWidth: 360,
+    padding: 24,
   },
-  desktopLogoWrap: {
-    marginBottom: 32,
+  desktopCard: {
+    width: 500,
+    height: 500,
+    backgroundColor: '#0e0e0e',
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(13,148,136,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 44,
+    shadowColor: '#14b8a6',
+    shadowOpacity: 0.18,
+    shadowOffset: { width: 0, height: 12 },
+    shadowRadius: 30,
+    elevation: 10,
   },
   desktopLogoCircle: {
-    width: 72,
-    height: 72,
+    width: 64,
+    height: 64,
     borderRadius: 18,
     backgroundColor: COLORS.teal,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#14b8a6',
+    shadowOpacity: 0.55,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 14,
+    elevation: 6,
   },
   desktopLogoLetter: {
     fontFamily: 'Calibri',
     fontWeight: '700',
     color: '#fff',
-    fontSize: 36,
+    fontSize: 32,
   },
   desktopAppName: {
     fontFamily: 'Calibri',
     fontWeight: '700',
     color: COLORS.textWhite,
-    fontSize: 26,
+    fontSize: 23,
     textAlign: 'center',
-    lineHeight: 34,
-  },
-  desktopVersion: {
-    fontFamily: 'Calibri',
-    fontWeight: '600',
-    color: '#333',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  desktopDivider: {
-    width: 40,
-    height: 2,
-    backgroundColor: COLORS.teal,
-    marginVertical: 24,
-    borderRadius: 1,
   },
   desktopTagline: {
     fontFamily: 'Calibri',
     fontWeight: '600',
-    color: '#666',
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  desktopFeatures: {
-    marginTop: 32,
-    gap: 12,
-  },
-  desktopFeatureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  desktopFeatureDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.teal,
-  },
-  desktopFeatureText: {
-    fontFamily: 'Calibri',
-    fontWeight: '600',
-    color: '#555',
+    color: '#999',
     fontSize: 13,
+    textAlign: 'center',
+    marginTop: 6,
   },
-  desktopCopyright: {
-    fontFamily: 'Calibri',
-    fontWeight: '500',
-    color: '#2a2a2a',
-    fontSize: 11,
-  },
-
-  desktopRight: {
-    width: 440,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 48,
-  },
-  desktopFormArea: {
-    width: '100%',
-    maxWidth: 340,
-  },
-  desktopFormHeader: {
-    marginBottom: 36,
+  desktopDivider: {
+    width: 44,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: COLORS.teal,
+    marginVertical: 22,
   },
   desktopFormTitle: {
     fontFamily: 'Calibri',
     fontWeight: '700',
     color: COLORS.textWhite,
-    fontSize: 28,
+    fontSize: 24,
+    textAlign: 'center',
   },
   desktopFormSubtitle: {
     fontFamily: 'Calibri',
     fontWeight: '500',
-    color: '#555',
-    fontSize: 14,
-    marginTop: 6,
+    color: '#888',
+    fontSize: 13.5,
+    textAlign: 'center',
+    marginTop: 5,
+    marginBottom: 22,
   },
 
-  desktopInputGroup: {
-    marginBottom: 20,
-  },
-  desktopInputLabel: {
-    fontFamily: 'Calibri',
-    fontWeight: '700',
-    color: '#444',
-    fontSize: 11,
-    letterSpacing: 1.2,
-    marginBottom: 8,
-  },
   desktopInputWrap: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'stretch',
     backgroundColor: '#111',
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#252525',
+    borderColor: '#2a2a2a',
     paddingHorizontal: 14,
     gap: 10,
   },
   desktopInputWrapActive: {
     borderColor: COLORS.teal,
+    shadowColor: '#14b8a6',
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 0 },
+    shadowRadius: 8,
+    elevation: 3,
   },
   desktopInput: {
     flex: 1,
@@ -596,27 +514,36 @@ const s = StyleSheet.create({
     color: COLORS.textWhite,
     fontSize: 15,
     paddingVertical: 14,
+    outlineStyle: 'none',
+    outlineWidth: 0,
   },
 
   desktopBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'stretch',
     gap: 8,
     backgroundColor: '#1a1a1a',
-    borderRadius: 10,
+    borderRadius: 12,
     paddingVertical: 14,
+    marginTop: 18,
     borderWidth: 1,
     borderColor: '#2a2a2a',
   },
   desktopBtnActive: {
     backgroundColor: COLORS.teal,
     borderColor: COLORS.teal,
+    shadowColor: '#14b8a6',
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 14,
+    elevation: 6,
   },
   desktopBtnText: {
     fontFamily: 'Calibri',
     fontWeight: '700',
-    color: '#444',
+    color: '#777',
     fontSize: 15,
   },
   desktopBtnTextActive: {
@@ -624,23 +551,24 @@ const s = StyleSheet.create({
   },
 
   desktopUsersSection: {
-    marginTop: 32,
+    alignSelf: 'stretch',
+    marginTop: 20,
   },
   desktopUsersDivider: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   desktopUsersDividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: '#222',
   },
   desktopUsersDividerText: {
     fontFamily: 'Calibri',
     fontWeight: '700',
-    color: '#333',
+    color: '#555',
     fontSize: 10,
     letterSpacing: 1.5,
   },
@@ -648,6 +576,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   desktopUserChip: {
     flexDirection: 'row',
@@ -655,10 +584,10 @@ const s = StyleSheet.create({
     gap: 8,
     backgroundColor: '#111',
     borderRadius: 20,
-    paddingVertical: 7,
+    paddingVertical: 6,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: '#1e1e1e',
+    borderColor: '#2a2a2a',
   },
   desktopUserAvatar: {
     width: 24,
@@ -676,19 +605,27 @@ const s = StyleSheet.create({
   desktopUserName: {
     fontFamily: 'Calibri',
     fontWeight: '600',
-    color: '#777',
+    color: '#aaa',
     fontSize: 13,
     maxWidth: 100,
   },
 
   desktopSkipBtn: {
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: 18,
   },
   desktopSkipText: {
     fontFamily: 'Calibri',
     fontWeight: '600',
-    color: '#333',
+    color: '#777',
     fontSize: 13,
+  },
+
+  desktopCopyright: {
+    fontFamily: 'Calibri',
+    fontWeight: '500',
+    color: '#333',
+    fontSize: 11,
+    marginTop: 20,
   },
 });

@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, LogBox, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, LogBox, Dimensions, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+
 import HomeScreen from './src/screens/HomeScreen';
 import LessonsScreen from './src/screens/LessonsScreen';
 import TypingScreen from './src/screens/TypingScreen';
+import TestScreen from './src/screens/TestScreen';
+import StatsScreen from './src/screens/StatsScreen';
+import CertificatesScreen from './src/screens/CertificatesScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 import NameEntryScreen from './src/screens/NameEntryScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
-import BottomNav, { DesktopSidebar } from './src/components/BottomNav';
-import StatsScreen from './src/screens/StatsScreen';
+import BottomNav from './src/components/BottomNav';
+import { Sidebar } from './src/components/DesktopShell';
 import CourseScreen, { COURSES } from './src/screens/CourseScreen';
 import LessonDetailScreen from './src/screens/LessonDetailScreen';
 import ResultScreen from './src/screens/ResultScreen';
@@ -18,12 +24,19 @@ import CloudsGameScreen from './src/screens/CloudsGameScreen';
 import WordTrisGameScreen from './src/screens/WordTrisGameScreen';
 import AlphabetGameScreen from './src/screens/AlphabetGameScreen';
 import BubblesGameScreen from './src/screens/BubblesGameScreen';
+import SpeedChallengeScreen from './src/screens/SpeedChallengeScreen';
+import WordRushScreen from './src/screens/WordRushScreen';
+import AccuracyChallengeScreen from './src/screens/AccuracyChallengeScreen';
+import TimeAttackScreen from './src/screens/TimeAttackScreen';
 import GamesMenuScreen from './src/screens/GamesMenuScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
 import InfoScreen from './src/screens/InfoScreen';
-import { LESSON_ORDER, getRandomPracticeParagraph } from './src/data/lessons';
-import { IS_DESKTOP, SIDEBAR_WIDTH, HEADER_HEIGHT, COLORS, BG } from './src/theme';
+import { LESSON_ORDER, getNextLesson } from './src/data/lessons';
+import { BG, BG_DEEP, COLORS } from './src/theme';
+import { applyLightTheme } from './src/lightTheme';
+
+LogBox.ignoreAllLogs();
 
 const STORAGE_KEYS = {
   name: 'antriksh_student_name',
@@ -33,59 +46,40 @@ const STORAGE_KEYS = {
 
 const unlockedKeyFor = (name) => `antriksh_unlocked_lessons_${name || 'default'}`;
 const courseProgressKeyFor = (name) => `antriksh_course_progress_${name || 'default'}`;
+const historyKeyFor = (name) => `antriksh_typing_history_${name || 'default'}`;
+
 const DEFAULT_UNLOCKED = { english: [1], hindi: [1] };
 
-// Desktop header component
-function DesktopHeader({ activeTab, studentName }) {
-  const titles = {
-    Home: 'Dashboard',
-    Lessons: 'Lessons',
-    History: 'History',
-    Stats: 'Statistics',
-    Course: 'Course',
-    Settings: 'Settings',
-    Review: 'Review',
-    Games: 'Games',
-    Explore: 'Explore',
-    Info: 'About',
-  };
-  return (
-    <View style={appStyles.desktopHeader}>
-      <Text style={appStyles.desktopHeaderTitle}>{titles[activeTab] || 'Typing Master'}</Text>
-      {studentName ? (
-        <View style={appStyles.desktopHeaderUser}>
-          <View style={appStyles.desktopHeaderAvatar}>
-            <Text style={appStyles.desktopHeaderAvatarText}>{studentName[0].toUpperCase()}</Text>
-          </View>
-          <Text style={appStyles.desktopHeaderName}>{studentName}</Text>
-        </View>
-      ) : null}
-    </View>
-  );
-}
+const DEFAULT_SETTINGS = {
+  keyboardSound: true,
+  virtualKeyboard: true,
+  fingerGuide: false,
+  nextKeyHighlight: true,
+  fontSize: 22,
+  practiceTimeSec: 300,
+  hindiLayout: 'mangal',
+  theme: 'white',
+};
 
 export default function App() {
-  const [fontsReady] = useState(true);
-  const [activeTab, setActiveTab] = useState('Home');
+  const [tab, setTab] = useState('Home');
   const [studentName, setStudentName] = useState('');
   const [unlockedLessons, setUnlockedLessons] = useState(DEFAULT_UNLOCKED);
   const [users, setUsers] = useState([]);
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [currentLesson, setCurrentLesson] = useState(null);
-  const [isPracticeMode, setIsPracticeMode] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [selectedLesson, setSelectedLesson] = useState(null);
-  const [courseProgress, setCourseProgress] = useState([]);
+  const [showNameEntry, setShowNameEntry] = useState(true);
+  const [loaded, setLoaded] = useState(false);
+  const [typingConfig, setTypingConfig] = useState(null);
+  const [course, setCourse] = useState(null);
+  const [lesson, setLesson] = useState(null);
+  const [completedSubLessons, setCompletedSubLessons] = useState([]);
   const [reviewConfig, setReviewConfig] = useState(null);
-  const [previousScreen, setPreviousScreen] = useState('Home');
-  const [abcMode, setAbcMode] = useState('az');
-  const [bubbleMode, setBubbleMode] = useState('lower');
-  const [practiceTimeSec, setPracticeTimeSec] = useState(300);
-  const [hindiLayout, setHindiLayout] = useState('mangal');
+  const [launchTab, setLaunchTab] = useState('Home');
+  const [alphabetMode, setAlphabetMode] = useState('az');
+  const [bubblesMode, setBubblesMode] = useState('lower');
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [bestWpm, setBestWpm] = useState(0);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
 
-  // Listen for dimension changes (window resize on web)
   useEffect(() => {
     const sub = Dimensions.addEventListener('change', ({ window }) => {
       setDimensions(window);
@@ -93,7 +87,24 @@ export default function App() {
     return () => sub?.remove?.();
   }, []);
 
-  const isDesktop = Platform.OS === 'web' && dimensions.width >= 900;
+  useEffect(() => {
+    // Project ka fixed background #D5EEF2 hai — sirf light theme.
+    applyLightTheme();
+  }, []);
+
+  const isDesktop = dimensions.width >= 900;
+
+  const loadBestWpm = (name) => {
+    AsyncStorage.getItem(historyKeyFor(name))
+      .then((raw) => {
+        try {
+          const all = raw ? JSON.parse(raw) : [];
+          const wpmList = (Array.isArray(all) ? all : []).map((e) => e.wpm || 0);
+          setBestWpm(wpmList.length ? Math.max(...wpmList) : 0);
+        } catch {}
+      })
+      .catch(() => {});
+  };
 
   useEffect(() => {
     (async () => {
@@ -107,8 +118,9 @@ export default function App() {
           }
           const savedCourseProgress = await AsyncStorage.getItem(courseProgressKeyFor(savedName));
           if (savedCourseProgress) {
-            try { setCourseProgress(JSON.parse(savedCourseProgress)); } catch {}
+            try { setCompletedSubLessons(JSON.parse(savedCourseProgress)); } catch {}
           }
+          loadBestWpm(savedName);
         }
         const savedUsers = await AsyncStorage.getItem(STORAGE_KEYS.users);
         if (savedUsers) {
@@ -121,21 +133,35 @@ export default function App() {
         if (savedSettings) {
           try {
             const parsed = JSON.parse(savedSettings);
-            if (parsed && typeof parsed.practiceTimeSec === 'number') setPracticeTimeSec(parsed.practiceTimeSec);
-            if (parsed && typeof parsed.hindiLayout === 'string') setHindiLayout(parsed.hindiLayout);
+            if (parsed && typeof parsed === 'object') setSettings({ ...DEFAULT_SETTINGS, ...parsed });
           } catch {}
         }
       } catch (e) {} finally {
-        setIsLoaded(true);
+        setLoaded(true);
       }
     })();
   }, []);
 
-  const handleSetName = (name) => {
+  const persistSettings = (next) => {
+    AsyncStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(next)).catch(() => {});
+  };
+
+  const setSetting = (key, value) => {
+    setSettings((prev) => {
+      const next = { ...prev, [key]: value };
+      persistSettings(next);
+      return next;
+    });
+  };
+
+  const changePracticeTime = (sec) => setSetting('practiceTimeSec', sec);
+  const changeHindiLayout = (layout) => setSetting('hindiLayout', layout);
+
+  const handleSubmitName = (name) => {
     const safe = name.trim();
     if (!safe) return;
     setStudentName(safe);
-    setShowWelcome(false);
+    setShowNameEntry(false);
     AsyncStorage.getItem(unlockedKeyFor(safe))
       .then((raw) => {
         if (raw) {
@@ -146,11 +172,12 @@ export default function App() {
     AsyncStorage.getItem(courseProgressKeyFor(safe))
       .then((raw) => {
         if (raw) {
-          try { setCourseProgress(JSON.parse(raw)); } catch { setCourseProgress([]); }
-        } else { setCourseProgress([]); }
+          try { setCompletedSubLessons(JSON.parse(raw)); } catch { setCompletedSubLessons([]); }
+        } else { setCompletedSubLessons([]); }
       })
-      .catch(() => setCourseProgress([]));
+      .catch(() => setCompletedSubLessons([]));
     AsyncStorage.setItem(STORAGE_KEYS.name, safe).catch(() => {});
+    loadBestWpm(safe);
     setUsers((prev) => {
       if (prev.includes(safe)) return prev;
       const next = [...prev, safe];
@@ -159,57 +186,59 @@ export default function App() {
     });
   };
 
-  const showLessons = () => setActiveTab('Lessons');
+  const startPracticeFromHome = () => {
+    setTypingConfig({
+      type: 'practice',
+      lang: 'english',
+      title: 'Typing Practice',
+      timeSec: settings.practiceTimeSec || 300,
+      difficulty: 'Easy',
+      mode: 'paragraph',
+    });
+    setLaunchTab('Home');
+    setTab('Type');
+  };
 
   const startPractice = () => {
-    const paragraph = getRandomPracticeParagraph(practiceTimeSec);
-    setCurrentLesson({
+    setTypingConfig({
+      type: 'practice',
       lang: 'english',
-      id: `practice_${Date.now()}`,
-      title: 'Practice',
-      timeSec: practiceTimeSec,
-      practiceText: paragraph,
+      title: 'Typing Practice',
+      timeSec: settings.practiceTimeSec || 300,
+      difficulty: 'Easy',
+      mode: 'paragraph',
     });
-    setPreviousScreen('Home');
-    setIsPracticeMode(true);
-    setActiveTab('Type');
+    setLaunchTab('Home');
+    setTab('Type');
   };
 
-  const changePracticeTime = (sec) => {
-    setPracticeTimeSec(sec);
-    AsyncStorage.setItem(STORAGE_KEYS.settings, JSON.stringify({ practiceTimeSec: sec, hindiLayout })).catch(() => {});
+  const startTest = ({ timeSec, difficulty, mode }) => {
+    setTypingConfig({
+      type: 'test',
+      lang: 'english',
+      title: 'Typing Test',
+      timeSec,
+      difficulty,
+      mode,
+    });
+    setLaunchTab('Tests');
+    setTab('Type');
   };
 
-  const changeHindiLayout = (layout) => {
-    setHindiLayout(layout);
-    AsyncStorage.setItem(STORAGE_KEYS.settings, JSON.stringify({ practiceTimeSec, hindiLayout: layout })).catch(() => {});
+  const startLesson = (lang, lessonId, title, timeSec) => {
+    setTypingConfig({
+      type: 'lesson',
+      lang,
+      id: lessonId,
+      title,
+      timeSec,
+      nextLesson: getNextLesson(lang, lessonId),
+    });
+    setLaunchTab('Lessons');
+    setTab('Type');
   };
 
-  const resetAllData = () => {
-    setStudentName('');
-    setUsers([]);
-    setUnlockedLessons(DEFAULT_UNLOCKED);
-    setCourseProgress([]);
-    setAbcMode('az');
-    setBubbleMode('lower');
-    setPracticeTimeSec(300);
-    setHindiLayout('mangal');
-    setShowWelcome(true);
-    setActiveTab('Home');
-  };
-
-  const handleStartLesson = (lang, lessonId, title, timeSec) => {
-    setCurrentLesson({ lang, id: lessonId, title, timeSec });
-    setPreviousScreen('Lessons');
-    setActiveTab('Type');
-  };
-
-  const handleLessonComplete = (lang, lessonId) => {
-    if (isPracticeMode) {
-      setIsPracticeMode(false);
-      setActiveTab(previousScreen);
-      return;
-    }
+  const unlockNextLesson = (lang, lessonId) => {
     const current = unlockedLessons[lang] || [];
     const nextId = LESSON_ORDER[LESSON_ORDER.indexOf(lessonId) + 1];
     if (nextId !== undefined && !current.includes(nextId)) {
@@ -217,224 +246,318 @@ export default function App() {
       setUnlockedLessons(next);
       AsyncStorage.setItem(unlockedKeyFor(studentName), JSON.stringify(next)).catch(() => {});
     }
-    setActiveTab('Lessons');
+    loadBestWpm(studentName);
   };
 
-  const handleSubLessonComplete = (subId) => {
-    const course = selectedCourse || (COURSES[0]);
-    if (!course) return;
-    const alreadyDone = courseProgress.includes(subId);
-    const newProgress = alreadyDone ? courseProgress : [...courseProgress, subId];
+  const handleNextLesson = (lang, lessonId, nextLessonData) => {
+    if (nextLessonData) {
+      unlockNextLesson(lang, lessonId);
+      setTypingConfig({
+        type: 'lesson',
+        lang,
+        id: nextLessonData.id,
+        title: nextLessonData.title,
+        timeSec: nextLessonData.timeSec,
+        nextLesson: getNextLesson(lang, nextLessonData.id),
+      });
+      setLaunchTab('Lessons');
+    }
+  };
+
+  const completeCourseSubLesson = (subId) => {
+    const currentCourse = course || COURSES[0];
+    if (!currentCourse) return;
+    const alreadyDone = completedSubLessons.includes(subId);
+    const newProgress = alreadyDone ? completedSubLessons : [...completedSubLessons, subId];
     if (!alreadyDone) {
-      setCourseProgress(newProgress);
+      setCompletedSubLessons(newProgress);
       AsyncStorage.setItem(courseProgressKeyFor(studentName), JSON.stringify(newProgress)).catch(() => {});
     }
-    const allLessonsDone = course.lessons.every((lesson) =>
-      lesson.subLessons.every((s) => newProgress.includes(s.id))
+    const allComplete = currentCourse.lessons.every((l) =>
+      l.subLessons.every((s) => newProgress.includes(s.id))
     );
-    if (allLessonsDone) {
-      setPreviousScreen('LessonDetail');
-      setActiveTab('Result');
+    if (allComplete) {
+      setLaunchTab('LessonDetail');
+      setTypingConfig(null);
+      setTab('Result');
       return;
     }
-    const parentLesson = course.lessons.find((lesson) =>
-      lesson.subLessons.some((s) => s.id === subId)
+    const parentLesson = currentCourse.lessons.find((l) =>
+      l.subLessons.some((s) => s.id === subId)
     );
     if (parentLesson) {
       const parentComplete = parentLesson.subLessons.every((s) => newProgress.includes(s.id));
-      const idx = course.lessons.findIndex((l) => l.id === parentLesson.id);
-      const nextLesson = course.lessons[idx + 1];
+      const idx = currentCourse.lessons.findIndex((l) => l.id === parentLesson.id);
+      const nextLesson = currentCourse.lessons[idx + 1];
       if (parentComplete && nextLesson) {
-        setSelectedLesson(nextLesson);
-        setPreviousScreen('LessonDetail');
-        setActiveTab('LessonDetail');
+        setLesson(nextLesson);
+        setLaunchTab('LessonDetail');
+        setTypingConfig(null);
+        setTab('LessonDetail');
         return;
       }
     }
-    setPreviousScreen('LessonDetail');
-    setActiveTab('LessonDetail');
+    setLaunchTab('LessonDetail');
+    setTypingConfig(null);
+    setTab('LessonDetail');
+  };
+
+  const handleTypingComplete = (lang, lessonId) => {
+    if (typingConfig && typingConfig.courseSubId) {
+      completeCourseSubLesson(typingConfig.courseSubId);
+    } else {
+      unlockNextLesson(lang, lessonId);
+    }
+  };
+
+  const closeTyping = () => {
+    loadBestWpm(studentName);
+    const returnTo = launchTab === 'Type' ? 'Home' : launchTab;
+    setTypingConfig(null);
+    setTab(returnTo);
+  };
+
+  const resetAll = () => {
+    setStudentName('');
+    setUsers([]);
+    setUnlockedLessons(DEFAULT_UNLOCKED);
+    setCompletedSubLessons([]);
+    setAlphabetMode('az');
+    setBubblesMode('lower');
+    setSettings(DEFAULT_SETTINGS);
+    setBestWpm(0);
+    setShowNameEntry(true);
+    setTab('Home');
   };
 
   const renderScreen = () => {
-    switch (activeTab) {
+    switch (tab) {
       case 'Lessons':
         return (
           <LessonsScreen
+            studentName={studentName}
             unlockedLessons={unlockedLessons}
-            onStartLesson={handleStartLesson}
-            hindiLayout={hindiLayout}
+            onStartLesson={startLesson}
+            hindiLayout={settings.hindiLayout || 'mangal'}
             onChangeHindiLayout={changeHindiLayout}
-            onBack={() => setActiveTab('Home')}
+            onBack={() => setTab('Home')}
           />
         );
       case 'Type':
         return (
           <TypingScreen
-            lesson={currentLesson}
-            onComplete={(lang, id) => {
-              if (currentLesson && currentLesson.courseSubId) {
-                handleSubLessonComplete(currentLesson.courseSubId);
-              } else if (isPracticeMode) {
-                setIsPracticeMode(false);
-                setActiveTab(previousScreen);
-              } else {
-                handleLessonComplete(lang, id);
-              }
-            }}
+            config={typingConfig || {}}
+            settings={settings}
+            onComplete={handleTypingComplete}
+            onNextLesson={handleNextLesson}
             studentName={studentName}
-            hindiLayout={hindiLayout}
-            onBack={() => {
-              setIsPracticeMode(false);
-              setActiveTab(previousScreen);
-            }}
+            hindiLayout={settings.hindiLayout || 'mangal'}
+            onBack={closeTyping}
+          />
+        );
+      case 'Tests':
+        return (
+          <TestScreen
+            studentName={studentName}
+            onStartTest={startTest}
+            onBack={() => setTab('Home')}
+          />
+        );
+      case 'Statistics':
+      case 'Stats':
+        return (
+          <StatsScreen
+            studentName={studentName}
+            onBack={() => setTab('Home')}
+          />
+        );
+      case 'Certificates':
+        return (
+          <CertificatesScreen
+            studentName={studentName}
+            onBack={() => setTab('Home')}
+          />
+        );
+      case 'Profile':
+        return (
+          <ProfileScreen
+            studentName={studentName}
+            onBack={() => setTab('Home')}
+            onSwitchUser={() => setShowNameEntry(true)}
+            onSettings={() => setTab('Settings')}
           />
         );
       case 'History':
-        return <HistoryScreen studentName={studentName} onBack={() => setActiveTab('Home')} />;
-      case 'Stats':
-        return <StatsScreen studentName={studentName} onBack={() => setActiveTab('Home')} />;
+        return (
+          <HistoryScreen
+            studentName={studentName}
+            onBack={() => setTab('Home')}
+          />
+        );
       case 'Course':
         return (
           <CourseScreen
-            onBack={() => setActiveTab('Home')}
-            completedSubLessons={courseProgress}
-            onViewResult={() => setActiveTab('Result')}
-            onStartLesson={(course, lesson) => {
-              setSelectedCourse(course);
-              setSelectedLesson(lesson);
-              setActiveTab('LessonDetail');
+            onBack={() => setTab('Home')}
+            completedSubLessons={completedSubLessons}
+            onViewResult={() => setTab('Result')}
+            onStartLesson={(c, l) => {
+              setCourse(c);
+              setLesson(l);
+              setTab('LessonDetail');
             }}
           />
         );
       case 'LessonDetail':
         return (
           <LessonDetailScreen
-            lesson={selectedLesson}
-            course={selectedCourse}
-            completedSubLessons={courseProgress}
-            onBack={() => setActiveTab('Course')}
+            lesson={lesson}
+            course={course}
+            completedSubLessons={completedSubLessons}
+            onBack={() => setTab('Course')}
             onStartSubLesson={(sub) => {
-              const timeMin = sub.duration ? parseInt(sub.duration) : 5;
-              setCurrentLesson({
+              const minutes = sub.duration ? parseInt(sub.duration) : 5;
+              setTypingConfig({
+                type: 'lesson',
                 lang: 'english',
                 id: `course_${sub.id}_${Date.now()}`,
                 title: sub.title,
-                timeSec: timeMin * 60,
-                practiceText: sub.text,
+                timeSec: minutes * 60,
+                lessonText: sub.text,
                 courseSubId: sub.id,
               });
-              setPreviousScreen('LessonDetail');
-              setIsPracticeMode(true);
-              setActiveTab('Type');
+              setLaunchTab('LessonDetail');
+              setTab('Type');
             }}
-            onSelectLesson={(lesson) => setSelectedLesson(lesson)}
+            onSelectLesson={(l) => setLesson(l)}
           />
         );
       case 'Result':
         return (
           <ResultScreen
-            course={selectedCourse || COURSES[0]}
-            onBack={() => setActiveTab('Course')}
+            course={course || COURSES[0]}
+            onBack={() => setTab('Course')}
           />
         );
       case 'Review':
         return (
           <ReviewScreen
-            onBack={() => setActiveTab('Home')}
+            onBack={() => setTab('Home')}
             onStartReview={(config) => {
               if (config.exercise === 'Keyboard Drill') {
                 setReviewConfig(config);
-                setActiveTab('ReviewDrill');
+                setTab('ReviewDrill');
               } else if (config.exercise === 'Word Drill') {
                 setReviewConfig(config);
-                setActiveTab('WordDrill');
+                setTab('WordDrill');
               } else if (config.exercise === 'Game' && config.game === 'Clouds') {
                 setReviewConfig(config);
-                setActiveTab('CloudsGame');
+                setTab('CloudsGame');
               } else if (config.exercise === 'Game' && config.game === 'WordTris') {
                 setReviewConfig(config);
-                setActiveTab('WordTrisGame');
+                setTab('WordTrisGame');
               } else {
-                setActiveTab('Review');
+                setTab('Review');
               }
             }}
           />
         );
       case 'ReviewDrill':
-        return <ReviewDrillScreen onBack={() => setActiveTab('Review')} keyOption={reviewConfig ? reviewConfig.keyOption : 'Difficult Keys'} />;
-      case 'WordDrill':
-        return <WordDrillScreen onBack={() => setActiveTab('Review')} />;
-      case 'CloudsGame':
-        return <CloudsGameScreen onBack={() => setActiveTab('Review')} />;
-      case 'WordTrisGame':
-        return <WordTrisGameScreen onBack={() => setActiveTab('Review')} />;
-      case 'Home':
-      default:
         return (
-          <HomeScreen
-            studentName={studentName}
-            onStartTyping={startPractice}
-            onContinueLesson={showLessons}
-            onCourse={() => setActiveTab('Course')}
-            onReview={() => setActiveTab('Review')}
-            onGames={() => setActiveTab('Games')}
-            onSetting={() => setActiveTab('Settings')}
-            onExplore={() => setActiveTab('Explore')}
-            onInfo={() => setActiveTab('Info')}
-            onSwitchUser={() => setShowWelcome(true)}
+          <ReviewDrillScreen
+            onBack={() => setTab('Review')}
+            keyOption={reviewConfig ? reviewConfig.keyOption : 'Difficult Keys'}
           />
         );
+      case 'WordDrill':
+        return <WordDrillScreen onBack={() => setTab('Review')} />;
+      case 'CloudsGame':
+        return <CloudsGameScreen onBack={() => setTab('Review')} />;
+      case 'WordTrisGame':
+        return <WordTrisGameScreen onBack={() => setTab('Review')} />;
       case 'Games':
         return (
           <GamesMenuScreen
-            onBack={() => setActiveTab('Home')}
-            onStartABC={(mode) => { setAbcMode(mode || 'az'); setActiveTab('AlphabetGame'); }}
-            onStartBubbles={(mode) => { setBubbleMode(mode || 'lower'); setActiveTab('BubblesGame'); }}
+            onBack={() => setTab('Home')}
+            onStartABC={(mode) => { setAlphabetMode(mode || 'az'); setTab('AlphabetGame'); }}
+            onStartBubbles={(mode) => { setBubblesMode(mode || 'lower'); setTab('BubblesGame'); }}
+            onStartSpeed={() => setTab('SpeedChallenge')}
+            onStartWordRush={() => setTab('WordRush')}
+            onStartAccuracy={() => setTab('AccuracyChallenge')}
+            onStartTimeAttack={() => setTab('TimeAttack')}
           />
         );
       case 'AlphabetGame':
-        return <AlphabetGameScreen onBack={() => setActiveTab('Games')} mode={abcMode} />;
+        return <AlphabetGameScreen onBack={() => setTab('Games')} mode={alphabetMode} />;
       case 'BubblesGame':
-        return <BubblesGameScreen onBack={() => setActiveTab('Games')} mode={bubbleMode} />;
+        return <BubblesGameScreen onBack={() => setTab('Games')} mode={bubblesMode} />;
+      case 'SpeedChallenge':
+        return <SpeedChallengeScreen onBack={() => setTab('Games')} />;
+      case 'WordRush':
+        return <WordRushScreen onBack={() => setTab('Games')} />;
+      case 'AccuracyChallenge':
+        return <AccuracyChallengeScreen onBack={() => setTab('Games')} />;
+      case 'TimeAttack':
+        return <TimeAttackScreen onBack={() => setTab('Games')} />;
       case 'Settings':
         return (
           <SettingsScreen
             studentName={studentName}
-            practiceTimeSec={practiceTimeSec}
+            settings={settings}
+            onChangeSetting={setSetting}
+            practiceTimeSec={settings.practiceTimeSec || 300}
             onChangePracticeTime={changePracticeTime}
-            hindiLayout={hindiLayout}
+            hindiLayout={settings.hindiLayout || 'mangal'}
             onChangeHindiLayout={changeHindiLayout}
-            onSwitchUser={() => setShowWelcome(true)}
-            onBack={() => setActiveTab('Home')}
-            onResetAll={resetAllData}
+            onSwitchUser={() => setShowNameEntry(true)}
+            onBack={() => setTab('Home')}
+            onResetAll={resetAll}
           />
         );
       case 'Explore':
         return (
           <ExploreScreen
             studentName={studentName}
-            onBack={() => setActiveTab('Home')}
+            onBack={() => setTab('Home')}
           />
         );
       case 'Info':
-        return <InfoScreen onBack={() => setActiveTab('Home')} />;
+        return <InfoScreen onBack={() => setTab('Home')} />;
+      case 'Home':
+      default:
+        return (
+          <HomeScreen
+            studentName={studentName}
+            onStartTyping={startPracticeFromHome}
+            onLessons={() => setTab('Lessons')}
+            onTests={() => setTab('Tests')}
+            onGames={() => setTab('Games')}
+            onCertificates={() => setTab('Certificates')}
+            onStatistics={() => setTab('Statistics')}
+            onProfile={() => setTab('Profile')}
+            onSettings={() => setTab('Settings')}
+            onSwitchUser={() => setShowNameEntry(true)}
+            onCourse={() => setTab('Course')}
+            onReview={() => setTab('Review')}
+            onExplore={() => setTab('Explore')}
+            onInfo={() => setTab('Info')}
+          />
+        );
     }
   };
 
-  if (!isLoaded) {
+  if (!loaded) {
     return (
-      <View style={[appStyles.app, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a0a0a' }]}>
-        <Text style={{ color: '#f8fafc', fontSize: 18, letterSpacing: 2 }}>Typing Master</Text>
+      <View style={[styles.app, { alignItems: 'center', justifyContent: 'center', backgroundColor: BG }]}>
+        <Text style={{ color: '#f8fafc', fontSize: 18, letterSpacing: 2, fontFamily: 'Calibri', fontWeight: '700' }}>Typing Master</Text>
         <Text style={{ color: 'rgba(226,232,240,0.65)', fontSize: 12, marginTop: 6 }}>Loading...</Text>
       </View>
     );
   }
 
-  // Welcome screen (same for mobile & desktop)
-  if (showWelcome) {
+  if (showNameEntry) {
     return (
       <NameEntryScreen
-        onSubmit={handleSetName}
+        onSubmit={handleSubmitName}
         onCancel={() => {
           if (typeof window !== 'undefined' && window.close) {
             window.close();
@@ -448,18 +571,23 @@ export default function App() {
     );
   }
 
-  // Full-screen modes (typing, games, drills) - no sidebar
-  const fullScreenTabs = ['Type', 'WordDrill', 'ReviewDrill', 'CloudsGame', 'WordTrisGame', 'AlphabetGame', 'BubblesGame'];
-  const isFullScreen = fullScreenTabs.includes(activeTab);
+  const fullScreenTabs = ['Type', 'WordDrill', 'ReviewDrill', 'CloudsGame', 'WordTrisGame', 'AlphabetGame', 'BubblesGame', 'SpeedChallenge', 'WordRush', 'AccuracyChallenge', 'TimeAttack'];
+  const isFullScreen = fullScreenTabs.includes(tab);
 
   if (isDesktop && !isFullScreen) {
-    // Desktop layout: sidebar + header + content
     return (
-      <View style={appStyles.desktopRoot}>
-        <DesktopSidebar activeTab={activeTab} onTabPress={setActiveTab} />
-        <View style={appStyles.desktopMain}>
-          <DesktopHeader activeTab={activeTab} studentName={studentName} />
-          <View style={appStyles.desktopContent}>
+      <View style={styles.desktopRoot}>
+        <Sidebar
+          activeTab={tab}
+          onTabPress={(t) => {
+            if (t !== 'Practice') setTab(t);
+            else startPractice();
+          }}
+          studentName={studentName}
+          bestWpm={bestWpm}
+        />
+        <View style={styles.desktopMain}>
+          <View style={styles.desktopContent}>
             {renderScreen()}
           </View>
         </View>
@@ -468,28 +596,50 @@ export default function App() {
   }
 
   if (isDesktop && isFullScreen) {
-    // Full screen mode on desktop (typing, games) - no sidebar/header
     return (
-      <View style={appStyles.desktopRoot}>
-        <View style={appStyles.desktopMain}>
-          {renderScreen()}
+      <View style={styles.desktopRoot}>
+        <View style={styles.fsOuter}>
+          <View style={styles.fsWindow}>
+            <View style={styles.fsExitFloating}>
+              <TouchableOpacity
+                style={styles.fsExitBtn}
+                onPress={() => { setTypingConfig(null); setTab('Home'); }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="home" size={14} color="#fff" />
+              </TouchableOpacity>
+              {typeof window !== 'undefined' && window.close && (
+                <TouchableOpacity
+                  style={styles.fsExitBtn}
+                  onPress={closeTyping}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="close" size={14} color="#fff" />
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={styles.fsBody}>
+              {renderScreen()}
+            </View>
+          </View>
         </View>
       </View>
     );
   }
 
-  // Mobile layout (existing)
+  const mobileHiddenTabs = ['Type', 'WordDrill', 'ReviewDrill', 'CloudsGame', 'WordTrisGame', 'AlphabetGame', 'BubblesGame', 'Settings', 'Games', 'Tests', 'Statistics', 'Certificates', 'Profile', 'SpeedChallenge', 'WordRush', 'AccuracyChallenge', 'TimeAttack'];
+
   return (
-    <View style={appStyles.app}>
+    <View style={styles.app}>
       {renderScreen()}
-      {activeTab !== 'Type' && activeTab !== 'WordDrill' && activeTab !== 'ReviewDrill' && activeTab !== 'CloudsGame' && activeTab !== 'WordTrisGame' && activeTab !== 'AlphabetGame' && activeTab !== 'BubblesGame' && activeTab !== 'Settings' && activeTab !== 'Games' && (
-        <BottomNav activeTab={activeTab} onTabPress={setActiveTab} />
+      {!mobileHiddenTabs.includes(tab) && (
+        <BottomNav activeTab={tab} onTabPress={setTab} />
       )}
     </View>
   );
 }
 
-const appStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   app: {
     flex: 1,
     backgroundColor: BG,
@@ -499,6 +649,7 @@ const appStyles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     backgroundColor: BG,
+    paddingHorizontal: 100,
     overflow: 'hidden',
   },
   desktopMain: {
@@ -506,48 +657,56 @@ const appStyles = StyleSheet.create({
     flexDirection: 'column',
     overflow: 'hidden',
   },
-  desktopHeader: {
-    height: HEADER_HEIGHT,
+  desktopContent: {
+    flex: 1,
+    overflow: 'hidden',
+  },
+  fsOuter: {
+    flex: 1,
+    paddingTop: 12,
+    paddingBottom: 12,
+    paddingLeft: 100,
+    paddingRight: 100,
+    backgroundColor: BG_DEEP,
+  },
+  fsWindow: {
+    flex: 1,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: COLORS.headerBorder,
+    backgroundColor: BG,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.55,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 24,
+    elevation: 12,
+  },
+  fsExitFloating: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 100,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    backgroundColor: COLORS.headerBg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.headerBorder,
+    gap: 6,
   },
-  desktopHeaderTitle: {
-    fontFamily: 'Calibri',
-    fontWeight: '700',
-    color: COLORS.textWhite,
-    fontSize: 15,
-  },
-  desktopHeaderUser: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  desktopHeaderAvatar: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: COLORS.green,
+  fsExitBtn: {
+    width: 30,
+    height: 30,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'rgba(10,14,26,0.55)',
+    borderWidth: 1,
+    borderColor: COLORS.headerBorder,
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 4,
   },
-  desktopHeaderAvatarText: {
-    fontFamily: 'Calibri',
-    fontWeight: '700',
-    color: '#fff',
-    fontSize: 12,
-  },
-  desktopHeaderName: {
-    fontFamily: 'Calibri',
-    fontWeight: '700',
-    color: COLORS.textLight,
-    fontSize: 13,
-  },
-  desktopContent: {
+  fsBody: {
     flex: 1,
     overflow: 'hidden',
   },

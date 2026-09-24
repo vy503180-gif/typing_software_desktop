@@ -1,322 +1,353 @@
 // src/screens/GamesMenuScreen.js
-// Games launcher with vibrant colors
+// Games launcher: saare games ek saath grid me dikhte hain (row/column),
+// har game ka apna theme. Card select karo → Start dabao → typing shuru.
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  KeyboardAvoidingView,
-  Platform,
+  View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar, ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
+import { BG, COLORS, scaleFont, scaleSize, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const GAMES = [
-  { id: 'abc', label: 'ABC Speed Race', icon: 'rocket', color: COLORS.teal, desc: 'A se Z tak type karo, time se race' },
-  { id: 'bubbles', label: 'Bubbles', icon: 'water', color: COLORS.green, desc: 'Bubble par wala letter type karke pop karo' },
+  {
+    id: 'abc', label: 'ABC Speed Race', icon: 'rocket', color: COLORS.teal,
+    desc: 'Type A to Z in a circle under full speed', badge: 'Arcade',
+    modes: [
+      { id: 'az', label: 'A-Z' },
+      { id: 'za', label: 'Z-A' },
+      { id: 'num', label: '0-9' },
+      { id: 'numrev', label: '9-0' },
+    ],
+  },
+  {
+    id: 'bubbles', label: 'Bubbles', icon: 'water', color: COLORS.green,
+    desc: 'Pop rising bubbles by typing the letter', badge: 'Arcade',
+    modes: [
+      { id: 'lower', label: 'a-z' },
+      { id: 'mixed', label: 'a-z, A-Z' },
+      { id: 'alnum', label: 'a-z, A-Z, 0-9' },
+    ],
+  },
+  {
+    id: 'speed', label: 'Speed Challenge', icon: 'flash', color: COLORS.amber,
+    desc: 'Rapid-fire words - survive 60 seconds of full speed', badge: '60s',
+    modes: null,
+  },
+  {
+    id: 'wordrush', label: 'Word Rush', icon: 'trending-up', color: COLORS.rose,
+    desc: 'Word chain with streak multiplier - keep it alive!', badge: 'Combo',
+    modes: null,
+  },
+  {
+    id: 'accuracy', label: 'Accuracy Challenge', icon: 'locate', color: COLORS.purple,
+    desc: 'Slow and precise - keep accuracy above 98% to score big', badge: '98%',
+    modes: null,
+  },
+  {
+    id: 'timeattack', label: 'Time Attack', icon: 'timer', color: COLORS.cyan,
+    desc: 'Beat the 40 second clock with a full paragraph', badge: '40s',
+    modes: null,
+  },
 ];
 
-const ALPHABET_MODES = [
-  { id: 'az', label: 'A-Z' },
-  { id: 'za', label: 'Z-A' },
-  { id: 'num', label: '1-10' },
-  { id: 'numrev', label: '10-1' },
-];
+export default function GamesMenuScreen({
+  onBack,
+  onStartABC,
+  onStartBubbles,
+  onStartSpeed,
+  onStartWordRush,
+  onStartAccuracy,
+  onStartTimeAttack,
+}) {
+  const [selected, setSelected] = useState(null);
+  const [mode, setMode] = useState({});
 
-const BUBBLE_MODES = [
-  { id: 'lower', label: 'a-z' },
-  { id: 'mixed', label: 'a-z, A-Z' },
-  { id: 'alnum', label: 'a-z, A-Z, 0-9' },
-];
+  const currentGame = selected ? GAMES.find((g) => g.id === selected) : null;
+  const currentMode = currentGame && currentGame.modes
+    ? currentGame.modes.find((m) => m.id === mode[currentGame.id]) || currentGame.modes[0]
+    : null;
 
-export default function GamesMenuScreen({ onBack, onStartABC, onStartBubbles }) {
-  const [selected, setSelected] = useState('abc');
-  const [inputBubbles, setInputBubbles] = useState('');
-  const [abcMode, setAbcMode] = useState('az');
-  const [showAbcDropdown, setShowAbcDropdown] = useState(false);
-  const [bubbleMode, setBubbleMode] = useState('lower');
-  const [showBubbleDropdown, setShowBubbleDropdown] = useState(false);
-
-  const abcDropdownRef = useRef(null);
-  const bubbleDropdownRef = useRef(null);
-
-  // Web par: dropdown ke bahar click karne se band
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    const onDown = (e) => {
-      const t = e.target;
-      const insideAbc = abcDropdownRef.current && abcDropdownRef.current.contains(t);
-      const insideBubble = bubbleDropdownRef.current && bubbleDropdownRef.current.contains(t);
-      if (!insideAbc && !insideBubble) {
-        setShowAbcDropdown(false);
-        setShowBubbleDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', onDown, true);
-    return () => document.removeEventListener('mousedown', onDown, true);
-  }, []);
-
-  const handleDone = () => {
-    if (selected === 'abc' && onStartABC) onStartABC(abcMode);
-    else if (selected === 'bubbles' && onStartBubbles) onStartBubbles(bubbleMode);
+  const handleStart = () => {
+    if (!currentGame) return;
+    if (currentGame.id === 'abc' && onStartABC) onStartABC(currentMode.id);
+    else if (currentGame.id === 'bubbles' && onStartBubbles) onStartBubbles(currentMode.id);
+    else if (currentGame.id === 'speed' && onStartSpeed) onStartSpeed();
+    else if (currentGame.id === 'wordrush' && onStartWordRush) onStartWordRush();
+    else if (currentGame.id === 'accuracy' && onStartAccuracy) onStartAccuracy();
+    else if (currentGame.id === 'timeattack' && onStartTimeAttack) onStartTimeAttack();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.gradient}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={[styles.flex, IS_DESKTOP && styles.flexDesktop]}>
-          {/* Header */}
-          <View style={styles.headerRow}>
-            {onBack && (
-              <TouchableOpacity onPress={onBack} style={styles.backIconBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
-              </TouchableOpacity>
-            )}
-            <Ionicons name="game-controller" size={22} color={COLORS.rose} />
+      <ScrollView
+        contentContainerStyle={[styles.scroll, IS_DESKTOP && styles.scrollDesktop]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Header */}
+        <View style={styles.headerRow}>
+          {onBack && (
+            <TouchableOpacity onPress={onBack} style={styles.backIconBtn} activeOpacity={0.7}>
+              <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+            </TouchableOpacity>
+          )}
+          <View style={styles.headerText}>
             <Text style={styles.headerTitle}>Games</Text>
-            <View style={styles.headerSpacer} />
+            <Text style={styles.headerSub}>Tap a game to select it, then press Start</Text>
           </View>
+        </View>
 
-          <Text style={styles.subtitle}>Koi ek game chuno aur Done dabao</Text>
-
-          {/* Games row */}
-          <View style={styles.gamesRow}>
-            {GAMES.map((game) => {
-              const isSel = selected === game.id;
-              return (
-                <View key={game.id} style={styles.gameCol}>
-                  <TouchableOpacity
-                    style={[styles.gameCard, isSel && { borderColor: game.color + '60', backgroundColor: game.color + '15' }]}
-                    onPress={() => setSelected(game.id)}
-                    activeOpacity={0.85}
-                  >
-                    {isSel && (
-                      <View style={[styles.selBadge, { backgroundColor: game.color }]}>
-                        <Ionicons name="checkmark" size={12} color="#fff" />
-                      </View>
-                    )}
-                    <View style={[styles.gameIcon, { backgroundColor: game.color + '20' }]}>
-                      <Ionicons name={game.icon} size={22} color={game.color} />
-                    </View>
-                    <Text style={styles.gameLabel}>{game.label}</Text>
-                    <Text style={styles.gameDesc} numberOfLines={2}>{game.desc}</Text>
-                  </TouchableOpacity>
-
-                  {game.id === 'abc' ? (
-                    <View style={styles.dropdownWrap} ref={abcDropdownRef}>
-                      <TouchableOpacity
-                        style={[styles.dropdownBtn, isSel && { borderColor: COLORS.teal + '70', backgroundColor: COLORS.teal + '12' }]}
-                        onPress={() => {
-                          setSelected('abc');
-                          setShowBubbleDropdown(false);
-                          setShowAbcDropdown(!showAbcDropdown);
-                        }}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.dropdownLeadIcon, { backgroundColor: COLORS.teal + '22' }]}>
-                          <Ionicons name="keypad" size={13} color={COLORS.teal} />
-                        </View>
-                        <Text style={styles.dropdownBtnText}>{ALPHABET_MODES.find((m) => m.id === abcMode).label}</Text>
-                        <Ionicons name={showAbcDropdown ? 'chevron-up' : 'chevron-down'} size={15} color={isSel ? COLORS.teal : COLORS.textMuted} />
-                      </TouchableOpacity>
-                      {showAbcDropdown && (
-                        <View style={styles.dropdownList}>
-                          {ALPHABET_MODES.map((m) => (
-                            <TouchableOpacity
-                              key={m.id}
-                              style={[styles.dropdownItem, m.id === abcMode && styles.dropdownItemActive]}
-                              onPress={() => {
-                                setAbcMode(m.id);
-                                setShowAbcDropdown(false);
-                              }}
-                              activeOpacity={0.7}
-                            >
-                              <Text style={[styles.dropdownItemText, m.id === abcMode && styles.dropdownItemTextActive]}>{m.label}</Text>
-                              {m.id === abcMode && <Ionicons name="checkmark" size={15} color={COLORS.teal} />}
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                      )}
-                    </View>
-                  ) : (
-                    <View style={styles.dropdownWrap} ref={bubbleDropdownRef}>
-                      <TouchableOpacity
-                        style={[styles.dropdownBtn, isSel && { borderColor: game.color + '70', backgroundColor: game.color + '12' }]}
-                        onPress={() => {
-                          setSelected('bubbles');
-                          setShowAbcDropdown(false);
-                          setShowBubbleDropdown(!showBubbleDropdown);
-                        }}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[styles.dropdownLeadIcon, { backgroundColor: game.color + '22' }]}>
-                          <Ionicons name="keypad" size={13} color={game.color} />
-                        </View>
-                        <Text style={styles.dropdownBtnText} numberOfLines={1}>{BUBBLE_MODES.find((m) => m.id === bubbleMode).label}</Text>
-                        <Ionicons name={showBubbleDropdown ? 'chevron-up' : 'chevron-down'} size={15} color={isSel ? game.color : COLORS.textMuted} />
-                      </TouchableOpacity>
-                      {showBubbleDropdown && (
-                        <View style={styles.dropdownList}>
-                          {BUBBLE_MODES.map((m) => (
-                            <TouchableOpacity
-                              key={m.id}
-                              style={[styles.dropdownItem, m.id === bubbleMode && { backgroundColor: game.color + '20' }]}
-                              onPress={() => {
-                                setBubbleMode(m.id);
-                                setShowBubbleDropdown(false);
-                              }}
-                              activeOpacity={0.7}
-                            >
-                              <Text style={[styles.dropdownItemText, m.id === bubbleMode && { color: game.color }]} numberOfLines={1}>{m.label}</Text>
-                              {m.id === bubbleMode && <Ionicons name="checkmark" size={15} color={game.color} />}
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                      )}
-                    </View>
-                  )}
+        {/* All games - grid (row/column) */}
+        <View style={styles.grid}>
+          {GAMES.map((game) => {
+            const active = selected === game.id;
+            return (
+              <TouchableOpacity
+                key={game.id}
+                style={[
+                  styles.gameCard,
+                  { backgroundColor: game.color + '14', borderColor: game.color + '4d' },
+                ]}
+                onPress={() => {
+                  setSelected(game.id);
+                  if (game.modes && mode[game.id] == null) {
+                    setMode((m) => ({ ...m, [game.id]: game.modes[0].id }));
+                  }
+                }}
+                activeOpacity={0.85}
+              >
+                <View style={[styles.gameTop, { borderBottomColor: game.color + '33' }]}>
+                  <View style={[styles.gameIcon, { backgroundColor: game.color, shadowColor: game.color }]}>
+                    <Ionicons name={game.icon} size={24} color="#fff" />
+                  </View>
+                  <View style={[styles.gameBadge, { backgroundColor: game.color + '2b', borderColor: game.color + '70' }]}>
+                    <Text style={[styles.gameBadgeText, { color: game.color }]}>{game.badge}</Text>
+                  </View>
                 </View>
-              );
-            })}
-          </View>
+                <Text style={styles.gameLabel}>{game.label}</Text>
+                <Text style={styles.gameDesc} numberOfLines={2}>{game.desc}</Text>
+                <View style={[styles.footerRow, active && { backgroundColor: game.color, borderColor: game.color }]}>
+                  <View style={[styles.checkBox, active && styles.checkBoxChecked]}>
+                    {active && <Ionicons name="checkmark" size={13} color={game.color} />}
+                  </View>
+                  <Text style={active ? styles.footerActiveText : styles.footerText}>
+                    {active ? 'Selected' : 'Select'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
 
-          {/* Done button */}
-          <TouchableOpacity style={styles.doneBtn} onPress={handleDone} activeOpacity={0.85}>
-            <View style={[styles.doneBtnGradient, { backgroundColor: COLORS.green }]}>
-              <Ionicons name="checkmark" size={18} color="#fff" />
-              <Text style={styles.doneBtnText}>Done</Text>
+        {/* Selected game details + modes */}
+        {currentGame && (
+          <View style={[styles.detailCard, { borderColor: currentGame.color + '50' }]}>
+            <View style={styles.detailHeader}>
+              <View style={[styles.detailIcon, { backgroundColor: currentGame.color + '18' }]}>
+                <Ionicons name={currentGame.icon} size={26} color={currentGame.color} />
+              </View>
+              <View style={styles.detailText}>
+                <Text style={styles.detailTitle}>{currentGame.label}</Text>
+                <Text style={styles.detailDesc}>{currentGame.desc}</Text>
+              </View>
             </View>
-          </TouchableOpacity>
-        </KeyboardAvoidingView>
-      </View>
+
+            {currentGame.modes && currentMode ? (
+              <View style={styles.modeRow}>
+                <Text style={styles.modeLabel}>Mode</Text>
+                <View style={styles.modePills}>
+                  {currentGame.modes.map((m) => {
+                    const activeMode = m.id === currentMode.id;
+                    return (
+                      <TouchableOpacity
+                        key={m.id}
+                        style={[styles.modePill, activeMode && { backgroundColor: currentGame.color + '2b', borderColor: currentGame.color }]}
+                        onPress={() => setMode((prev) => ({ ...prev, [currentGame.id]: m.id }))}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.modePillText, activeMode && { color: currentGame.color, fontWeight: '700' }]}>
+                          {m.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+            ) : (
+              <View style={styles.rulesRow}>
+                <Ionicons name="information-circle" size={15} color={currentGame.color} />
+                <Text style={styles.rulesText}>
+                  {currentGame.id === 'speed'
+                    ? 'Type as many words as you can in 60s. Combo grows when you never miss a letter!'
+                    : currentGame.id === 'wordrush'
+                      ? 'Words rush in one after another. Each word adds to your streak — and the multiplier.'
+                      : currentGame.id === 'accuracy'
+                        ? 'Every mistake hurts your accuracy. Stay above 98% to score big.'
+                        : 'Finish the paragraph before the 40 second clock hits zero. Words give you time back.'}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Start button */}
+        <TouchableOpacity
+          style={[styles.startBtn, currentGame ? { backgroundColor: currentGame.color, shadowColor: currentGame.color } : styles.startBtnDisabled]}
+          onPress={handleStart}
+          activeOpacity={0.85}
+          disabled={!currentGame}
+        >
+          <Ionicons name="play" size={17} color={currentGame ? COLORS.BG_NAVY || '#06121f' : COLORS.textDim} />
+          <Text style={[styles.startBtnText, !currentGame && { color: COLORS.textDim }]}>
+            {currentGame ? `Start ${currentGame.label}` : 'Select a game to start'}
+          </Text>
+        </TouchableOpacity>
+
+        {!currentGame && (
+          <Text style={styles.hint}>Tip: tap a game card above to begin</Text>
+        )}
+
+        <View style={{ height: 24 }} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
-  gradient: { flex: 1 },
-  dropdownBackdrop: {
-    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    zIndex: 15,
-  },
-  flex: { flex: 1, padding: scaleSize(16) },
-  flexDesktop: {
-    flex: 1,
+  scroll: { padding: scaleSize(16) },
+  scrollDesktop: {
     padding: 24,
     maxWidth: CONTENT_MAX_WIDTH,
     alignSelf: 'center',
     width: '100%',
   },
 
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginTop: scaleSize(8) },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginTop: scaleSize(8), marginBottom: scaleSize(16) },
   backIconBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     backgroundColor: COLORS.cardBg, alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1, borderColor: COLORS.cardBorder, marginRight: scaleSize(6),
   },
-  headerTitle: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(20), flexShrink: 1 },
-  headerSpacer: { flex: 1 },
+  headerText: { flex: 1 },
+  headerTitle: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(22) },
+  headerSub: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: scaleFont(12), marginTop: 1 },
 
-  subtitle: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(6), marginBottom: scaleSize(18) },
-
-  gamesRow: { flexDirection: 'row', gap: scaleSize(10) },
-  gameCol: { flex: 1, gap: scaleSize(8) },
+  // Grid - row/column layout
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: scaleSize(10),
+    marginBottom: scaleSize(12),
+  },
   gameCard: {
-    backgroundColor: COLORS.cardBg, borderRadius: 16,
-    borderWidth: 2, borderColor: COLORS.cardBorder,
-    paddingVertical: scaleSize(12), paddingHorizontal: scaleSize(10), alignItems: 'center',
+    flexBasis: '31%',
+    flexGrow: 1,
+    minWidth: scaleSize(150),
+    minHeight: scaleSize(150),
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingVertical: scaleSize(14),
+    paddingHorizontal: scaleSize(14),
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 4,
   },
-  selBadge: {
-    position: 'absolute', top: 8, right: 8,
-    width: 18, height: 18, borderRadius: 9,
-    alignItems: 'center', justifyContent: 'center',
+  gameTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    paddingBottom: scaleSize(10),
+    marginBottom: scaleSize(8),
   },
   gameIcon: {
-    width: scaleSize(44), height: scaleSize(44), borderRadius: scaleSize(22),
-    alignItems: 'center', justifyContent: 'center', marginBottom: scaleSize(8),
+    width: scaleSize(40), height: scaleSize(40), borderRadius: scaleSize(13),
+    alignItems: 'center', justifyContent: 'center',
+    shadowOpacity: 0.45,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 5,
   },
-  gameLabel: { color: COLORS.textWhite, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', textAlign: 'center' },
-  gameDesc: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(4) },
-
-  inputWrap: {
-    flexDirection: 'row', alignItems: 'center',
+  gameBadge: {
+    borderRadius: 10, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 2,
+  },
+  gameBadgeText: { fontSize: scaleFont(9), fontFamily: 'Calibri', fontWeight: '700' },
+  gameLabel: { color: COLORS.textWhite, fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(4) },
+  gameDesc: {
+    color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '600',
+    marginTop: scaleSize(4), lineHeight: scaleFont(14), minHeight: scaleSize(28),
+  },
+  footerRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
+    borderRadius: 12, borderWidth: 1, borderColor: COLORS.cardBorder,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    paddingVertical: scaleSize(6), marginTop: scaleSize(10),
+  },
+  checkBox: {
+    width: scaleSize(18), height: scaleSize(18), borderRadius: 5,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: scaleSize(12), borderWidth: 1, borderColor: COLORS.cardBorder,
-    paddingHorizontal: scaleSize(10), gap: scaleSize(6),
   },
-  input: {
-    flex: 1, color: COLORS.textWhite, fontSize: scaleFont(12),
-    fontFamily: 'Calibri', fontWeight: '700', paddingVertical: scaleSize(10),
-    outlineWidth: 0, outlineColor: 'transparent', outlineStyle: 'none',
+  checkBoxChecked: {
+    backgroundColor: '#fff',
+    borderColor: '#fff',
   },
+  footerText: { fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted },
+  footerActiveText: { fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '700', color: '#fff' },
 
-  dropdownWrap: {
-    position: 'relative',
-    zIndex: 20,
+  // Details of selected game
+  detailCard: {
+    backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: 14,
+    borderWidth: 1, padding: scaleSize(10), marginBottom: scaleSize(12),
   },
-  dropdownBtn: {
-    flexDirection: 'row', alignItems: 'center',
-    gap: scaleSize(7),
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: scaleSize(12), borderWidth: 1, borderColor: COLORS.cardBorder,
-    paddingHorizontal: scaleSize(9), paddingVertical: scaleSize(8),
-  },
-  dropdownLeadIcon: {
-    width: scaleSize(24), height: scaleSize(24), borderRadius: scaleSize(8),
+  detailHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(10) },
+  detailIcon: {
+    width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(11),
     alignItems: 'center', justifyContent: 'center',
   },
-  dropdownBtnText: {
-    flex: 1, color: COLORS.textWhite, fontSize: scaleFont(13),
-    fontFamily: 'Calibri', fontWeight: '700',
-    letterSpacing: 1,
+  detailText: { flex: 1 },
+  detailTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
+  detailDesc: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '600', marginTop: scaleSize(2) },
+
+  modeRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(10), marginTop: scaleSize(12) },
+  modeLabel: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', letterSpacing: 0.5 },
+  modePills: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(6), flex: 1 },
+  modePill: {
+    borderRadius: 10, borderWidth: 1, borderColor: COLORS.cardBorder,
+    paddingHorizontal: scaleSize(10), paddingVertical: scaleSize(5),
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
-  dropdownList: {
-    position: 'absolute',
-    top: '100%', left: 0, right: 0,
-    marginTop: scaleSize(5),
-    backgroundColor: '#1c1c1c',
-    borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.16)',
-    overflow: 'hidden',
-    zIndex: 30,
-    shadowColor: '#000',
-    shadowOpacity: 0.5,
+  modePillText: { color: COLORS.textLight, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '600' },
+
+  rulesRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(7), marginTop: scaleSize(12) },
+  rulesText: { flex: 1, color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '600', lineHeight: scaleFont(14) },
+
+  startBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    borderRadius: 14,
+    paddingVertical: scaleSize(13),
+    shadowOpacity: 0.4,
     shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 12,
+    shadowRadius: 16,
     elevation: 8,
   },
-  dropdownItem: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: scaleSize(12), paddingVertical: scaleSize(10),
-    borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.07)',
+  startBtnDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1, borderColor: COLORS.cardBorder,
+    shadowOpacity: 0,
+    elevation: 0,
   },
-  dropdownItemActive: {
-    backgroundColor: COLORS.teal + '1c',
+  startBtnText: {
+    color: '#fff', fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700',
   },
-  dropdownItemText: {
-    color: COLORS.textWhite, fontSize: scaleFont(13),
-    fontFamily: 'Calibri', fontWeight: '700',
-    letterSpacing: 1,
+  hint: {
+    color: COLORS.textDim, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '600',
+    textAlign: 'center', marginTop: scaleSize(10),
   },
-  dropdownItemTextActive: {
-    color: COLORS.teal,
-  },
-  doneBtn: {
-    alignSelf: 'center',
-    width: scaleSize(180),
-    marginTop: scaleSize(200),
-    borderRadius: scaleSize(14),
-    overflow: 'hidden',
-  },
-  doneBtnGradient: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: scaleSize(6), paddingVertical: scaleSize(10),
-  },
-  doneBtnText: { color: '#fff', fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700'},
 });

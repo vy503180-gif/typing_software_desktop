@@ -26,14 +26,14 @@ const SCREEN_W = SCREEN.width;
 // Saare 26 letters A-Z
 const LETTERS_AZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const LETTERS_ZA = 'ZYXWVUTSRQPONMLKJIHGFEDCBA'.split('');
-const NUMBERS_10 = ['1','2','3','4','5','6','7','8','9','10'];
-const NUMBERS_10_REV = ['10','9','8','7','6','5','4','3','2','1'];
+const NUMBERS_0_9 = ['0','1','2','3','4','5','6','7','8','9'];
+const NUMBERS_0_9_REV = ['9','8','7','6','5','4','3','2','1','0'];
 
 const MODES = [
   { id: 'az', label: 'A - Z', data: LETTERS_AZ },
   { id: 'za', label: 'Z - A', data: LETTERS_ZA },
-  { id: 'num', label: '1 - 10', data: NUMBERS_10 },
-  { id: 'numrev', label: '10 - 1', data: NUMBERS_10_REV },
+  { id: 'num', label: '0 - 9', data: NUMBERS_0_9 },
+  { id: 'numrev', label: '9 - 0', data: NUMBERS_0_9_REV },
 ];
 
 // Har mode ka apna accent color
@@ -223,7 +223,7 @@ export default function AlphabetGameScreen({ onBack, mode: initialMode }) {
           <View style={styles.resultContainer}>
             <Ionicons name="checkmark-circle" size={60} color={accent} />
             <Text style={[styles.resultTitle, { color: accent }]}>Excellent!</Text>
-            <Text style={styles.resultSub}>{mode === 'num' ? '1 se 10 complete ho gaya' : mode === 'numrev' ? '10 se 1 complete ho gaya' : mode === 'za' ? 'Z se A complete ho gaya' : 'A to Z complete ho gaya'}</Text>
+            <Text style={styles.resultSub}>{mode === 'num' ? '0 se 9 complete ho gaya' : mode === 'numrev' ? '9 se 0 complete ho gaya' : mode === 'za' ? 'Z se A complete ho gaya' : 'A to Z complete ho gaya'}</Text>
             <View style={styles.resultCard}>
               <View style={styles.resultRow}>
                 <Ionicons name="time-outline" size={20} color={accent} />

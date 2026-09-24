@@ -54,6 +54,21 @@ export const LESSON_TEXTS = {
     13: 'भारत एक महान देश है। यहाँ अनेक भाषाएँ बोली जाती हैं। हिंदी सबसे ज़्यादा बोली जाने वाली भाषा है।',
     14: 'प्रौद्योगिकी ने हमारे जीवन को बदल दिया है। आज हम अपने फ़ोन से सब कुछ कर सकते हैं — पढ़ाई, काम, और मनोरंजन।',
     15: 'हर दिन अभ्यास करने से टाइपिंग की गति बढ़ती है। शुरुआत में गलतियाँ होती हैं लेकिन धीरे-धीरे सुधार आता है। धैर्य रखें और लगातार अभ्यास करते रहें।',
+  16: 'क्ष त्र ज्ञ श्र क्ष त्र ज्ञ श्र क्ष त्र ज्ञ द्व न्य स्त स्थ स्न स्म ह्म क्ष त्र ज्ञ',
+  17: 'का की कु के कौ हा ही हु है हौ रा री रु रे रौ ला ली लु ले लौ वा वी वु वे वौ',
+  18: 'पानी घर स्कूल किताब दोस्त माता पिता भाई बहन देश समय काम विद्या अभ्यास सफलता',
+  19: 'मैं रोज विद्यालय जाता हूँ। मोहन एक अच्छा लड़का है। राधा गीत गाती है। पानी जीवन है।',
+  20: 'सोमवार मंगलवार बुधवार गुरुवार शुक्रवार शनिवार रविवार जनवरी फरवरी मार्च अप्रैल मई जून',
+  21: 'एक दो तीन चार पांच छह सात आठ नौ दस ग्यारह बारह तेरह चौदह पंद्रह बीस तीस चालीस',
+  22: 'आप कैसे हैं? मैं ठीक हूँ। यह क्या है? वह कौन है? मुझे चाय पसंद है। हम खेलते हैं।',
+  23: 'सूरज पूर्व में उगता है। बादल आसमान में घूमते हैं। नदियाँ पहाड़ों से निकलती हैं। हवा धीरे चल रही है।',
+  24: 'भारत हमारा देश है। यहाँ कई भाषाएँ बोली जाती हैं। हमें अपने देश पर गर्व है। हमें मेहनत करनी चाहिए।',
+  25: 'समय बहुत कीमती है। जो समय खो जाता है वह वापस नहीं आता। इसलिए हमें समय का सही उपयोग करना चाहिए। हर दिन कुछ नया सीखना चाहिए।',
+  26: 'शिक्षा जीवन की रोशनी है। शिक्षित व्यक्ति समाज का विकास कर सकता है। विद्या धन से बढ़कर है। हमें पढ़ना और लिखना चाहिए। परिश्रम ही सफलता की कुंजी है।',
+  27: 'कंप्यूटर आज के युग की बड़ी देन है। इससे हम तेजी से काम कर सकते हैं। कंप्यूटर टाइपिंग एक आवश्यक कौशल बन गया है। अच्छी टाइपिंग से समय और श्रम दोनों बचते हैं। नियमित अभ्यास से टाइपिंग तेज और सटीक होती है।',
+  28: 'प्रौद्योगिकी ने हमारे जीवन को बहुत बदल दिया है। आज हम अपने हाथ में मौजूद फोन से दुनिया से जुड़े रहते हैं। पढ़ाई, काम और मनोरंजन सब कुछ डिजिटल हो गया है। पर हमें इसका उपयोग संयम से करना चाहिए। अधिक स्क्रीन समय हमारे स्वास्थ्य के लिए हानिकारक है।',
+  29: 'स्वास्थ्य सबसे बड़ा धन है। शरीर को स्वस्थ रखने के लिए सुबह व्यायाम करना चाहिए। संतुलित आहार और साफ पानी जरूरी है। रोज थोड़ी देर टहलना भी फायदेमंद है। जब शरीर स्वस्थ रहता है तो मन भी प्रसन्न रहता है और काम अच्छा होता है।',
+  30: 'हमारा भारत देश संस्कृति और परंपरा का धनी देश है। यहाँ विभिन्न धर्मों और भाषाओं के लोग एक साथ रहते हैं। भारत के लोग मेहनती और भाईचारे वाले हैं। हमें अपनी संस्कृति पर गर्व है और उसे आगे बढ़ाना हमारा कर्तव्य है। शिक्षा, सेवा और सदाचार से हम देश को और अच्छा बना सकते हैं। इसलिए हमें मिलजुल कर प्रगति करनी चाहिए।',
   },
 };
 
@@ -76,6 +91,89 @@ const difficulties = {};
 });
 
 export const LESSON_DIFFICULTY = difficulties;
+
+// Har lesson ka title + duration (LessonsScreen display aur TypingScreen ke
+// "Next Lesson" button dono ke liye), taki dono jagah ek jaise rahe.
+export const LESSON_META = {
+  english: [
+    { id: 1, title: 'Home Row - Letters', time: '2 min' },
+    { id: 2, title: 'Home Row - Easy Words 1', time: '2 min' },
+    { id: 3, title: 'Home Row - Easy Words 2', time: '2 min' },
+    { id: 4, title: 'Middle Row (G H)', time: '2 min' },
+    { id: 5, title: 'Middle Row - Words', time: '2 min' },
+    { id: 6, title: 'Top Row - Letters', time: '3 min' },
+    { id: 7, title: 'Top Row - Words 1', time: '3 min' },
+    { id: 8, title: 'Top Row - Words 2', time: '3 min' },
+    { id: 9, title: 'Bottom Row - Letters', time: '3 min' },
+    { id: 10, title: 'Bottom Row - Words', time: '3 min' },
+    { id: 11, title: 'All Letters - Mixed Words', time: '4 min' },
+    { id: 12, title: 'Common Words 1', time: '4 min' },
+    { id: 13, title: 'Common Words 2', time: '4 min' },
+    { id: 14, title: 'Common Words 3', time: '4 min' },
+    { id: 15, title: 'Sight Words', time: '4 min' },
+    { id: 16, title: 'Action Verbs', time: '5 min' },
+    { id: 17, title: 'Short Sentences', time: '5 min' },
+    { id: 18, title: 'Question Words', time: '5 min' },
+    { id: 19, title: 'Colours', time: '5 min' },
+    { id: 20, title: 'Days of Week', time: '5 min' },
+    { id: 21, title: 'Months of Year', time: '6 min' },
+    { id: 22, title: 'Numbers', time: '6 min' },
+    { id: 23, title: 'School Words', time: '6 min' },
+    { id: 24, title: 'Family Words', time: '6 min' },
+    { id: 25, title: 'Nature - Sentence', time: '7 min' },
+    { id: 26, title: 'About Me', time: '7 min' },
+    { id: 27, title: 'Proverb Practice', time: '8 min' },
+    { id: 28, title: 'Tongue Twister', time: '8 min' },
+    { id: 29, title: 'Long Paragraph', time: '9 min' },
+    { id: 30, title: 'Final Exam', time: '10 min' },
+  ],
+  hindi: [
+    { id: 1, title: 'क, ख, ग', time: '2 min' },
+    { id: 2, title: 'स्वर', time: '2 min' },
+    { id: 3, title: 'शब्द अभ्यास', time: '3 min' },
+    { id: 4, title: 'वाक्य लेखन', time: '5 min' },
+    { id: 5, title: 'पैराग्राफ', time: '5 min' },
+    { id: 6, title: 'च, छ, ज, झ, ञ', time: '2 min' },
+    { id: 7, title: 'ट, ठ, ड, ढ, ण', time: '2 min' },
+    { id: 8, title: 'त, थ, द, ध, न', time: '2 min' },
+    { id: 9, title: 'प, फ, ब, भ, म', time: '2 min' },
+    { id: 10, title: 'य, र, ल, व, श, ष, स, ह', time: '3 min' },
+    { id: 11, title: 'छोटे वाक्य', time: '4 min' },
+    { id: 12, title: 'संवाद अभ्यास', time: '5 min' },
+    { id: 13, title: 'भारत परिचय', time: '5 min' },
+    { id: 14, title: 'प्रौद्योगिकी', time: '6 min' },
+    { id: 15, title: 'अभ्यास परीक्षा', time: '8 min' },
+    { id: 16, title: 'संयुक्त अक्षर', time: '2 min' },
+    { id: 17, title: 'मात्रा अभ्यास', time: '3 min' },
+    { id: 18, title: 'आम शब्द', time: '3 min' },
+    { id: 19, title: 'रोज़-भर के वाक्य', time: '4 min' },
+    { id: 20, title: 'दिन और महीने', time: '4 min' },
+    { id: 21, title: 'गिनती', time: '4 min' },
+    { id: 22, title: 'प्रश्न वाक्य', time: '4 min' },
+    { id: 23, title: 'प्रकृति', time: '5 min' },
+    { id: 24, title: 'भारत परिचय', time: '5 min' },
+    { id: 25, title: 'समय का महत्व', time: '5 min' },
+    { id: 26, title: 'शिक्षा', time: '6 min' },
+    { id: 27, title: 'कंप्यूटर', time: '6 min' },
+    { id: 28, title: 'प्रौद्योगिकी 2', time: '7 min' },
+    { id: 29, title: 'स्वास्थ्य', time: '7 min' },
+    { id: 30, title: 'अंतिम परीक्षा', time: '10 min' },
+  ],
+};
+
+// Kisi lesson se agla lesson ka data dhundo (agar ho)
+export const getNextLesson = (lang, lessonId) => {
+  const list = LESSON_META[lang] || [];
+  const idx = list.findIndex((l) => l.id === lessonId);
+  if (idx === -1 || idx + 1 >= list.length) return null;
+  const next = list[idx + 1];
+  return {
+    id: next.id,
+    title: next.title,
+    timeSec: parseInt(next.time) * 60,
+    label: `Lesson ${next.id}`,
+  };
+};
 
 // Practice paragraphs - Start Typing button ke liye
 // Duration ke hisab se paragraph ka size hota hai (1/3/5/10 min)

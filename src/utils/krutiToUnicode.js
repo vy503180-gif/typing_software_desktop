@@ -275,6 +275,44 @@ const MAIN = [
 
 const SAFE_MAX = 1000;
 
+// Woh keys jo user Kruti Dev me daba sakta hai — "pending" (bech ka state)
+// check karne ke liye: agar abhi type hua raw + ek aur key dabane par
+// match ho sakta hai, to red mat dikhao (jaise ि = f consonant se pehle).
+const KRUTI_KEYS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ;,'\"/\\.?:[]`~=+<>-";
+
+// raw (abi tak type kiye ASCII keys) + target (unicode lesson text) se batao:
+//   ok      -> target ke kitne leading chars poori tarah sahi type ho chuke hain
+//   pending -> raw ko ek aur sahi key ke saath complete kiya ja sakta hai
+//              (multi-key ka adhura part ho, ya pre-base matra jaise ki ि)
+export const krutiKeyProgress = (raw, target) => {
+  if (!raw || !target) return { ok: 0, pending: false };
+
+  // Sabse pehle: poori raw abhi tak sahi hai?
+  const full = krutiToUnicode(raw);
+  if (full.length > 0 && target.startsWith(full)) {
+    return { ok: full.length, pending: false };
+  }
+
+  // Ek aur key aage padhne par kya match ho sakta hai? (pending check)
+  let pending = false;
+  for (const c of KRUTI_KEYS) {
+    const sc = krutiToUnicode(raw + c);
+    if (sc !== full && sc.length > 0 && target.startsWith(sc)) {
+      pending = true;
+      break;
+    }
+  }
+
+  // Jahan tak poori tarah match ho chuka hai wo count karo
+  let ok = 0;
+  for (let i = 1; i <= raw.length; i++) {
+    const pc = krutiToUnicode(raw.slice(0, i));
+    if (pc.length > 0 && target.startsWith(pc)) ok = Math.max(ok, pc.length);
+  }
+
+  return { ok, pending };
+};
+
 // Kruti Dev string -> Unicode string
 export const krutiToUnicode = (input) => {
   if (!input) return '';

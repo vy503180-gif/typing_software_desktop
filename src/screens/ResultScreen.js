@@ -1,150 +1,89 @@
+// src/screens/ResultScreen.js
+// Course completion screen with professional result summary.
+
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  StatusBar,
-  Dimensions,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
-
-const SCREEN_W = SCREEN.width;
+import { BG, COLORS } from '../theme';
 
 export default function ResultScreen({ course, onBack }) {
-  const lessonCount = course ? course.lessons.length : 0;
+  const name = course && course.title ? course.title : 'Course';
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.gradient}>
-        <ScrollView contentContainerStyle={[styles.container, IS_DESKTOP && styles.containerDesktop]} showsVerticalScrollIndicator={false}>
-          {/* Header */}
-          <View style={styles.header}>
-            {onBack && (
-              <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
-              </TouchableOpacity>
-            )}
-            <Ionicons name="trophy" size={22} color={COLORS.amber} />
-            <Text style={styles.headerTitle}>Result</Text>
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.card}>
+          <View style={styles.badge}>
+            <Ionicons name="checkmark" size={36} color="#fff" />
           </View>
+          <Text style={styles.title}>Course Completed!</Text>
+          <Text style={styles.sub}>
+            Congratulations — you have finished every lesson in{' '}
+            <Text style={styles.strong}>{name}</Text>.
+          </Text>
 
-          {/* Success card */}
-          <View style={styles.successCard}>
-            <View style={[styles.trophyBg, { backgroundColor: COLORS.amber }]}>
-              <Ionicons name="trophy" size={48} color="#fff" />
+          <View style={styles.items}>
+            <View style={styles.item}>
+              <Ionicons name="ribbon" size={20} color={COLORS.amber} />
+              <Text style={styles.itemText}>You earned the {name} badge</Text>
             </View>
-            <Text style={styles.successTitle}>Course Complete!</Text>
-            <Text style={styles.successMsg}>
-              Congratulations! You have completed all {lessonCount} lessons.
-            </Text>
-          </View>
-
-          {/* Graph card */}
-          <View style={styles.graphCard}>
-            <Text style={styles.graphTitle}>Lesson-wise Progress</Text>
-            <View style={styles.barRow}>
-              {course && course.lessons.map((lesson, i) => {
-                const height = 30 + (i + 1) * 12;
-                return (
-                  <View key={lesson.id} style={styles.barWrap}>
-                    <View style={styles.barTrack}>
-                    <View style={[styles.bar, { height, backgroundColor: lesson.color }]} />
-                    </View>
-                    <Text style={styles.barLabel}>L{lesson.id}</Text>
-                  </View>
-                );
-              })}
+            <View style={styles.item}>
+              <Ionicons name="trending-up" size={20} color={COLORS.blueBright} />
+              <Text style={styles.itemText}>Your typing speed has grown</Text>
             </View>
-            <Text style={styles.graphCaption}>All lessons completed successfully</Text>
-          </View>
-
-          {/* Summary stats */}
-          <View style={styles.summaryRow}>
-            <View style={[styles.summaryCard, { backgroundColor: COLORS.green + '15', borderColor: COLORS.green + '30' }]}>
-              <Ionicons name="checkmark-done" size={22} color={COLORS.green} />
-              <Text style={[styles.summaryValue, { color: COLORS.green }]}>{lessonCount}</Text>
-              <Text style={styles.summaryLabel}>Lessons Done</Text>
-            </View>
-            <View style={[styles.summaryCard, { backgroundColor: COLORS.teal + '15', borderColor: COLORS.teal + '30' }]}>
-              <Ionicons name="flash" size={22} color={COLORS.teal} />
-              <Text style={[styles.summaryValue, { color: COLORS.teal }]}>100%</Text>
-              <Text style={styles.summaryLabel}>Progress</Text>
+            <View style={styles.item}>
+              <Ionicons name="trophy" size={20} color={COLORS.green} />
+              <Text style={styles.itemText}>Ready for the next challenge</Text>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.homeBtn} onPress={onBack} activeOpacity={0.7}>
-            <View style={[styles.homeBtnGradient, { backgroundColor: COLORS.green }]}>
-              <Ionicons name="arrow-back" size={16} color="#fff" />
-              <Text style={styles.homeBtnText}>Back to Course</Text>
-            </View>
+          <TouchableOpacity style={styles.btnPrimary} onPress={onBack} activeOpacity={0.85}>
+            <Ionicons name="arrow-back" size={17} color="#fff" />
+            <Text style={styles.btnPrimaryText}>Back to Course</Text>
           </TouchableOpacity>
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: BG },
-  gradient: { flex: 1 },
-  container: { flexGrow: 1, padding: scaleSize(16) },
-  containerDesktop: {
-    padding: 24,
-    maxWidth: CONTENT_MAX_WIDTH,
-    alignSelf: 'center',
-    width: '100%',
+  safe: { flex: 1, backgroundColor: BG },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: 20 },
+  card: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(30,46,84,0.5)',
+    borderWidth: 1, borderColor: 'rgba(59,130,246,0.4)',
+    borderRadius: 20, padding: 32,
+    maxWidth: 520, width: '100%', alignSelf: 'center',
+    shadowColor: '#14b8a6', shadowOpacity: 0.25, shadowOffset: { width: 0, height: 8 }, shadowRadius: 24, elevation: 8,
   },
-
-  header: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginBottom: scaleSize(16) },
-  backBtn: {
-    width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
-    alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.cardBorder,
+  badge: {
+    width: 76, height: 76, borderRadius: 38,
+    backgroundColor: '#22c55e', alignItems: 'center', justifyContent: 'center', marginBottom: 16,
+    shadowColor: '#22c55e', shadowOpacity: 0.5, shadowOffset: { width: 0, height: 6 }, shadowRadius: 18, elevation: 6,
   },
-  headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
-
-  successCard: {
-    alignItems: 'center', backgroundColor: COLORS.cardBg,
-    borderRadius: scaleSize(18), borderWidth: 1, borderColor: COLORS.cardBorder,
-    padding: scaleSize(24), marginBottom: scaleSize(16),
+  title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24, textAlign: 'center' },
+  sub: {
+    fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted,
+    fontSize: 14, textAlign: 'center', marginTop: 8, lineHeight: 21,
   },
-  trophyBg: {
-    width: scaleSize(72), height: scaleSize(72), borderRadius: scaleSize(36),
-    alignItems: 'center', justifyContent: 'center',
-    shadowColor: COLORS.amber, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 4 }, shadowRadius: 12,
+  strong: { color: COLORS.cyan, fontFamily: 'Calibri', fontWeight: '700' },
+  items: { width: '100%', marginTop: 22, gap: 10 },
+  item: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: 12, padding: 12,
   },
-  successTitle: { fontSize: scaleFont(22), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, marginTop: scaleSize(12) },
-  successMsg: { fontFamily: 'Calibri', fontSize: scaleFont(13), color: COLORS.textMuted, textAlign: 'center', marginTop: scaleSize(6) },
-
-  graphCard: {
-    backgroundColor: COLORS.cardBg, borderRadius: scaleSize(16),
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: scaleSize(16), marginBottom: scaleSize(16),
+  itemText: { flex: 1, fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textLight, fontSize: 13 },
+  btnPrimary: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    backgroundColor: '#0e9488', borderRadius: 12,
+    paddingVertical: 13, marginTop: 24, width: '100%',
   },
-  graphTitle: { fontSize: scaleFont(15), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(14) },
-  barRow: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', height: 150 },
-  barWrap: { alignItems: 'center' },
-  barTrack: { height: 120, justifyContent: 'flex-end' },
-  bar: { width: scaleSize(24), borderRadius: scaleSize(6), minHeight: scaleSize(18) },
-  barLabel: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(6) },
-  graphCaption: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: scaleFont(11), textAlign: 'center', marginTop: scaleSize(10) },
-
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', gap: scaleSize(12), marginBottom: scaleSize(16) },
-  summaryCard: {
-    flex: 1, alignItems: 'center', backgroundColor: COLORS.cardBg,
-    borderRadius: scaleSize(14), borderWidth: 1, paddingVertical: scaleSize(14),
-  },
-  summaryValue: { fontSize: scaleFont(20), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(4) },
-  summaryLabel: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(2) },
-
-  homeBtn: { borderRadius: scaleSize(14), overflow: 'hidden' },
-  homeBtnGradient: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: scaleSize(6), paddingVertical: scaleSize(14),
-  },
-  homeBtnText: { color: '#fff', fontSize: scaleFont(15), fontFamily: 'Calibri', fontWeight: '700'},
+  btnPrimaryText: { color: '#fff', fontFamily: 'Calibri', fontWeight: '700', fontSize: 14 },
 });

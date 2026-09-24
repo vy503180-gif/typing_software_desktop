@@ -80,7 +80,6 @@ export default function InfoScreen({ onBack }) {
             <View style={styles.logo}>
               <Text style={styles.logoLetter}>T</Text>
             </View>
-            <Text style={styles.appName}>Typing Master</Text>
             <Text style={styles.appVersion}>Version {APP_VERSION}</Text>
             <Text style={styles.appDesc}>
               Typing seekho English aur Hindi me — lessons, games, speed tests aur detailed statistics ke saath.

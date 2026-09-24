@@ -1,19 +1,17 @@
 // src/screens/LessonsScreen.js
+// Professional lessons page with Beginner / Intermediate / Advanced categories.
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  StatusBar,
-  Modal,
+  View, Text, StyleSheet, TouchableOpacity, ScrollView,
+  SafeAreaView, StatusBar, Modal,
 } from 'react-native';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BG, COLORS, IS_DESKTOP } from '../theme';
 import { LESSON_DIFFICULTY } from '../data/lessons';
+
+const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
 
 const LESSONS = {
   english: [
@@ -64,12 +62,30 @@ const LESSONS = {
     { id: 13, title: 'भारत परिचय', desc: 'देश के बारे में', time: '5 min', characters: 96 },
     { id: 14, title: 'प्रौद्योगिकी', desc: 'तकनीक पर निबंध', time: '6 min', characters: 120 },
     { id: 15, title: 'अभ्यास परीक्षा', desc: 'लंबा पाठ — समय सीमा', time: '8 min', characters: 160 },
+    { id: 16, title: 'संयुक्त अक्षर', desc: 'क्ष, त्र, ज्ञ, श्र', time: '2 min', characters: 48 },
+    { id: 17, title: 'मात्रा अभ्यास', desc: 'का, की, कु, के, कौ', time: '3 min', characters: 60 },
+    { id: 18, title: 'आम शब्द', desc: 'पानी, घर, स्कूल', time: '3 min', characters: 70 },
+    { id: 19, title: 'रोज़-भर के वाक्य', desc: 'मैं रोज़ विद्यालय जाता हूँ', time: '4 min', characters: 80 },
+    { id: 20, title: 'दिन और महीने', desc: 'सोमवार...रविवार', time: '4 min', characters: 90 },
+    { id: 21, title: 'गिनती', desc: 'एक...चालीस', time: '4 min', characters: 85 },
+    { id: 22, title: 'प्रश्न वाक्य', desc: 'आप कैसे हैं? क्या है?', time: '4 min', characters: 78 },
+    { id: 23, title: 'प्रकृति', desc: 'सूरज, बादल, नदियाँ', time: '5 min', characters: 90 },
+    { id: 24, title: 'भारत परिचय', desc: 'हमारा देश', time: '5 min', characters: 85 },
+    { id: 25, title: 'समय का महत्व', desc: 'अनुच्छेद', time: '5 min', characters: 120 },
+    { id: 26, title: 'शिक्षा', desc: 'विद्या का महत्व', time: '6 min', characters: 110 },
+    { id: 27, title: 'कंप्यूटर', desc: 'आधुनिक युग', time: '6 min', characters: 140 },
+    { id: 28, title: 'प्रौद्योगिकी 2', desc: 'डिजिटल जीवन', time: '7 min', characters: 160 },
+    { id: 29, title: 'स्वास्थ्य', desc: 'स्वास्थ्य ही धन', time: '7 min', characters: 150 },
+    { id: 30, title: 'अंतिम परीक्षा', desc: 'संस्कृति और कर्तव्य', time: '10 min', characters: 220 },
   ],
 };
 
-const LESSON_COLORS = [COLORS.green, COLORS.amber, COLORS.teal, COLORS.rose];
+const CATEGORIES = [
+  { id: 'beginner', label: 'Beginner', icon: 'leaf', ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], color: COLORS.green },
+  { id: 'intermediate', label: 'Intermediate', icon: 'book', ids: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20], color: COLORS.blue },
+  { id: 'advanced', label: 'Advanced', icon: 'rocket', ids: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30], color: COLORS.purple },
+];
 
-// Hindi Character Map data
 const CHARMAP_CONSONANTS = [
   { unicode: 'क', kruti: 'd' }, { unicode: 'ख', kruti: '[k' }, { unicode: 'ग', kruti: 'x' },
   { unicode: 'घ', kruti: '?k' }, { unicode: 'ङ', kruti: '\xb3' }, { unicode: 'च', kruti: 'p' },
@@ -110,8 +126,8 @@ const CHARMAP_NUMBERS = [
 const getDifficultyColor = (diff) => {
   switch (diff) {
     case 'Easy': return COLORS.green;
-    case 'Medium': return COLORS.amber;
-    case 'Hard': return COLORS.rose;
+    case 'Medium': return COLORS.blue;
+    case 'Hard': return COLORS.purple;
     default: return COLORS.teal;
   }
 };
@@ -119,205 +135,225 @@ const getDifficultyColor = (diff) => {
 export default function LessonsScreen({
   onStartLesson,
   onBack,
+  studentName = '',
   unlockedLessons = { english: [1], hindi: [1] },
   hindiLayout = 'mangal',
   onChangeHindiLayout,
 }) {
   const [selectedLang, setSelectedLang] = useState('english');
-  const [chosenLayout, setChosenLayout] = useState(hindiLayout);
+  const [category, setCategory] = useState('beginner');
   const [showCharMap, setShowCharMap] = useState(false);
   const [charMapTab, setCharMapTab] = useState('mangal');
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    AsyncStorage.getItem(getHistoryKey(studentName))
+      .then((raw) => {
+        try {
+          const all = raw ? JSON.parse(raw) : [];
+          if (Array.isArray(all)) setHistory(all);
+        } catch {}
+      })
+      .catch(() => {});
+  }, [studentName]);
+
   const lessons = LESSONS[selectedLang];
   const unlocked = unlockedLessons[selectedLang] || [];
+  const activeCat = CATEGORIES.find((c) => c.id === category);
+  const catLessons = lessons.filter((l) => activeCat.ids.includes(l.id));
+  const catUnlockedCount = catLessons.filter((l) => unlocked.includes(l.id)).length;
   const countUnlocked = lessons.filter((l) => unlocked.includes(l.id)).length;
 
-  const handleLessonPress = (lesson) => {
-    onStartLesson(selectedLang, lesson.id, lesson.title, parseInt(lesson.time) * 60);
+  const statsForLesson = (title) => {
+    const recs = history.filter((r) => r.lesson === title);
+    if (recs.length === 0) return { done: false, bestWpm: null, acc: null };
+    return {
+      done: true,
+      bestWpm: Math.max(...recs.map((r) => r.wpm || 0)),
+      acc: Math.round(recs.reduce((s, r) => s + (r.accuracy || 0), 0) / recs.length),
+    };
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
-      <View style={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
-          </TouchableOpacity>
-          <View style={styles.headerTextWrap}>
-            <Text style={styles.title}>Lessons</Text>
-            <Text style={styles.subtitle}>Choose a category and start learning</Text>
-          </View>
-        </View>
-
-        {/* Language Toggle */}
-        <View style={styles.langToggle}>
-          <TouchableOpacity
-            style={[styles.langBtn, selectedLang === 'english' && styles.langBtnActive]}
-            onPress={() => setSelectedLang('english')}
-          >
-            <Ionicons name="globe" size={16} color={selectedLang === 'english' ? '#fff' : COLORS.textMuted} />
-            <Text style={[styles.langBtnText, selectedLang === 'english' && styles.langBtnTextActive]}>English</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.langBtn, selectedLang === 'hindi' && styles.langBtnActive]}
-            onPress={() => setSelectedLang('hindi')}
-          >
-            <Ionicons name="language" size={16} color={selectedLang === 'hindi' ? '#fff' : COLORS.textMuted} />
-            <Text style={[styles.langBtnText, selectedLang === 'hindi' && styles.langBtnTextActive]}>हिंदी</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Hindi Typing Layout */}
-        {selectedLang === 'hindi' && (
-          <View style={styles.layoutCard}>
-            <View style={styles.layoutHeader}>
-              <Ionicons name="keypad" size={16} color={COLORS.teal} />
-              <Text style={styles.layoutTitle}>Typing Layout</Text>
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {/* Header */}
+          <View style={styles.header}>
+            {onBack && (
+              <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
+                <Ionicons name="arrow-back" size={18} color={COLORS.textLight} />
+              </TouchableOpacity>
+            )}
+            <View style={styles.headerTextWrap}>
+              <Text style={styles.title}>Lessons</Text>
+              <Text style={styles.subtitle}>Master the keyboard, one step at a time</Text>
             </View>
-            <View style={styles.layoutSegment}>
-              {[
-                { label: 'Mangal', value: 'mangal' },
-                { label: 'Kruti Dev', value: 'krutidev' },
-              ].map((d) => {
-                const sel = hindiLayout === d.value;
-                return (
-                  <TouchableOpacity
-                    key={d.value}
-                    style={[styles.layoutItem, sel && styles.layoutItemActive]}
-                    onPress={() => onChangeHindiLayout && onChangeHindiLayout(d.value)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={[styles.layoutItemText, sel && styles.layoutItemTextActive]}>
-                      {d.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+          </View>
+
+          {/* Language toggle */}
+          <View style={styles.langToggle}>
+            {[
+              { label: 'English', value: 'english', icon: 'globe' },
+              { label: 'हिंदी', value: 'hindi', icon: 'language' },
+            ].map((d) => (
+              <TouchableOpacity
+                key={d.value}
+                style={[styles.langBtn, selectedLang === d.value && styles.langBtnActive]}
+                onPress={() => { setSelectedLang(d.value); setCategory('beginner'); }}
+                activeOpacity={0.7}
+              >
+                <Ionicons name={d.icon} size={15} color={selectedLang === d.value ? '#fff' : COLORS.textMuted} />
+                <Text style={[styles.langBtnText, selectedLang === d.value && styles.langBtnTextActive]}>{d.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Hindi layout */}
+          {selectedLang === 'hindi' && (
+            <View style={styles.layoutRow}>
+              <View style={styles.segment}>
+                {[{ label: 'Mangal', value: 'mangal' }, { label: 'Kruti Dev', value: 'krutidev' }].map((l) => {
+                  const sel = hindiLayout === l.value;
+                  return (
+                    <TouchableOpacity
+                      key={l.value}
+                      style={[styles.segmentItem, sel && styles.segmentItemActive]}
+                      onPress={() => onChangeHindiLayout && onChangeHindiLayout(l.value)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[styles.segmentText, sel && styles.segmentTextActive]}>{l.label}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+              <TouchableOpacity
+                style={styles.charMapBtn}
+                onPress={() => { setCharMapTab(hindiLayout); setShowCharMap(true); }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="grid" size={14} color={COLORS.cyan} />
+                <Text style={styles.charMapBtnText}>Character Map</Text>
+              </TouchableOpacity>
             </View>
-            <Text style={styles.layoutHint}>
-              {hindiLayout === 'krutidev'
-                ? 'Kruti Dev keyboard se type karo, display Unicode (Mangal) me hoga.'
-                : 'Normal Unicode (Mangal) Hindi keyboard se type karo.'}
-            </Text>
-            <TouchableOpacity
-              style={styles.charMapBtn}
-              onPress={() => { setCharMapTab(hindiLayout); setShowCharMap(true); }}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="grid" size={14} color={COLORS.teal} />
-              <Text style={styles.charMapBtnText}>View Character Map</Text>
-              <Ionicons name="chevron-forward" size={14} color={COLORS.textMuted} />
-            </TouchableOpacity>
-          </View>
-        )}
+          )}
 
-        {/* Progress */}
-        <View style={styles.progressCard}>
-          <View style={styles.progressHeader}>
-            <Ionicons name="trophy" size={18} color={COLORS.amber} />
-            <Text style={styles.progressTitle}>{countUnlocked} of {lessons.length} Unlocked</Text>
+          {/* Overall progress */}
+          <View style={styles.progressCard}>
+            <View style={styles.progressHeader}>
+              <View style={styles.progressLeft}>
+                <Ionicons name="trophy" size={17} color={COLORS.amber} />
+                <Text style={styles.progressTitle}>{countUnlocked}/{lessons.length} lessons unlocked</Text>
+              </View>
+              <Text style={styles.progressPct}>{Math.round((countUnlocked / lessons.length) * 100)}%</Text>
+            </View>
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: `${(countUnlocked / lessons.length) * 100}%` }]} />
+            </View>
           </View>
-          <View style={styles.progressTrack}>
-            <View
-              style={[styles.progressFill, { width: `${(countUnlocked / lessons.length) * 100}%`, backgroundColor: COLORS.green }]}
-            />
-          </View>
-        </View>
 
-        {/* Lessons List */}
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {lessons.map((lesson, idx) => {
+          {/* Categories */}
+          <View style={styles.catRow}>
+            {CATEGORIES.map((c) => (
+              <TouchableOpacity
+                key={c.id}
+                style={[styles.catPill, category === c.id && { backgroundColor: c.color + '22', borderColor: c.color }]}
+                onPress={() => setCategory(c.id)}
+                activeOpacity={0.75}
+              >
+                <Ionicons name={c.icon} size={14} color={category === c.id ? c.color : COLORS.textMuted} />
+                <Text style={[styles.catPillText, category === c.id && { color: c.color }]}>{c.label}</Text>
+                <View style={[styles.catCount, { backgroundColor: c.color + '22' }]}>
+                  <Text style={[styles.catCountText, { color: c.color }]}>{catUnlockedCount}/{catLessons.length}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Lesson cards */}
+          {catLessons.map((lesson) => {
             const locked = !unlocked.includes(lesson.id);
             const diffColor = getDifficultyColor(LESSON_DIFFICULTY[lesson.id]);
-            const accentColor = LESSON_COLORS[idx % LESSON_COLORS.length];
+            const st = statsForLesson(lesson.title);
             return (
-              <TouchableOpacity
-                key={lesson.id}
-                style={[styles.lessonCard, locked && styles.lessonCardLocked]}
-                onPress={() => !locked && handleLessonPress(lesson)}
-                activeOpacity={locked ? 1 : 0.8}
-                disabled={locked}
-              >
-                <View style={[styles.lessonIcon, { backgroundColor: locked ? 'rgba(255,255,255,0.06)' : accentColor + '20' }]}>
-                  <Ionicons
-                    name={locked ? 'lock-closed' : 'keypad'}
-                    size={20}
-                    color={locked ? COLORS.textDim : accentColor}
-                  />
-                </View>
-                <View style={styles.lessonInfo}>
-                  <Text style={[styles.lessonNumber, { color: accentColor }]}>LESSON {lesson.id}</Text>
-                  <Text style={[styles.lessonTitle, locked && { color: COLORS.textDim }]}>{lesson.title}</Text>
-                  <Text style={[styles.lessonDesc, locked && { color: COLORS.textDim }]}>{lesson.desc}</Text>
-                  <View style={styles.badgeRow}>
-                    <View style={styles.badge}>
-                      <Ionicons name="time" size={10} color={COLORS.textMuted} />
-                      <Text style={styles.badgeText}>{lesson.time}</Text>
-                    </View>
-                    <View style={[styles.badge, { backgroundColor: diffColor + '18' }]}>
-                      <Ionicons name="speedometer" size={10} color={diffColor} />
-                      <Text style={[styles.badgeText, { color: diffColor }]}>{LESSON_DIFFICULTY[lesson.id]}</Text>
-                    </View>
-                    <View style={styles.badge}>
-                      <Ionicons name="text" size={10} color={COLORS.textMuted} />
-                      <Text style={styles.badgeText}>{lesson.characters} chars</Text>
+              <View key={lesson.id} style={[styles.lessonCard, locked && styles.lessonCardLocked]}>
+                <View style={styles.lessonLeft}>
+                  <View style={[styles.lessonIcon, { backgroundColor: locked ? 'rgba(255,255,255,0.06)' : diffColor + '22' }]}>
+                    <Ionicons name={locked ? 'lock-closed' : 'keypad'} size={20} color={locked ? COLORS.textDim : diffColor} />
+                  </View>
+                  <View style={styles.lessonInfo}>
+                    <Text style={[styles.lessonNum, { color: diffColor }]}>LESSON {lesson.id}</Text>
+                    <Text style={[styles.lessonTitle, locked && { color: COLORS.textDim }]}>{lesson.title}</Text>
+                    <Text style={styles.lessonDesc}>{lesson.desc}</Text>
+                    <View style={styles.badgeRow}>
+                      <View style={styles.badge}>
+                        <Ionicons name="time" size={10} color={COLORS.textMuted} />
+                        <Text style={styles.badgeText}>{lesson.time}</Text>
+                      </View>
+                      <View style={[styles.badge, { backgroundColor: diffColor + '18' }]}>
+                        <Ionicons name="speedometer" size={10} color={diffColor} />
+                        <Text style={[styles.badgeText, { color: diffColor }]}>{LESSON_DIFFICULTY[lesson.id]}</Text>
+                      </View>
+                      {st.done && (
+                        <>
+                          <View style={[styles.badge, { backgroundColor: COLORS.green + '18' }]}>
+                            <Ionicons name="flash" size={10} color={COLORS.green} />
+                            <Text style={[styles.badgeText, { color: COLORS.green }]}>{st.bestWpm} WPM</Text>
+                          </View>
+                          <View style={[styles.badge, { backgroundColor: COLORS.cyan + '18' }]}>
+                            <Ionicons name="checkmark-circle" size={10} color={COLORS.cyan} />
+                            <Text style={[styles.badgeText, { color: COLORS.cyan }]}>{st.acc}%</Text>
+                          </View>
+                        </>
+                      )}
                     </View>
                   </View>
                 </View>
                 <View style={styles.lessonRight}>
                   {locked ? (
-                    <Ionicons name="lock-closed" size={16} color={COLORS.textDim} />
+                    <Ionicons name="lock-closed" size={18} color={COLORS.textDim} />
                   ) : (
-                    <View style={[styles.playBtn, { backgroundColor: accentColor + '20' }]}>
-                      <Ionicons name="chevron-forward" size={18} color={accentColor} />
-                    </View>
+                    <TouchableOpacity
+                      style={[styles.startBtn, { backgroundColor: diffColor + '22', borderColor: diffColor + '66' }]}
+                      onPress={() => onStartLesson(selectedLang, lesson.id, lesson.title, parseInt(lesson.time) * 60)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[styles.startBtnText, { color: diffColor }]}>Start Lesson</Text>
+                      <Ionicons name="play" size={13} color={diffColor} />
+                    </TouchableOpacity>
                   )}
                 </View>
-              </TouchableOpacity>
+              </View>
             );
           })}
+
+          <View style={{ height: 30 }} />
         </ScrollView>
 
         {/* Character Map Modal */}
-        <Modal
-          visible={showCharMap}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowCharMap(false)}
-        >
+        <Modal visible={showCharMap} transparent animationType="slide" onRequestClose={() => setShowCharMap(false)}>
           <View style={styles.cmOverlay}>
             <View style={styles.cmCard}>
-              {/* Header */}
               <View style={styles.cmHeader}>
                 <Text style={styles.cmTitle}>Hindi Character Map</Text>
                 <TouchableOpacity onPress={() => setShowCharMap(false)} style={styles.cmClose}>
                   <Ionicons name="close" size={20} color={COLORS.textWhite} />
                 </TouchableOpacity>
               </View>
-
-              {/* Tabs */}
               <View style={styles.cmTabs}>
-                {[
-                  { label: 'Mangal (Unicode)', value: 'mangal' },
-                  { label: 'Kruti Dev', value: 'krutidev' },
-                ].map((t) => {
-                  const sel = charMapTab === t.value;
-                  return (
-                    <TouchableOpacity
-                      key={t.value}
-                      style={[styles.cmTab, sel && styles.cmTabActive]}
-                      onPress={() => setCharMapTab(t.value)}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={[styles.cmTabText, sel && styles.cmTabTextActive]}>{t.label}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
+                {[{ label: 'Mangal (Unicode)', value: 'mangal' }, { label: 'Kruti Dev', value: 'krutidev' }].map((t) => (
+                  <TouchableOpacity
+                    key={t.value}
+                    style={[styles.cmTab, charMapTab === t.value && styles.cmTabActive]}
+                    onPress={() => setCharMapTab(t.value)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.cmTabText, charMapTab === t.value && styles.cmTabTextActive]}>{t.label}</Text>
+                  </TouchableOpacity>
+                ))}
               </View>
-
               <ScrollView style={styles.cmScroll} contentContainerStyle={styles.cmScrollContent}>
-                {/* Consonants */}
                 <Text style={styles.cmSectionTitle}>व्यंजन (Consonants)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_CONSONANTS.map((c, i) => (
@@ -327,8 +363,6 @@ export default function LessonsScreen({
                     </View>
                   ))}
                 </View>
-
-                {/* Vowels */}
                 <Text style={styles.cmSectionTitle}>स्वर (Vowels)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_VOWELS.map((c, i) => (
@@ -338,8 +372,6 @@ export default function LessonsScreen({
                     </View>
                   ))}
                 </View>
-
-                {/* Matras */}
                 <Text style={styles.cmSectionTitle}>मात्राएँ (Matras)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_MATRAS.map((c, i) => (
@@ -349,30 +381,12 @@ export default function LessonsScreen({
                     </View>
                   ))}
                 </View>
-
-                {/* Numbers */}
                 <Text style={styles.cmSectionTitle}>अंक (Numbers)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_NUMBERS.map((c, i) => (
                     <View key={i} style={styles.cmItem}>
                       <Text style={styles.cmUnicode}>{c.unicode}</Text>
-                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : String(i)}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                {/* Special */}
-                <Text style={styles.cmSectionTitle}>विशेष</Text>
-                <View style={styles.cmGrid}>
-                  {[
-                    { unicode: '्', label: 'halant', kruti: '~' },
-                    { unicode: '़', label: 'nukta', kruti: '+' },
-                    { unicode: 'ॐ', label: 'om', kruti: '=\u0915\u094d\u0930' },
-                    { unicode: '।', label: 'purna viram', kruti: 'A' },
-                  ].map((c, i) => (
-                    <View key={i} style={styles.cmItem}>
-                      <Text style={styles.cmUnicode}>{c.unicode}</Text>
-                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : c.label}</Text>
+                      <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? String(i) : c.unicode}</Text>
                     </View>
                   ))}
                 </View>
@@ -387,150 +401,152 @@ export default function LessonsScreen({
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
-  container: { flex: 1, padding: scaleSize(16) },
-  containerDesktop: {
-    padding: 24,
-    maxWidth: CONTENT_MAX_WIDTH,
-    alignSelf: 'center',
+  scroll: {
+    padding: 20,
+    paddingBottom: 30,
+    maxWidth: 1180,
     width: '100%',
+    alignSelf: 'center',
   },
-
-  header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(16) },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
   backBtn: {
-    width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(19),
+    width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, marginRight: scaleSize(10),
+    backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
     borderWidth: 1, borderColor: COLORS.cardBorder,
   },
   headerTextWrap: { flex: 1 },
-  title: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(24) },
-  subtitle: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: scaleFont(12), marginTop: 2 },
+  title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
+  subtitle: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
 
   langToggle: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.cardBg,
-    borderRadius: scaleSize(14), padding: scaleSize(4), marginBottom: scaleSize(14),
+    flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 12, padding: 4, marginBottom: 12,
     borderWidth: 1, borderColor: COLORS.cardBorder,
   },
-  langBtn: { flex: 1, paddingVertical: scaleSize(10), borderRadius: scaleSize(10), alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: scaleSize(6) },
-  langBtnActive: { backgroundColor: COLORS.green },
-  langBtnText: { color: COLORS.textMuted, fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700'},
-  langBtnTextActive: { color: '#fff', fontFamily: 'Calibri', fontWeight: '700'},
+  langBtn: {
+    flex: 1, paddingVertical: 9, borderRadius: 9, alignItems: 'center',
+    flexDirection: 'row', justifyContent: 'center', gap: 6,
+  },
+  langBtnActive: { backgroundColor: '#0e9488' },
+  langBtnText: { color: COLORS.textMuted, fontSize: 13.5, fontFamily: 'Calibri', fontWeight: '700' },
+  langBtnTextActive: { color: '#fff' },
+
+  layoutRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap',
+  },
+  segment: {
+    flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 10, padding: 3, borderWidth: 1, borderColor: COLORS.cardBorder,
+  },
+  segmentItem: {
+    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+  },
+  segmentItemActive: { backgroundColor: COLORS.cyan + '22', borderWidth: 1, borderColor: COLORS.cyan },
+  segmentText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Calibri', fontWeight: '700' },
+  segmentTextActive: { color: COLORS.cyan },
+  charMapBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: 'rgba(14,116,144,0.1)', borderWidth: 1, borderColor: 'rgba(14,116,144,0.4)',
+    borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8,
+  },
+  charMapBtnText: { color: COLORS.cyan, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
 
   progressCard: {
-    borderRadius: scaleSize(14), borderWidth: 1, borderColor: COLORS.cardBorder,
-    backgroundColor: COLORS.cardBg, padding: scaleSize(14), marginBottom: scaleSize(14),
+    backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: 14,
+    borderWidth: 1, borderColor: COLORS.cardBorder, padding: 14, marginBottom: 14,
   },
-  progressHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  progressTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700'},
+  progressHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  progressLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  progressTitle: { color: COLORS.textLight, fontSize: 13, fontFamily: 'Calibri', fontWeight: '700' },
+  progressPct: { color: COLORS.cyan, fontSize: 15, fontFamily: 'Calibri', fontWeight: '700' },
   progressTrack: {
-    height: 7, borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    marginTop: scaleSize(10), overflow: 'hidden',
+    height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)',
+    marginTop: 10, overflow: 'hidden',
   },
-  progressFill: { height: '100%', borderRadius: 4 },
+  progressFill: { height: '100%', borderRadius: 4, backgroundColor: '#0e9488' },
 
-  scrollContent: { paddingBottom: scaleSize(120) },
+  catRow: { flexDirection: 'row', gap: 8, marginBottom: 14, flexWrap: 'wrap' },
+  catPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 7,
+    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1,
+    borderColor: COLORS.cardBorder, borderRadius: 20,
+    paddingHorizontal: 13, paddingVertical: 8,
+  },
+  catPillText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Calibri', fontWeight: '700' },
+  catCount: { borderRadius: 9, paddingHorizontal: 7, paddingVertical: 2 },
+  catCountText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 10 },
 
   lessonCard: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: COLORS.cardBg, borderRadius: scaleSize(14),
-    padding: scaleSize(12), marginBottom: scaleSize(10),
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: COLORS.cardBgSolid, borderRadius: 16,
+    padding: 14, marginBottom: 10,
     borderWidth: 1, borderColor: COLORS.cardBorder,
+    shadowColor: '#000', shadowOpacity: 0.18, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 3,
   },
-  lessonCardLocked: { opacity: 0.45 },
+  lessonCardLocked: { opacity: 0.5 },
+  lessonLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   lessonIcon: {
-    width: scaleSize(44), height: scaleSize(44), borderRadius: scaleSize(12),
+    width: 46, height: 46, borderRadius: 13,
     alignItems: 'center', justifyContent: 'center',
   },
-  lessonInfo: { marginLeft: scaleSize(10), flex: 1 },
-  lessonNumber: { fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700', letterSpacing: 1, marginBottom: 1 },
-  lessonTitle: { color: COLORS.textWhite, fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700'},
-  lessonDesc: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: scaleFont(11), marginTop: 1 },
-  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(5), marginTop: scaleSize(6) },
+  lessonInfo: { marginLeft: 12, flex: 1 },
+  lessonNum: { fontSize: 10, fontFamily: 'Calibri', fontWeight: '700', letterSpacing: 1, marginBottom: 1 },
+  lessonTitle: { color: '#fff', fontSize: 14.5, fontFamily: 'Calibri', fontWeight: '700' },
+  lessonDesc: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 11, marginTop: 1 },
+  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 7 },
   badge: {
     flexDirection: 'row', alignItems: 'center', gap: 3,
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: scaleSize(6), paddingHorizontal: scaleSize(5), paddingVertical: scaleSize(2),
+    borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2,
   },
-  badgeText: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700'},
-  lessonRight: { marginLeft: scaleSize(6) },
-  playBtn: {
-    width: scaleSize(32), height: scaleSize(32), borderRadius: scaleSize(16),
-    alignItems: 'center', justifyContent: 'center',
+  badgeText: { color: COLORS.textMuted, fontSize: 10, fontFamily: 'Calibri', fontWeight: '700' },
+  lessonRight: { marginLeft: 10 },
+  startBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderRadius: 10, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 9,
   },
+  startBtnText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 12.5 },
 
-  layoutCard: {
-    borderRadius: scaleSize(14), borderWidth: 1, borderColor: COLORS.cardBorder,
-    backgroundColor: COLORS.cardBg, padding: scaleSize(12), marginBottom: scaleSize(14),
-  },
-  layoutHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(6), marginBottom: scaleSize(10) },
-  layoutTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
-  layoutSegment: { flexDirection: 'row', gap: scaleSize(8) },
-  layoutItem: {
-    flex: 1, paddingVertical: scaleSize(9), borderRadius: scaleSize(10), alignItems: 'center',
-    borderWidth: 1, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
-  },
-  layoutItemActive: { backgroundColor: COLORS.teal + '22', borderColor: COLORS.teal },
-  layoutItemText: { color: COLORS.textMuted, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
-  layoutItemTextActive: { color: COLORS.teal },
-  layoutHint: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(9), lineHeight: scaleFont(15) },
-
-  // CharMap button
-  charMapBtn: {
-    flexDirection: 'row', alignItems: 'center', gap: scaleSize(6),
-    marginTop: scaleSize(10), paddingVertical: scaleSize(8), paddingHorizontal: scaleSize(12),
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(10),
-    borderWidth: 1, borderColor: COLORS.teal + '30',
-  },
-  charMapBtnText: { flex: 1, color: COLORS.teal, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700' },
-
-  // CharMap Modal
-  cmOverlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.75)',
-    justifyContent: 'flex-end',
-  },
+  // CharMap modal
+  cmOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'flex-end' },
   cmCard: {
-    height: '85%', backgroundColor: '#1a1a1a',
-    borderTopLeftRadius: scaleSize(20), borderTopRightRadius: scaleSize(20),
+    height: '85%', backgroundColor: '#101a30',
+    borderTopLeftRadius: 20, borderTopRightRadius: 20,
     borderWidth: 1, borderBottomWidth: 0, borderColor: COLORS.cardBorder,
     overflow: 'hidden',
   },
   cmHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    padding: scaleSize(16), paddingBottom: scaleSize(10),
+    padding: 16, paddingBottom: 10,
   },
-  cmTitle: { color: COLORS.textWhite, fontSize: scaleFont(18), fontFamily: 'Calibri', fontWeight: '700' },
+  cmTitle: { color: '#fff', fontSize: 18, fontFamily: 'Calibri', fontWeight: '700' },
   cmClose: {
-    width: scaleSize(32), height: scaleSize(32), borderRadius: scaleSize(16),
-    backgroundColor: COLORS.cardBg, alignItems: 'center', justifyContent: 'center',
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center',
     borderWidth: 1, borderColor: COLORS.cardBorder,
   },
-  cmTabs: {
-    flexDirection: 'row', marginHorizontal: scaleSize(16), gap: scaleSize(8),
-    marginBottom: scaleSize(12),
-  },
+  cmTabs: { flexDirection: 'row', marginHorizontal: 16, gap: 8, marginBottom: 12 },
   cmTab: {
-    flex: 1, paddingVertical: scaleSize(9), borderRadius: scaleSize(10), alignItems: 'center',
+    flex: 1, paddingVertical: 9, borderRadius: 10, alignItems: 'center',
     borderWidth: 1, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
   },
-  cmTabActive: { backgroundColor: COLORS.teal + '22', borderColor: COLORS.teal },
-  cmTabText: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700' },
-  cmTabTextActive: { color: COLORS.teal },
+  cmTabActive: { backgroundColor: COLORS.cyan + '22', borderColor: COLORS.cyan },
+  cmTabText: { color: COLORS.textMuted, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
+  cmTabTextActive: { color: COLORS.cyan },
   cmScroll: { flex: 1 },
-  cmScrollContent: { padding: scaleSize(16), paddingBottom: scaleSize(40) },
+  cmScrollContent: { padding: 16, paddingBottom: 40 },
   cmSectionTitle: {
-    color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700',
-    marginBottom: scaleSize(8), marginTop: scaleSize(14),
+    color: '#fff', fontSize: 13, fontFamily: 'Calibri', fontWeight: '700',
+    marginBottom: 8, marginTop: 14,
   },
-  cmGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(6),
-  },
+  cmGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   cmItem: {
-    width: scaleSize(58), alignItems: 'center', paddingVertical: scaleSize(8),
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(8),
+    width: 58, alignItems: 'center', paddingVertical: 8,
+    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
     borderWidth: 1, borderColor: COLORS.cardBorder,
   },
-  cmUnicode: { color: COLORS.textWhite, fontSize: scaleFont(18), fontFamily: 'Calibri', fontWeight: '700' },
-  cmKey: { color: COLORS.textMuted, fontSize: scaleFont(9), fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
+  cmUnicode: { color: '#fff', fontSize: 18, fontFamily: 'Calibri', fontWeight: '700' },
+  cmKey: { color: COLORS.textMuted, fontSize: 9, fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
 });
