@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
 
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   dropdownText: { fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700'},
   dropdownList: {
     position: 'absolute', top: '100%', left: 0, right: 0, minWidth: 140,
-    marginTop: 4, backgroundColor: '#1a1a2e', borderWidth: 1,
+    marginTop: 4, backgroundColor: '#1a1a2e', borderWidth: 1.5,
     borderColor: COLORS.cardBorder,     borderRadius: scaleSize(8), overflow: 'hidden',
     zIndex: 100, elevation: 25,
   },

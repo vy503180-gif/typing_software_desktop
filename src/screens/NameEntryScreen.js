@@ -87,12 +87,12 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
               />
 
               <TouchableOpacity
-                style={[s.mobileBtn, canSubmit && s.mobileBtnActive]}
+                style={[s.mobileBtn, !canSubmit && s.mobileBtnDim]}
                 onPress={handleSubmit}
                 disabled={!canSubmit}
                 activeOpacity={0.8}
               >
-                <Text style={[s.mobileBtnText, canSubmit && s.mobileBtnTextActive]}>
+                <Text style={[s.mobileBtnText, !canSubmit && s.mobileBtnTextDim]}>
                   {canSubmit ? 'Start Typing' : 'Enter your name first'}
                 </Text>
                 {canSubmit && <Ionicons name="arrow-forward" size={16} color="#fff" />}
@@ -176,18 +176,18 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
           </View>
 
           <TouchableOpacity
-            style={[s.desktopBtn, canSubmit && s.desktopBtnActive]}
+            style={[s.desktopBtn, !canSubmit && s.desktopBtnDim]}
             onPress={handleSubmit}
             disabled={!canSubmit}
             activeOpacity={0.85}
           >
-            <Text style={[s.desktopBtnText, canSubmit && s.desktopBtnTextActive]}>
+            <Text style={[s.desktopBtnText, !canSubmit && s.desktopBtnTextDim]}>
               Start Typing
             </Text>
             <Ionicons
               name={canSubmit ? 'arrow-forward' : 'lock-closed'}
               size={16}
-              color={canSubmit ? '#fff' : '#666'}
+              color={COLORS.textWhite}
             />
           </TouchableOpacity>
 
@@ -291,7 +291,7 @@ const s = StyleSheet.create({
     maxWidth: 380,
     backgroundColor: '#141414',
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#222',
     padding: 24,
   },
@@ -312,8 +312,8 @@ const s = StyleSheet.create({
   mobileInput: {
     backgroundColor: '#0e0e0e',
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
+    borderWidth: 2,
+    borderColor: '#3f516c',
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontFamily: 'Calibri',
@@ -328,25 +328,29 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: COLORS.teal,
     borderRadius: 10,
     paddingVertical: 14,
     marginTop: 14,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  mobileBtnActive: {
-    backgroundColor: COLORS.teal,
+    borderWidth: 2,
     borderColor: COLORS.teal,
+    shadowColor: '#14b8a6',
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 5 },
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  mobileBtnDim: {
+    opacity: 0.55,
   },
   mobileBtnText: {
     fontFamily: 'Calibri',
     fontWeight: '700',
-    color: '#555',
+    color: '#fff',
     fontSize: 15,
   },
-  mobileBtnTextActive: {
-    color: '#fff',
+  mobileBtnTextDim: {
+    color: 'rgba(255,255,255,0.9)',
   },
   mobileUsersSection: {
     marginTop: 20,
@@ -371,7 +375,7 @@ const s = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 6,
     paddingHorizontal: 10,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#252525',
   },
   mobileUserAvatar: {
@@ -418,7 +422,7 @@ const s = StyleSheet.create({
     height: 500,
     backgroundColor: '#0e0e0e',
     borderRadius: 28,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: 'rgba(13,148,136,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -494,8 +498,8 @@ const s = StyleSheet.create({
     alignSelf: 'stretch',
     backgroundColor: '#111',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
+    borderWidth: 2,
+    borderColor: '#3f516c',
     paddingHorizontal: 14,
     gap: 10,
   },
@@ -524,15 +528,11 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'stretch',
     gap: 8,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: COLORS.teal,
     borderRadius: 12,
     paddingVertical: 14,
     marginTop: 18,
-    borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  desktopBtnActive: {
-    backgroundColor: COLORS.teal,
+    borderWidth: 2,
     borderColor: COLORS.teal,
     shadowColor: '#14b8a6',
     shadowOpacity: 0.4,
@@ -540,14 +540,17 @@ const s = StyleSheet.create({
     shadowRadius: 14,
     elevation: 6,
   },
+  desktopBtnDim: {
+    opacity: 0.55,
+  },
   desktopBtnText: {
     fontFamily: 'Calibri',
     fontWeight: '700',
-    color: '#777',
+    color: '#fff',
     fontSize: 15,
   },
-  desktopBtnTextActive: {
-    color: '#fff',
+  desktopBtnTextDim: {
+    color: 'rgba(255,255,255,0.9)',
   },
 
   desktopUsersSection: {
@@ -586,7 +589,7 @@ const s = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: '#2a2a2a',
   },
   desktopUserAvatar: {

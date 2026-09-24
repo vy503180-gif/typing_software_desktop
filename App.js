@@ -71,6 +71,7 @@ export default function App() {
   const [typingConfig, setTypingConfig] = useState(null);
   const [course, setCourse] = useState(null);
   const [lesson, setLesson] = useState(null);
+  const [certTarget, setCertTarget] = useState(null);
   const [completedSubLessons, setCompletedSubLessons] = useState([]);
   const [reviewConfig, setReviewConfig] = useState(null);
   const [launchTab, setLaunchTab] = useState('Home');
@@ -225,6 +226,22 @@ export default function App() {
     setTab('Type');
   };
 
+  const startCert = (c) => {
+    setCertTarget(c);
+    setTypingConfig({
+      type: 'cert',
+      lang: 'english',
+      title: `${c.name} Certificate`,
+      timeSec: 60,
+      difficulty: 'Easy',
+      mode: 'paragraph',
+      targetWpm: c.id === 'accuracy' ? null : c.target,
+      targetAcc: c.id === 'accuracy' ? c.target : null,
+    });
+    setLaunchTab('Certificates');
+    setTab('Type');
+  };
+
   const startLesson = (lang, lessonId, title, timeSec) => {
     setTypingConfig({
       type: 'lesson',
@@ -375,6 +392,7 @@ export default function App() {
         return (
           <CertificatesScreen
             studentName={studentName}
+            onStartCert={startCert}
             onBack={() => setTab('Home')}
           />
         );

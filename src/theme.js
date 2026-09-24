@@ -71,8 +71,8 @@ export const COLORS = {
   // Surfaces
   cardBg: 'rgba(45, 58, 82, 0.45)',
   cardBgSolid: '#0f1830',
-  cardBorder: 'rgba(148, 163, 184, 0.35)',
-  cardBorderStrong: 'rgba(148, 163, 184, 0.55)',
+  cardBorder: 'rgba(148, 163, 184, 0.65)',
+  cardBorderStrong: 'rgba(148, 163, 184, 0.8)',
   inputBg: 'rgba(13, 20, 36, 0.8)',
 
   // Nav
@@ -80,7 +80,7 @@ export const COLORS = {
   sidebarActive: 'rgba(13, 148, 136, 0.22)',
   sidebarHover: 'rgba(45, 212, 191, 0.10)',
   headerBg: '#0d1424',
-  headerBorder: 'rgba(148, 163, 184, 0.3)',
+  headerBorder: 'rgba(148, 163, 184, 0.5)',
 
   // Keyboard
   keyBg: '#1a2542',
@@ -116,8 +116,8 @@ export const typingContainer = {
 export const card = {
   backgroundColor: COLORS.cardBgSolid,
   borderRadius: 16,
-  borderWidth: 1,
-  borderColor: COLORS.cardBorder,
+  borderWidth: 1.5,
+  borderColor: COLORS.cardBorderStrong,
   padding: 18,
 };
 

@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import VirtualKeyboard, { keyIdForChar, FINGERS, KRUTI_KEYCAPS } from '../components/VirtualKeyboard';
 import { playKeySound } from '../audio/keySound';
 import { LESSON_TEXTS, LESSON_DIFFICULTY } from '../data/lessons';
-import { generateTypingText, sentencesText, paragraphText, wordsText, rushWordList } from '../data/typingTexts';
+import { generateTypingText, sentencesText, paragraphText, wordsText, rushWordList, certText } from '../data/typingTexts';
 import { krutiToUnicode, krutiKeyProgress } from '../utils/krutiToUnicode';
 import { COLORS, BG, levelForWpm, scaleFont } from '../theme';
 
@@ -100,6 +100,15 @@ export default function TypingScreen({
   const isPractice = config.type === 'practice';
   const isGame = config.type === 'game';
   const isTest = config.type === 'test';
+  const isCert = config.type === 'cert';
+  const certTargetValid = (res) =>
+    res && config.targetWpm ? res.wpm >= config.targetWpm : res && config.targetAcc ? res.accuracy >= config.targetAcc : null;
+
+  const certTargetLabel = config.targetWpm
+    ? `${config.targetWpm} WPM`
+    : config.targetAcc
+      ? `${config.targetAcc}% Accuracy`
+      : null;
 
   // --- config state ---
   const [difficulty, setDifficulty] = useState(config.difficulty || 'Easy');
@@ -125,12 +134,16 @@ export default function TypingScreen({
   const [correctId, setCorrectId] = useState(null);
 
   const timerRef = useRef(null);
+  const certCloseRef = useRef(null);
+  const onBackRef = useRef(onBack);
   const inputRef = useRef(null);
   const rawRef = useRef('');
   const scrollRef = useRef(null);
   const lastScrollRow = useRef(0);
   const cursorOpacity = useRef(new Animated.Value(1)).current;
   const textBoxRef = useRef(null);
+
+  onBackRef.current = onBack;
 
   // ---- sound + settings ----
   const soundEnabled = settings.keyboardSound !== false;
@@ -146,6 +159,7 @@ export default function TypingScreen({
       return LESSON_TEXTS[config.lang]?.[config.id] || null;
     }
     if (config.type === 'rare') return null;
+    if (config.type === 'cert') return certText(config.targetWpm || 15);
     return generateTypingText({ mode: config.mode || 'paragraph', difficulty: config.difficulty || 'Easy', timeSec: config.timeSec || 60, lang: config.lang || 'english' });
   }, [config]);
 
@@ -194,6 +208,22 @@ export default function TypingScreen({
     loop.start();
     return () => loop.stop();
   }, [cursorOpacity]);
+
+  useEffect(() => () => {
+    if (certCloseRef.current) clearTimeout(certCloseRef.current);
+  }, []);
+
+  // ESC = go back (web)
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape' && onBackRef.current) {
+        onBackRef.current();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   // timer
   useEffect(() => {
@@ -246,6 +276,7 @@ export default function TypingScreen({
   };
 
   const resetTest = (nextText) => {
+    if (certCloseRef.current) { clearTimeout(certCloseRef.current); certCloseRef.current = null; }
     if (nextText) setCurrentText(nextText);
     setRawInput('');
     setUserInput('');
@@ -267,6 +298,7 @@ export default function TypingScreen({
     let next = config.text;
     if (!next) {
       if (config.type === 'lesson') next = LESSON_TEXTS[config.lang]?.[config.id];
+      else if (config.type === 'cert') next = certText(config.targetWpm || 15);
       else if (config.type === 'game' && mode === 'words') next = wordsText(60, 'medium');
       else next = generateTypingText({ mode, difficulty, timeSec: duration });
     }
@@ -274,7 +306,9 @@ export default function TypingScreen({
   };
 
   const handleRegenerate = () => {
-    const next = generateTypingText({ mode, difficulty, timeSec: duration, lang: config.lang || 'english' });
+    const next = config.type === 'cert'
+      ? certText(config.targetWpm || 15)
+      : generateTypingText({ mode, difficulty, timeSec: duration, lang: config.lang || 'english' });
     resetTest(next);
   };
 
@@ -284,8 +318,10 @@ export default function TypingScreen({
     clearInterval(timerRef.current);
     if (inputRef.current && typeof inputRef.current.blur === 'function') inputRef.current.blur();
 
-    const words = currentText.trim().split(/\s+/).filter((w) => w).length;
+    const wordsBase = currentText.trim().split(/\s+/).filter((w) => w).length;
     const elapsed = Math.max(1, seconds);
+    const typedWords = userInput.trim() ? userInput.trim().split(/\s+/).filter(Boolean).length : 0;
+    const words = isCert ? typedWords : wordsBase;
     const wpm = Math.round((words / elapsed) * 60);
     const cpm = Math.round((userInput.length / elapsed) * 60);
     let correctChars = 0;
@@ -301,7 +337,16 @@ export default function TypingScreen({
     const score = Math.round(Math.max(0, (wpm * accuracy) / 100) * 1.5 + accuracy * 0.2);
     const res = { wpm, cpm, accuracy, mistakes, seconds, score, timedOut: timedOut };
     setResult(res);
-    saveHistory(res);
+    const historyPromise = saveHistory(res);
+
+    if (isCert && onBack) {
+      if (certCloseRef.current) clearTimeout(certCloseRef.current);
+      certCloseRef.current = setTimeout(() => {
+        historyPromise
+          .then(() => { if (onBack) onBack(); })
+          .catch(() => { if (onBack) onBack(); });
+      }, timedOut ? 400 : 1400);
+    }
 
     if (!timedOut && config.type === 'lesson' && onComplete) {
       setTimeout(() => onComplete(config.lang, config.id), 400);
@@ -310,7 +355,7 @@ export default function TypingScreen({
 
   const saveHistory = (res) => {
     const key = getHistoryKey(studentName);
-    AsyncStorage.getItem(key)
+    return AsyncStorage.getItem(key)
       .then((raw) => {
         let list = [];
         try { list = raw ? JSON.parse(raw) : []; } catch { list = []; }
@@ -335,7 +380,7 @@ export default function TypingScreen({
         };
         list.unshift(record);
         list = list.slice(0, 120);
-        AsyncStorage.setItem(key, JSON.stringify(list)).catch(() => {});
+        return AsyncStorage.setItem(key, JSON.stringify(list)).catch(() => {});
       })
       .catch(() => {});
   };
@@ -524,6 +569,7 @@ export default function TypingScreen({
   const renderResult = () => {
     if (!result) return null;
     const level = levelForWpm(result.wpm);
+    const passed = isCert ? certTargetValid(result) : null;
     return (
       <View style={styles.resultOverlay}>
         <View style={styles.resultCard}>
@@ -531,8 +577,16 @@ export default function TypingScreen({
             <View style={[styles.resultIcon, { backgroundColor: result.timedOut ? 'rgba(245,158,11,0.18)' : 'rgba(34,197,94,0.18)' }]}>
               <Ionicons name={result.timedOut ? 'time' : 'trophy'} size={34} color={result.timedOut ? COLORS.amber : COLORS.green} />
             </View>
-            <Text style={styles.resultTitle}>{result.timedOut ? 'Time Up!' : 'Test Complete!'}</Text>
+            <Text style={styles.resultTitle}>{isCert ? (passed ? 'Certificate Earned!' : 'So Close — Try Again') : result.timedOut ? 'Time Up!' : 'Test Complete!'}</Text>
             <Text style={styles.resultSub}>{config.title || (isTest ? 'Typing Test' : 'Practice')} — {level.name}</Text>
+            {isCert && certTargetLabel && (
+              <View style={[styles.certVerdict, passed ? styles.certVerdictPass : styles.certVerdictFail]}>
+                <Ionicons name={passed ? 'checkmark-circle' : 'flag'} size={14} color={passed ? COLORS.green : COLORS.amber} />
+                <Text style={[styles.certVerdictText, { color: passed ? COLORS.green : COLORS.amber }]}>
+                  {passed ? `Target reached (${certTargetLabel})` : `Target: ${certTargetLabel}`}
+                </Text>
+              </View>
+            )}
           </View>
 
           <View style={styles.resultBigRow}>
@@ -587,7 +641,7 @@ export default function TypingScreen({
               <Text style={styles.resultBtnText}>Retry</Text>
             </TouchableOpacity>
             {onBack && (
-              <TouchableOpacity style={[styles.resultBtn, { backgroundColor: '#0f1830', borderWidth: 1, borderColor: COLORS.cardBorder }]} onPress={onBack} activeOpacity={0.8}>
+              <TouchableOpacity style={[styles.resultBtn, { backgroundColor: '#0f1830', borderWidth: 1.5, borderColor: COLORS.cardBorder }]} onPress={onBack} activeOpacity={0.8}>
                 <Ionicons name="arrow-back" size={15} color={COLORS.textLight} />
                 <Text style={styles.resultBtnText}>Exit</Text>
               </TouchableOpacity>
@@ -745,6 +799,9 @@ const renderTextArea = () => {
                   <Ionicons name="arrow-back" size={18} color={COLORS.textLight} />
                 </TouchableOpacity>
               ) : null}
+              {onBack && Platform.OS === 'web' ? (
+                <Text style={styles.escHint}>Esc</Text>
+              ) : null}
               <View>
                 <Text style={styles.title}>{config.title || (isTest ? 'Typing Test' : isGame ? 'Typing Game' : 'Typing Practice')}</Text>
                 <Text style={styles.subtitle}>
@@ -774,6 +831,9 @@ const renderTextArea = () => {
 
             {/* Status chips */}
             <View style={styles.chipRow}>
+              {isCert && certTargetLabel && (
+                <StatChip icon="flag" value={certTargetLabel} label="Target" color={COLORS.amber} />
+              )}
               <StatChip icon="speedometer" value={`${stats.wpm}`} label="WPM" color={COLORS.blueBright} />
               <StatChip icon="pulse" value={`${stats.cpm}`} label="CPM" color={COLORS.cyan} />
               <StatChip icon="checkmark-circle" value={`${stats.accuracy}%`} label="Accuracy" color={COLORS.green} />
@@ -908,8 +968,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
+  },
+  escHint: {
+    fontFamily: 'Calibri',
+    fontWeight: '700',
+    color: COLORS.textMuted,
+    fontSize: 10.5,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1.5,
+    borderColor: COLORS.cardBorder,
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
   title: {
     fontFamily: 'Calibri',
@@ -943,7 +1015,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
   },
   scrollMain: { flex: 1 },
@@ -957,7 +1029,7 @@ const styles = StyleSheet.create({
   controlsBar: {
     backgroundColor: COLORS.cardBgSolid,
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
     padding: 12,
     marginBottom: 12,
@@ -982,7 +1054,7 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 9,
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
   },
   pillSmall: { paddingHorizontal: 10, paddingVertical: 5 },
@@ -1029,7 +1101,7 @@ const styles = StyleSheet.create({
     gap: 5,
     backgroundColor: COLORS.cardBg,
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
     paddingVertical: 8,
   },
@@ -1263,7 +1335,7 @@ const styles = StyleSheet.create({
   liveStats: { gap: 8, marginBottom: 14 },
   liveStat: {
     backgroundColor: COLORS.cardBg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
     borderRadius: 12,
     padding: 12,
@@ -1296,7 +1368,7 @@ const styles = StyleSheet.create({
   },
   guideCard: {
     backgroundColor: COLORS.cardBg,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
     borderRadius: 12,
     padding: 14,
@@ -1426,6 +1498,13 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     marginTop: 3,
   },
+  certVerdict: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, marginTop: 12,
+  },
+  certVerdictPass: { backgroundColor: 'rgba(34,197,94,0.15)', borderWidth: 1.5, borderColor: 'rgba(34,197,94,0.5)' },
+  certVerdictFail: { backgroundColor: 'rgba(245,158,11,0.12)', borderWidth: 1.5, borderColor: 'rgba(245,158,11,0.45)' },
+  certVerdictText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 12.5 },
   resultBigRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',

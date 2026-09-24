@@ -195,13 +195,13 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
 
   progressCard: {
     backgroundColor: COLORS.cardBg, borderRadius: scaleSize(14),
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: scaleSize(14), marginBottom: scaleSize(12),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(14), marginBottom: scaleSize(12),
   },
   progressHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8) },
   progressTitle: { fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite },
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
 
   lessonsCard: {
     backgroundColor: COLORS.cardBgSolid, borderRadius: scaleSize(14),
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: scaleSize(12),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(12),
     marginTop: scaleSize(10),
   },
   sectionTitle: { fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },

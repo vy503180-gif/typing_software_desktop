@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(19),
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, marginRight: scaleSize(10),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTextWrap: { flex: 1 },
   title: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(24) },
@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
   // Cards
   card: {
     backgroundColor: COLORS.cardBg, borderRadius: scaleSize(14),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     padding: scaleSize(14), marginBottom: scaleSize(12),
   },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(10), marginBottom: scaleSize(12) },
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
   durRow: { flexDirection: 'row', gap: scaleSize(8), marginBottom: scaleSize(12) },
   durItem: {
     flex: 1, paddingVertical: scaleSize(9), borderRadius: scaleSize(10), alignItems: 'center',
-    borderWidth: 1, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
   },
   durText: { color: COLORS.textMuted, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
 
@@ -603,7 +603,7 @@ const styles = StyleSheet.create({
   kbRow: { flexDirection: 'row', gap: scaleSize(3), marginBottom: scaleSize(3) },
   kbKey: {
     width: scaleSize(28), height: scaleSize(28), borderRadius: scaleSize(5),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.03)',
   },
@@ -644,7 +644,7 @@ const styles = StyleSheet.create({
 
   testTextBox: {
     backgroundColor: COLORS.cardBg, borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     padding: scaleSize(14), marginBottom: scaleSize(10),
   },
   charRow: { flexDirection: 'row', flexWrap: 'wrap' },

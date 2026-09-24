@@ -9,6 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BG, COLORS, levelForWpm } from '../theme';
+import { certsFromRecords } from '../data/certificates';
 
 const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
 
@@ -55,22 +56,14 @@ export default function ProfileScreen({ studentName = '', onBack, onSwitchUser, 
   }, [records]);
 
   const level = useMemo(() => levelForWpm(stats.bestWpm), [stats.bestWpm]);
+  const certs = useMemo(() => certsFromRecords(records), [records]);
   const practiceStr = useMemo(() => {
     const h = Math.floor(stats.totalSec / 3600);
     const m = Math.round((stats.totalSec % 3600) / 60);
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
   }, [stats.totalSec]);
 
-  const achievements = useMemo(() => {
-    let count = 0;
-    if (stats.bestWpm >= 15) count++;
-    if (stats.bestWpm >= 25) count++;
-    if (stats.bestWpm >= 35) count++;
-    if (stats.bestWpm >= 50) count++;
-    if (stats.bestWpm >= 70) count++;
-    if (stats.bestAcc >= 97) count++;
-    return count;
-  }, [stats]);
+  const achievements = useMemo(() => certs.filter((c) => c.earned).length, [certs]);
 
   const weekDays = useMemo(() => {
     const days = [];
@@ -168,6 +161,27 @@ export default function ProfileScreen({ studentName = '', onBack, onSwitchUser, 
           </View>
         </Section>
 
+        {/* Certificates */}
+        <Section title="Certificates">
+          <View style={styles.certGrid}>
+            {certs.map((c) => (
+              <View key={c.id} style={[styles.certTile, c.earned ? { borderColor: c.color + '66', backgroundColor: c.color + '10' } : styles.certTileLocked]}>
+                <View style={[styles.certTileIcon, { backgroundColor: c.earned ? c.color : 'rgba(255,255,255,0.06)' }]}>
+                  <Ionicons name={c.earned ? c.icon : 'lock-closed'} size={18} color={c.earned ? '#fff' : COLORS.textDim} />
+                </View>
+                <Text style={[styles.certTileName, !c.earned && { color: COLORS.textDim }]} numberOfLines={1}>
+                  {c.name}
+                </Text>
+                {c.earned && (
+                  <Text style={[styles.certTileDate, { color: c.color }]} numberOfLines={1}>
+                    {c.date ? c.date : 'Earned'}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        </Section>
+
         {/* Days practiced this week */}
         <Section title="This Week">
           <View style={styles.weekRow}>
@@ -234,7 +248,7 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerText: { flex: 1 },
   title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
@@ -270,6 +284,22 @@ const styles = StyleSheet.create({
   },
   achieveText: { color: COLORS.amber, fontFamily: 'Calibri', fontWeight: '700', fontSize: 14, marginTop: 2 },
 
+  certGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  certTile: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    backgroundColor: 'rgba(30,46,84,0.45)',
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    borderRadius: 13, paddingVertical: 8, paddingHorizontal: 12,
+    minWidth: 170, flexGrow: 1, maxWidth: 280,
+  },
+  certTileLocked: { opacity: 0.55 },
+  certTileIcon: {
+    width: 30, height: 30, borderRadius: 9,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  certTileName: { flex: 1, fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 12 },
+  certTileDate: { fontFamily: 'Calibri', fontWeight: '600', fontSize: 10 },
+
   section: { marginTop: 6 },
   sectionTitle: {
     fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted,
@@ -280,7 +310,7 @@ const styles = StyleSheet.create({
   kpi: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 14, padding: 16,
   },
   kpiVal: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 24 },
@@ -290,7 +320,7 @@ const styles = StyleSheet.create({
   weekCol: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 14, paddingVertical: 14,
   },
   weekBar: { width: 10, borderRadius: 5, backgroundColor: '#0e7490' },
@@ -299,7 +329,7 @@ const styles = StyleSheet.create({
 
   recentCard: {
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 16, paddingHorizontal: 14,
   },
   recentRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, gap: 10 },
@@ -316,7 +346,7 @@ const styles = StyleSheet.create({
   emptyCard: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 14, padding: 16,
   },
   emptyText: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12.5 },

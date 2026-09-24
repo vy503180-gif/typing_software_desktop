@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
   statBox: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(10),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(10),
   },
   statBoxGood: { borderColor: 'rgba(34,197,94,0.5)' },
   statBoxWarn: { borderColor: 'rgba(245,158,11,0.5)' },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
 
   gaugeWrap: {
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(14),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     padding: scaleSize(14), marginBottom: scaleSize(12),
   },
   gaugeHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: scaleSize(8) },
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
   doneStat: {
     minWidth: scaleSize(96), alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(12),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(12),
   },
   doneVal: { fontSize: scaleFont(20), fontFamily: 'Calibri', fontWeight: '700' },
   doneLabel: { fontSize: scaleFont(9.5), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted, marginTop: 2 },
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   exitBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     paddingVertical: scaleSize(11), paddingHorizontal: scaleSize(24), marginTop: scaleSize(10),
   },
   exitBtnText: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },

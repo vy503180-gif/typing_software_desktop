@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 19,
     backgroundColor: 'rgba(255,255,255,0.06)',
     alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     marginRight: 12,
   },
   headerText: { flex: 1 },
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderRadius: 16, borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: 16, borderWidth: 1.5, borderColor: COLORS.cardBorder,
     padding: 14,
   },
 
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
   toggleTrack: {
     width: 46, height: 26, borderRadius: 13,
     backgroundColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     justifyContent: 'center',
   },
   toggleTrackOn: {
@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   segmentItem: {
     flex: 1, minWidth: 48,
     alignItems: 'center', justifyContent: 'center',
-    borderRadius: 10, borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: 10, borderWidth: 1.5, borderColor: COLORS.cardBorder,
     backgroundColor: 'rgba(255,255,255,0.04)',
     paddingVertical: 10,
   },
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
   },
   confirmBtnText: { fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
   cancelBtn: {
-    borderRadius: 10, borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: 10, borderWidth: 1.5, borderColor: COLORS.cardBorder,
     backgroundColor: 'rgba(255,255,255,0.04)',
     paddingHorizontal: 14, paddingVertical: 8,
   },

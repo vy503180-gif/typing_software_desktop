@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 12, padding: 12,
   },
   itemText: { flex: 1, fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textLight, fontSize: 13 },

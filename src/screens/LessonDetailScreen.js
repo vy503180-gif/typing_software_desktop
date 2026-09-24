@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, marginRight: scaleSize(8),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(18), color: COLORS.textWhite, flex: 1 },
 
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   tab: {
     width: scaleSize(28), height: scaleSize(28), borderRadius: scaleSize(6),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   tabText: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700'},
 

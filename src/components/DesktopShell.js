@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
     backgroundColor: 'rgba(59,130,246,0.08)',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: COLORS.cardBorder,
   },
   userAvatar: {

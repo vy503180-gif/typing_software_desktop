@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTextWrap: { flex: 1 },
   title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
@@ -422,7 +422,7 @@ const styles = StyleSheet.create({
   langToggle: {
     flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.04)',
     borderRadius: 12, padding: 4, marginBottom: 12,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   langBtn: {
     flex: 1, paddingVertical: 9, borderRadius: 9, alignItems: 'center',
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
   },
   segment: {
     flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 10, padding: 3, borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: 10, padding: 3, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   segmentItem: {
     paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8,
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
 
   progressCard: {
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: 14,
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: 14, marginBottom: 14,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: 14, marginBottom: 14,
   },
   progressHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   progressLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
   catRow: { flexDirection: 'row', gap: 8, marginBottom: 14, flexWrap: 'wrap' },
   catPill: {
     flexDirection: 'row', alignItems: 'center', gap: 7,
-    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1.5,
     borderColor: COLORS.cardBorder, borderRadius: 20,
     paddingHorizontal: 13, paddingVertical: 8,
   },
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: COLORS.cardBgSolid, borderRadius: 16,
     padding: 14, marginBottom: 10,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     shadowColor: '#000', shadowOpacity: 0.18, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 3,
   },
   lessonCardLocked: { opacity: 0.5 },
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   cmCard: {
     height: '85%', backgroundColor: '#101a30',
     borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    borderWidth: 1, borderBottomWidth: 0, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderBottomWidth: 0, borderColor: COLORS.cardBorder,
     overflow: 'hidden',
   },
   cmHeader: {
@@ -525,12 +525,12 @@ const styles = StyleSheet.create({
   cmClose: {
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   cmTabs: { flexDirection: 'row', marginHorizontal: 16, gap: 8, marginBottom: 12 },
   cmTab: {
     flex: 1, paddingVertical: 9, borderRadius: 10, alignItems: 'center',
-    borderWidth: 1, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
   },
   cmTabActive: { backgroundColor: COLORS.cyan + '22', borderColor: COLORS.cyan },
   cmTabText: { color: COLORS.textMuted, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
   cmItem: {
     width: 58, alignItems: 'center', paddingVertical: 8,
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   cmUnicode: { color: '#fff', fontSize: 18, fontFamily: 'Calibri', fontWeight: '700' },
   cmKey: { color: COLORS.textMuted, fontSize: 9, fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },

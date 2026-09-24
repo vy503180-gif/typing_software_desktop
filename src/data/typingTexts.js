@@ -157,6 +157,25 @@ export const paragraphText = (difficulty = 'easy') => {
   return pool[Math.floor(Math.random() * pool.length)];
 };
 
+// Certificate challenge text: fresh every call, sized to the target speed
+// (~1.2x the target words so a minute of typing at that speed completes it).
+export const certText = (targetWpm = 15) => {
+  const targetWords = Math.max(10, Math.round(targetWpm * 1.2));
+  const pool = targetWpm >= 50
+    ? HARD_SENTENCES
+    : targetWpm >= 30
+      ? MEDIUM_SENTENCES
+      : EASY_SENTENCES;
+  const parts = [];
+  let words = 0;
+  while (words < targetWords && parts.length < 6) {
+    const s = pool[Math.floor(Math.random() * pool.length)];
+    parts.push(s);
+    words += s.split(/\s+/).filter((w) => w).length;
+  }
+  return parts.join(' ');
+};
+
 const HINDI_LETTERS = 'कखगघचछजझञटठडढणतथदधनपफबभमयरलवशषसहअआइईउऊएऐओऔ';
 const ENGLISH_LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 const ENGLISH_HOME_ROW = 'asdfjkl;';

@@ -273,14 +273,14 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(19),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTitle: { fontSize: scaleFont(22), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, flex: 1 },
 
   overviewRow: { flexDirection: 'row', gap: scaleSize(8), marginBottom: scaleFont(14) },
   overviewCard: {
     flex: 1, backgroundColor: COLORS.cardBg, borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: scaleSize(10),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(10),
     alignItems: 'center', borderLeftWidth: 3,
   },
   overviewVal: { fontSize: scaleFont(20), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(4) },
@@ -288,12 +288,12 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: COLORS.cardBgSolid,     borderRadius: scaleSize(18),
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: scaleSize(16),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(16),
   },
   tabRow: { flexDirection: 'row', gap: scaleSize(10), marginBottom: scaleFont(14) },
   tab: {
     flex: 1, paddingVertical: scaleFont(12), paddingHorizontal: scaleFont(14),
-    borderRadius: scaleSize(12), borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: scaleSize(12), borderWidth: 1.5, borderColor: COLORS.cardBorder,
     backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center',
     flexDirection: 'row', justifyContent: 'center', gap: scaleSize(6),
   },
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
 
   detailBox: {
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(14),
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: scaleSize(14),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(14),
     marginBottom: scaleSize(12),
   },
   contentRow: { paddingVertical: scaleFont(10), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder },
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
   reportBtnText: { fontSize: scaleFont(15), color: COLORS.teal, fontFamily: 'Calibri', fontWeight: '700'},
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: scaleSize(20) },
-  modalCard: { backgroundColor: '#1a1a2e', borderRadius: scaleSize(18), borderWidth: 1, borderColor: COLORS.cardBorder, maxHeight: '80%' },
+  modalCard: { backgroundColor: '#1a1a2e', borderRadius: scaleSize(18), borderWidth: 1.5, borderColor: COLORS.cardBorder, maxHeight: '80%' },
   modalHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: scaleSize(16), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder,

@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(19),
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, marginRight: scaleSize(10),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTextWrap: { flex: 1 },
   title: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(24) },
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   // App Info Card
   appInfoCard: {
     backgroundColor: COLORS.cardBg, borderRadius: scaleSize(14),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     padding: scaleSize(20), alignItems: 'center', marginBottom: scaleSize(14),
   },
   logo: {
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   // Sections
   section: {
     backgroundColor: COLORS.cardBg, borderRadius: scaleSize(14),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     padding: scaleSize(14), marginBottom: scaleSize(12),
   },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(10), marginBottom: scaleSize(12) },
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   shortcutKey: {
     backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: scaleSize(6),
     paddingHorizontal: scaleSize(8), paddingVertical: scaleSize(4),
-    borderWidth: 1, borderColor: COLORS.cardBorder, minWidth: scaleSize(80), alignItems: 'center',
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, minWidth: scaleSize(80), alignItems: 'center',
   },
   shortcutKeyText: { color: COLORS.textWhite, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700' },
   shortcutUse: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700' },

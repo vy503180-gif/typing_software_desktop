@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   backIconBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     backgroundColor: COLORS.cardBg, alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: COLORS.cardBorder, marginRight: scaleSize(6),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, marginRight: scaleSize(6),
   },
   headerText: { flex: 1 },
   headerTitle: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(22) },
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   },
   footerRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
-    borderRadius: 12, borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: 12, borderWidth: 1.5, borderColor: COLORS.cardBorder,
     backgroundColor: 'rgba(255,255,255,0.04)',
     paddingVertical: scaleSize(6), marginTop: scaleSize(10),
   },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   modeLabel: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', letterSpacing: 0.5 },
   modePills: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(6), flex: 1 },
   modePill: {
-    borderRadius: 10, borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: 10, borderWidth: 1.5, borderColor: COLORS.cardBorder,
     paddingHorizontal: scaleSize(10), paddingVertical: scaleSize(5),
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   startBtnDisabled: {
     backgroundColor: 'rgba(255,255,255,0.06)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     shadowOpacity: 0,
     elevation: 0,
   },

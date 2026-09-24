@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerText: { flex: 1 },
   title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   kpi: {
     flex: 1, minWidth: 140,
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 14, padding: 13,
   },
   kpiTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
 
   chartCard: {
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 16, padding: 16, marginTop: 12,
   },
   chartTitle: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 15 },
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
 
   table: {
     borderRadius: 10, overflow: 'hidden',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   tableRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 9 },
   tableHeader: { backgroundColor: 'rgba(59,130,246,0.15)' },

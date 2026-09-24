@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   statCardX: {
     flex: 1, minWidth: 150, minHeight: 106, flexDirection: 'row', alignItems: 'center', gap: 12,
     backgroundColor: COLORS.cardBgSolid, borderRadius: 16,
-    borderWidth: 1, borderColor: COLORS.cardBorder, paddingVertical: 18, paddingHorizontal: 14,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, paddingVertical: 18, paddingHorizontal: 14,
   },
   statIcon: { width: 46, height: 46, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
   statInfo: { flex: 1 },
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   quickCard: {
     flex: 1, minWidth: 220, minHeight: 112, flexDirection: 'row', alignItems: 'center', gap: 12,
     backgroundColor: COLORS.cardBgSolid, borderRadius: 16,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     paddingVertical: 20, paddingHorizontal: 16, shadowColor: '#000', shadowOpacity: 0.2, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 3,
   },
   quickIconBig: {
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   focusCard: {
     flex: 1, minWidth: 260, minHeight: 106, flexDirection: 'row', alignItems: 'center', gap: 14,
     backgroundColor: COLORS.cardBgSolid, borderRadius: 16,
-    borderWidth: 1, borderColor: COLORS.cardBorder, paddingVertical: 20, paddingHorizontal: 16,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, paddingVertical: 20, paddingHorizontal: 16,
   },
   focusIcon: {
     width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   moreLink: {
     flexDirection: 'row', alignItems: 'center', gap: 7,
     backgroundColor: COLORS.cardBgSolid, borderRadius: 24,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     paddingVertical: 12, paddingHorizontal: 16,
   },
   moreLinkText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 13 },

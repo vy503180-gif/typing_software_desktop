@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
   subtitle: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
@@ -174,13 +174,13 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: 16,
-    borderWidth: 1, borderColor: COLORS.cardBorder, padding: 12, marginBottom: 8,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: 12, marginBottom: 8,
   },
   segment: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   segmentItem: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9,
   },
   segmentText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Calibri', fontWeight: '700' },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   diffCard: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 12, padding: 14,
   },
   diffTitle: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 14, marginTop: 8 },

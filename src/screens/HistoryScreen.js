@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, marginRight: scaleSize(8),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   clearBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
 
   emptyCard: {
     alignItems: 'center', backgroundColor: COLORS.cardBg,
-    borderRadius: scaleSize(16), borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderRadius: scaleSize(16), borderWidth: 1.5, borderColor: COLORS.cardBorder,
     padding: scaleSize(28), marginTop: scaleSize(10),
   },
   emptyTitle: { color: COLORS.textWhite, fontSize: scaleFont(16), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(10) },
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: COLORS.cardBg, borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     marginBottom: scaleSize(8), overflow: 'hidden',
   },
   rowAccent: { width: 3, alignSelf: 'stretch' },

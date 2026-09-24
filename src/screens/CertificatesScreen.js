@@ -9,19 +9,11 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BG, COLORS } from '../theme';
+import { certsFromRecords, targetText } from '../data/certificates';
 
 const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
 
-const CERT_DEFS = [
-  { id: 'beginner', name: 'Beginner Typist', icon: 'leaf', color: COLORS.green, req: (s) => s.bestWpm >= 15, desc: 'Reach 15 WPM in any test' },
-  { id: 'learning', name: 'Learning Typist', icon: 'school', color: COLORS.teal, req: (s) => s.bestWpm >= 25, desc: 'Reach 25 WPM in any test' },
-  { id: 'intermediate', name: 'Intermediate Typist', icon: 'book', color: COLORS.blue, req: (s) => s.bestWpm >= 35, desc: 'Reach 35 WPM in any test' },
-  { id: 'advanced', name: 'Advanced Typist', icon: 'rocket', color: COLORS.purple, req: (s) => s.bestWpm >= 50, desc: 'Reach 50 WPM in any test' },
-  { id: 'speed', name: 'Speed Expert', icon: 'flash', color: COLORS.amber, req: (s) => s.bestWpm >= 70, desc: 'Reach 70 WPM in any test' },
-  { id: 'accuracy', name: 'Accuracy Champion', icon: 'locate', color: COLORS.rose, req: (s) => s.bestAcc >= 97, desc: 'Score 97%+ accuracy in any test' },
-];
-
-export default function CertificatesScreen({ studentName = '', onBack }) {
+export default function CertificatesScreen({ studentName = '', onBack, onStartCert = null }) {
   const [records, setRecords] = useState([]);
 
   useEffect(() => {
@@ -45,17 +37,7 @@ export default function CertificatesScreen({ studentName = '', onBack }) {
     };
   }, [records]);
 
-  const certs = useMemo(() => {
-    return CERT_DEFS.map((c) => {
-      const earned = c.req(summary);
-      let date = null;
-      if (earned) {
-        const rec = records.find((r) => (c.id === 'accuracy' ? (r.accuracy || 0) >= 97 : (r.wpm || 0) >= (c.id === 'beginner' ? 15 : c.id === 'learning' ? 25 : c.id === 'intermediate' ? 35 : c.id === 'advanced' ? 50 : 70)));
-        date = rec ? rec.date : null;
-      }
-      return { ...c, earned, date };
-    });
-  }, [summary, records]);
+  const certs = useMemo(() => certsFromRecords(records), [records]);
 
   const earnedCount = certs.filter((c) => c.earned).length;
 
@@ -81,7 +63,7 @@ export default function CertificatesScreen({ studentName = '', onBack }) {
         <div class="sub"></div>
         <div>This certificate is proudly presented to</div>
         <div class="name">${studentName}</div>
-        <div class="sub">for achieving ${c.desc} at the ${summary.bestWpm} WPM level with ${summary.bestAcc}% best accuracy.</div>
+        <div class="sub">for reaching the ${c.name} level — ${targetText(c)} in a 1-minute attempt, with ${summary.bestAcc}% best accuracy.</div>
         <div class="detail">Awarded on ${new Date().toLocaleDateString()} • Typing Master App</div>
       </div>
       <script>window.print()</script></body></html>`);
@@ -127,16 +109,17 @@ export default function CertificatesScreen({ studentName = '', onBack }) {
           {certs.map((c) => (
             <View
               key={c.id}
-              style={[
-                styles.certCard,
-                c.earned ? { borderColor: c.color + '66', backgroundColor: c.color + '12' } : styles.certCardLocked,
-              ]}
+              style={[styles.certCard, { borderColor: c.color + '5e', backgroundColor: c.color + '10' }]}
             >
-              <View style={[styles.certIcon, { backgroundColor: c.earned ? c.color : 'rgba(255,255,255,0.06)' }]}>
-                <Ionicons name={c.earned ? c.icon : 'lock-closed'} size={26} color={c.earned ? '#fff' : COLORS.textDim} />
+              <View style={[styles.certIcon, { backgroundColor: c.color }]}>
+                <Ionicons name={c.icon} size={26} color="#fff" />
               </View>
-              <Text style={[styles.certName, !c.earned && { color: COLORS.textDim }]}>{c.name}</Text>
-              <Text style={styles.certDesc}>{c.desc}</Text>
+              <Text style={styles.certName}>{c.name}</Text>
+              <Text style={styles.certDesc}>Complete a 1-minute typing attempt</Text>
+              <View style={[styles.targetTag, { borderColor: c.color + '55', backgroundColor: c.color + '14' }]}>
+                <Ionicons name="flag" size={12} color={c.color} />
+                <Text style={[styles.targetTagText, { color: c.color }]}>Target: {targetText(c)}</Text>
+              </View>
               {c.earned ? (
                 <>
                   <View style={[styles.earnedTag, { backgroundColor: c.color + '22', borderColor: c.color + '66' }]}>
@@ -149,9 +132,20 @@ export default function CertificatesScreen({ studentName = '', onBack }) {
                     <Ionicons name="print" size={15} color={COLORS.cyan} />
                     <Text style={styles.printText}>View Certificate</Text>
                   </TouchableOpacity>
+                  {onStartCert && (
+                    <TouchableOpacity style={styles.retryBtn} onPress={() => onStartCert(c)} activeOpacity={0.8}>
+                      <Ionicons name="refresh" size={14} color={c.color} />
+                      <Text style={[styles.retryText, { color: c.color }]}>Practice Again (1 min)</Text>
+                    </TouchableOpacity>
+                  )}
                 </>
               ) : (
-                <Text style={styles.lockHint}>Keep practising to unlock</Text>
+                onStartCert && (
+                  <TouchableOpacity style={[styles.challengeBtn, { backgroundColor: c.color, borderColor: c.color }]} onPress={() => onStartCert(c)} activeOpacity={0.85}>
+                    <Ionicons name="timer" size={15} color="#fff" />
+                    <Text style={styles.challengeText}>Take Challenge · 1 min</Text>
+                  </TouchableOpacity>
+                )
               )}
             </View>
           ))}
@@ -175,7 +169,7 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerText: { flex: 1 },
   title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
@@ -191,7 +185,7 @@ const styles = StyleSheet.create({
   summaryItem: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 14, padding: 14,
   },
   summaryVal: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 26 },
@@ -202,10 +196,9 @@ const styles = StyleSheet.create({
     flex: 1, minWidth: 250,
     alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)',
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 16, padding: 20,
   },
-  certCardLocked: { opacity: 0.6 },
   certIcon: {
     width: 58, height: 58, borderRadius: 18,
     alignItems: 'center', justifyContent: 'center', marginBottom: 12,
@@ -213,6 +206,11 @@ const styles = StyleSheet.create({
   },
   certName: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 17, textAlign: 'center' },
   certDesc: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 11.5, textAlign: 'center', marginTop: 5 },
+  targetTag: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, marginTop: 10,
+  },
+  targetTagText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 11.5 },
   earnedTag: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, marginTop: 12,
@@ -224,5 +222,16 @@ const styles = StyleSheet.create({
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, marginTop: 12,
   },
   printText: { color: COLORS.cyan, fontFamily: 'Calibri', fontWeight: '700', fontSize: 12 },
-  lockHint: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textDim, fontSize: 11.5, marginTop: 12 },
+  challengeBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    borderRadius: 11, paddingHorizontal: 14, paddingVertical: 9, marginTop: 12,
+    shadowColor: '#000', shadowOpacity: 0.25, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 3,
+  },
+  challengeText: { color: '#fff', fontFamily: 'Calibri', fontWeight: '700', fontSize: 12.5 },
+  retryBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    borderRadius: 11, paddingHorizontal: 12, paddingVertical: 7, marginTop: 8,
+    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1.5, borderColor: COLORS.cardBorder,
+  },
+  retryText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 11.5 },
 });

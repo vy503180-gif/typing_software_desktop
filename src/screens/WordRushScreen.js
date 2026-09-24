@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   statBox: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(10),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(10),
   },
   statVal: { fontSize: scaleFont(19), fontFamily: 'Calibri', fontWeight: '700' },
   statLabel: { fontSize: scaleFont(9.5), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted, marginTop: 2, letterSpacing: 0.8 },
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   chainRow: { flexDirection: 'row', gap: scaleSize(6), marginTop: scaleSize(14), flexWrap: 'wrap', justifyContent: 'center' },
   chainPill: {
     backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: scaleSize(8),
-    borderWidth: 1, borderColor: COLORS.cardBorder, paddingHorizontal: scaleSize(9), paddingVertical: scaleSize(5),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, paddingHorizontal: scaleSize(9), paddingVertical: scaleSize(5),
   },
   chainText: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '600' },
 
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   doneStat: {
     minWidth: scaleSize(96), alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(12),
+    borderWidth: 1.5, borderColor: COLORS.cardBorder, paddingVertical: scaleSize(12),
   },
   doneVal: { fontSize: scaleFont(20), fontFamily: 'Calibri', fontWeight: '700' },
   doneLabel: { fontSize: scaleFont(9.5), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted, marginTop: 2 },
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
   exitBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(12),
-    borderWidth: 1, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
     paddingVertical: scaleSize(11), paddingHorizontal: scaleSize(24), marginTop: scaleSize(10),
   },
   exitBtnText: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
