@@ -98,7 +98,7 @@ export default function ReviewScreen({ onBack, onStartReview }) {
                                 onPress={() => { setSelectedGame(game); setGameOpen(false); }}
                                 activeOpacity={0.7}
                               >
-                                <Text style={[styles.dropdownItemText, selectedGame === game && { color: COLORS.green, fontFamily: 'Calibri', fontWeight: '700'}]}>
+                                <Text style={[styles.dropdownItemText, selectedGame === game && { color: COLORS.green, fontFamily: 'Poppins_700Bold', fontWeight: '700'}]}>
                                   {game}
                                 </Text>
                               </TouchableOpacity>
@@ -151,16 +151,16 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
-  headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
+  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
 
   columns: { flexDirection: 'row', gap: scaleSize(12), marginHorizontal: scaleSize(8), flexWrap: 'wrap' },
   column: { flex: 1 },
-  item: { fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, letterSpacing: 0.5 },
+  item: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, letterSpacing: 0.5 },
   columnDivider: { height: 1, marginTop: scaleSize(8) },
   optionsBox: { marginTop: scaleSize(10), gap: scaleSize(8) },
   optionRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(6), flexWrap: 'wrap' },
   radioOuter: { justifyContent: 'center', alignItems: 'center' },
-  optionLabel: { fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textLight },
+  optionLabel: { fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight },
 
   dropdownWrap: { marginLeft: scaleSize(8), position: 'relative', zIndex: 100, elevation: 20, alignSelf: 'flex-start' },
   dropdownBtn: {
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.cardBg, borderWidth: 1,
     borderRadius: scaleSize(8), paddingHorizontal: scaleSize(10), paddingVertical: scaleSize(5),
   },
-  dropdownText: { fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700'},
+  dropdownText: { fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
   dropdownList: {
     position: 'absolute', top: '100%', left: 0, right: 0, minWidth: 140,
     marginTop: 4, backgroundColor: '#1a1a2e', borderWidth: 1.5,
@@ -176,12 +176,12 @@ const styles = StyleSheet.create({
     zIndex: 100, elevation: 25,
   },
   dropdownItem: { paddingHorizontal: scaleSize(12), paddingVertical: scaleSize(8) },
-  dropdownItemText: { fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textLight },
+  dropdownItemText: { fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight },
 
   startBtn: { alignSelf: 'center', marginTop: scaleSize(28), borderRadius: scaleSize(28), overflow: 'hidden' },
   startBtnGradient: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: scaleSize(8), paddingVertical: scaleSize(14), paddingHorizontal: scaleSize(36),
   },
-  startBtnText: { color: '#fff', fontSize: scaleFont(15), fontFamily: 'Calibri', fontWeight: '700'},
+  startBtnText: { color: '#fff', fontSize: scaleFont(15), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 });

@@ -66,12 +66,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#22c55e', alignItems: 'center', justifyContent: 'center', marginBottom: 16,
     shadowColor: '#22c55e', shadowOpacity: 0.5, shadowOffset: { width: 0, height: 6 }, shadowRadius: 18, elevation: 6,
   },
-  title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24, textAlign: 'center' },
+  title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24, textAlign: 'center' },
   sub: {
-    fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted,
+    fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted,
     fontSize: 14, textAlign: 'center', marginTop: 8, lineHeight: 21,
   },
-  strong: { color: COLORS.cyan, fontFamily: 'Calibri', fontWeight: '700' },
+  strong: { color: COLORS.cyan, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   items: { width: '100%', marginTop: 22, gap: 10 },
   item: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
@@ -79,11 +79,11 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 12, padding: 12,
   },
-  itemText: { flex: 1, fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textLight, fontSize: 13 },
+  itemText: { flex: 1, fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textLight, fontSize: 13 },
   btnPrimary: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
     backgroundColor: '#0e9488', borderRadius: 12,
     paddingVertical: 13, marginTop: 24, width: '100%',
   },
-  btnPrimaryText: { color: '#fff', fontFamily: 'Calibri', fontWeight: '700', fontSize: 14 },
+  btnPrimaryText: { color: '#fff', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 14 },
 });

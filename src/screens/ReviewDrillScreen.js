@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
     marginRight: 8,
   },
-  headerTitle: { fontFamily: 'Calibri', fontSize: scaleFont(18),
+  headerTitle: { fontFamily: 'Poppins_400Regular', fontSize: scaleFont(18),
     color: COLORS.textWhite,
     flex: 1,
   },
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   progressText: {
     color: COLORS.textWhite,
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     width: 56,
   },
   progressTrack: {
@@ -437,14 +437,14 @@ const styles = StyleSheet.create({
   },
   bigLetter: {
     fontSize: scaleFont(120),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     color: COLORS.textWhite,
     textTransform: 'lowercase',
     lineHeight: scaleSize(150),
   },
-  bigLetterCorrect: { fontFamily: 'Calibri', color: COLORS.teal,
+  bigLetterCorrect: { fontFamily: 'Poppins_400Regular', color: COLORS.teal,
   },
-  bigLetterWrong: { fontFamily: 'Calibri', color: COLORS.rose,
+  bigLetterWrong: { fontFamily: 'Poppins_400Regular', color: COLORS.rose,
   },
 
   groupCells: {
@@ -492,18 +492,18 @@ const styles = StyleSheet.create({
   },
   groupCellText: {
     fontSize: scaleFont(42),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     color: 'rgba(255,255,255,0.55)',
     textTransform: 'lowercase',
   },
-  groupCellTextTyped: { fontFamily: 'Calibri', color: COLORS.teal,
+  groupCellTextTyped: { fontFamily: 'Poppins_400Regular', color: COLORS.teal,
   },
-  groupCellTextWrong: { fontFamily: 'Calibri', color: COLORS.rose,
+  groupCellTextWrong: { fontFamily: 'Poppins_400Regular', color: COLORS.rose,
   },
   letterHint: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
 
   hiddenInput: {
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 20,
   },
-  keyboardHintText: { fontFamily: 'Calibri', color: 'rgba(255,255,255,0.6)',
+  keyboardHintText: { fontFamily: 'Poppins_400Regular', color: 'rgba(255,255,255,0.6)',
     fontSize: scaleFont(12),
     textAlign: 'center',
   },
@@ -535,13 +535,13 @@ const styles = StyleSheet.create({
   doneTitle: {
     color: COLORS.textWhite,
     fontSize: scaleFont(22),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: scaleSize(10),
   },
   doneSub: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: scaleFont(13),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: scaleSize(4),
     textAlign: 'center',
   },
@@ -562,12 +562,12 @@ const styles = StyleSheet.create({
   doneVal: {
     color: COLORS.textWhite,
     fontSize: scaleFont(22),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
   doneLabel: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: scaleFont(11),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: 2,
   },
   restartBtn: {
@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
   restartBtnText: {
     color: COLORS.teal,
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
   backToReviewBtn: {
     flexDirection: 'row',
@@ -599,6 +599,6 @@ const styles = StyleSheet.create({
   backToReviewText: {
     color: COLORS.textWhite,
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
 });

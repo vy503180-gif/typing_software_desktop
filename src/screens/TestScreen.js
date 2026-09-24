@@ -150,8 +150,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
-  title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
-  subtitle: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
+  title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },
+  subtitle: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
 
   hero: {
     alignItems: 'center',
@@ -164,11 +164,11 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginBottom: 12,
     shadowColor: '#0e9488', shadowOpacity: 0.5, shadowOffset: { width: 0, height: 6 }, shadowRadius: 16, elevation: 6,
   },
-  heroTitle: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 20 },
-  heroSub: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 13, textAlign: 'center', marginTop: 6, lineHeight: 19 },
+  heroTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 20 },
+  heroSub: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 13, textAlign: 'center', marginTop: 6, lineHeight: 19 },
 
   sectionTitle: {
-    fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted,
+    fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textMuted,
     fontSize: 11.5, letterSpacing: 1.6, textTransform: 'uppercase',
     marginBottom: 8, marginTop: 8,
   },
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9,
   },
-  segmentText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Calibri', fontWeight: '700' },
+  segmentText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   diffRow: { flexDirection: 'row', gap: 8 },
   diffCard: {
@@ -192,10 +192,10 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 12, padding: 14,
   },
-  diffTitle: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 14, marginTop: 8 },
-  diffDesc: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 10.5, textAlign: 'center', marginTop: 3 },
+  diffTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 14, marginTop: 8 },
+  diffDesc: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 10.5, textAlign: 'center', marginTop: 3 },
 
-  hint: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 10 },
+  hint: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 10 },
 
   startBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15, marginTop: 18,
     shadowColor: '#0e9488', shadowOpacity: 0.5, shadowOffset: { width: 0, height: 6 }, shadowRadius: 16, elevation: 6,
   },
-  startBtnText: { color: '#fff', fontFamily: 'Calibri', fontWeight: '700', fontSize: 16 },
+  startBtnText: { color: '#fff', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 16 },
 
   infoRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 14, justifyContent: 'center' },
-  infoText: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 11.5 },
+  infoText: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 11.5 },
 });

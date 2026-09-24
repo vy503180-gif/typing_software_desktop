@@ -251,13 +251,13 @@ const s = StyleSheet.create({
     marginBottom: 16,
   },
   mobileLogoLetter: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 32,
   },
   mobileAppName: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textWhite,
     fontSize: 22,
@@ -265,7 +265,7 @@ const s = StyleSheet.create({
     lineHeight: 28,
   },
   mobileTagline: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.teal,
     fontSize: 13,
@@ -281,7 +281,7 @@ const s = StyleSheet.create({
     gap: 8,
   },
   mobileFeatureText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#888',
     fontSize: 12,
@@ -296,13 +296,13 @@ const s = StyleSheet.create({
     padding: 24,
   },
   mobileFormTitle: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textWhite,
     fontSize: 20,
   },
   mobileFormSubtitle: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#666',
     fontSize: 13,
@@ -316,7 +316,7 @@ const s = StyleSheet.create({
     borderColor: '#3f516c',
     paddingHorizontal: 14,
     paddingVertical: 14,
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.textWhite,
     fontSize: 15,
@@ -344,7 +344,7 @@ const s = StyleSheet.create({
     opacity: 0.55,
   },
   mobileBtnText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 15,
@@ -356,7 +356,7 @@ const s = StyleSheet.create({
     marginTop: 20,
   },
   mobileUsersTitle: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#444',
     fontSize: 10,
@@ -386,13 +386,13 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   mobileUserAvatarText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 11,
   },
   mobileUserName: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#999',
     fontSize: 12,
@@ -403,7 +403,7 @@ const s = StyleSheet.create({
     marginTop: 16,
   },
   mobileSkipText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#444',
     fontSize: 13,
@@ -448,20 +448,20 @@ const s = StyleSheet.create({
     elevation: 6,
   },
   desktopLogoLetter: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 32,
   },
   desktopAppName: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textWhite,
     fontSize: 23,
     textAlign: 'center',
   },
   desktopTagline: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#999',
     fontSize: 13,
@@ -476,14 +476,14 @@ const s = StyleSheet.create({
     marginVertical: 22,
   },
   desktopFormTitle: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textWhite,
     fontSize: 24,
     textAlign: 'center',
   },
   desktopFormSubtitle: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_500Medium',
     fontWeight: '500',
     color: '#888',
     fontSize: 13.5,
@@ -513,7 +513,7 @@ const s = StyleSheet.create({
   },
   desktopInput: {
     flex: 1,
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.textWhite,
     fontSize: 15,
@@ -544,7 +544,7 @@ const s = StyleSheet.create({
     opacity: 0.55,
   },
   desktopBtnText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 15,
@@ -569,7 +569,7 @@ const s = StyleSheet.create({
     backgroundColor: '#222',
   },
   desktopUsersDividerText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#555',
     fontSize: 10,
@@ -600,13 +600,13 @@ const s = StyleSheet.create({
     justifyContent: 'center',
   },
   desktopUserAvatarText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 11,
   },
   desktopUserName: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#aaa',
     fontSize: 13,
@@ -618,14 +618,14 @@ const s = StyleSheet.create({
     marginTop: 18,
   },
   desktopSkipText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#777',
     fontSize: 13,
   },
 
   desktopCopyright: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_500Medium',
     fontWeight: '500',
     color: '#333',
     fontSize: 11,

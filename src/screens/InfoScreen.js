@@ -195,8 +195,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTextWrap: { flex: 1 },
-  title: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(24) },
-  subtitle: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: scaleFont(12), marginTop: 2 },
+  title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(24) },
+  subtitle: { fontFamily: 'Poppins_400Regular', color: COLORS.textMuted, fontSize: scaleFont(12), marginTop: 2 },
   scroll: { paddingBottom: scaleSize(120) },
 
   // App Info Card
@@ -210,10 +210,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.teal, alignItems: 'center', justifyContent: 'center',
     marginBottom: scaleSize(10),
   },
-  logoLetter: { color: '#fff', fontSize: scaleFont(28), fontFamily: 'Calibri', fontWeight: '700' },
-  appName: { color: COLORS.textWhite, fontSize: scaleFont(20), fontFamily: 'Calibri', fontWeight: '700' },
-  appVersion: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
-  appDesc: { color: COLORS.textLight, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(8), lineHeight: scaleFont(18) },
+  logoLetter: { color: '#fff', fontSize: scaleFont(28), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  appName: { color: COLORS.textWhite, fontSize: scaleFont(20), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  appVersion: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 2 },
+  appDesc: { color: COLORS.textLight, fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(8), lineHeight: scaleFont(18) },
 
   // Sections
   section: {
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(10),
     alignItems: 'center', justifyContent: 'center',
   },
-  sectionTitle: { color: COLORS.textWhite, fontSize: scaleFont(15), fontFamily: 'Calibri', fontWeight: '700' },
+  sectionTitle: { color: COLORS.textWhite, fontSize: scaleFont(15), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   // Features
   featureRow: {
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   featureInfo: { flex: 1 },
-  featureTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
-  featureSub: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', marginTop: 1 },
+  featureTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  featureSub: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 1 },
 
   // How to Use
   stepRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginBottom: scaleSize(10) },
@@ -247,12 +247,12 @@ const styles = StyleSheet.create({
     width: scaleSize(24), height: scaleSize(24), borderRadius: scaleSize(12),
     alignItems: 'center', justifyContent: 'center',
   },
-  stepNumText: { fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700' },
+  stepNumText: { fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   stepIcon: {
     width: scaleSize(28), height: scaleSize(28), borderRadius: scaleSize(8),
     alignItems: 'center', justifyContent: 'center',
   },
-  stepText: { flex: 1, color: COLORS.textLight, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', lineHeight: scaleFont(17) },
+  stepText: { flex: 1, color: COLORS.textLight, fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700', lineHeight: scaleFont(17) },
 
   // Tips
   tipRow: {
@@ -264,15 +264,15 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginTop: 2,
   },
   tipInfo: { flex: 1 },
-  tipTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
-  tipDesc: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', marginTop: 2, lineHeight: scaleFont(16) },
+  tipTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  tipDesc: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 2, lineHeight: scaleFont(16) },
 
   // Hindi Typing
   infoBox: { backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: scaleSize(10), padding: scaleSize(12) },
-  infoText: { color: COLORS.textLight, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700', lineHeight: scaleFont(17) },
+  infoText: { color: COLORS.textLight, fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700', lineHeight: scaleFont(17) },
   layoutInfo: { marginVertical: scaleSize(8), paddingVertical: scaleSize(8), borderTopWidth: 1, borderTopColor: COLORS.cardBorder, borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder },
-  layoutName: { color: COLORS.teal, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
-  layoutDesc: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
+  layoutName: { color: COLORS.teal, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  layoutDesc: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 2 },
 
   // Shortcuts
   shortcutGrid: { gap: scaleSize(8) },
@@ -282,6 +282,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: scaleSize(8), paddingVertical: scaleSize(4),
     borderWidth: 1.5, borderColor: COLORS.cardBorder, minWidth: scaleSize(80), alignItems: 'center',
   },
-  shortcutKeyText: { color: COLORS.textWhite, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700' },
-  shortcutUse: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700' },
+  shortcutKeyText: { color: COLORS.textWhite, fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  shortcutUse: { color: COLORS.textMuted, fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 });

@@ -173,7 +173,7 @@ export default function StatsScreen({ studentName, onBack }) {
                 activeOpacity={0.7}
               >
                 <Ionicons name="speedometer" size={16} color={showSpeedDetail ? COLORS.teal : COLORS.textMuted} />
-                <Text style={[styles.tabText, showSpeedDetail && { color: COLORS.teal, fontFamily: 'Calibri', fontWeight: '700'}]}>Speed</Text>
+                <Text style={[styles.tabText, showSpeedDetail && { color: COLORS.teal, fontFamily: 'Poppins_700Bold', fontWeight: '700'}]}>Speed</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.tab, showAccDetail && { backgroundColor: COLORS.green + '20', borderColor: COLORS.green + '50' }]}
@@ -181,7 +181,7 @@ export default function StatsScreen({ studentName, onBack }) {
                 activeOpacity={0.7}
               >
                 <Ionicons name="checkmark-circle" size={16} color={showAccDetail ? COLORS.green : COLORS.textMuted} />
-                <Text style={[styles.tabText, showAccDetail && { color: COLORS.green, fontFamily: 'Calibri', fontWeight: '700'}]}>Accuracy</Text>
+                <Text style={[styles.tabText, showAccDetail && { color: COLORS.green, fontFamily: 'Poppins_700Bold', fontWeight: '700'}]}>Accuracy</Text>
               </TouchableOpacity>
             </View>
 
@@ -275,16 +275,16 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
-  headerTitle: { fontSize: scaleFont(22), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, flex: 1 },
+  headerTitle: { fontSize: scaleFont(22), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, flex: 1 },
 
   overviewRow: { flexDirection: 'row', gap: scaleSize(8), marginBottom: scaleFont(14) },
   overviewCard: {
-    flex: 1, backgroundColor: COLORS.cardBg, borderRadius: scaleSize(12),
+    flex: 1, minWidth: 0, backgroundColor: COLORS.cardBg, borderRadius: scaleSize(12),
     borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(10),
-    alignItems: 'center', borderLeftWidth: 3,
+    alignItems: 'center', borderLeftWidth: 3, overflow: 'hidden',
   },
-  overviewVal: { fontSize: scaleFont(20), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(4) },
-  overviewLabel: { fontSize: scaleFont(10), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(2) },
+  overviewVal: { fontSize: scaleFont(20), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: scaleSize(4), flexShrink: 1, textAlign: 'center' },
+  overviewLabel: { fontSize: scaleFont(10), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: scaleSize(2), flexShrink: 1, textAlign: 'center' },
 
   card: {
     backgroundColor: COLORS.cardBgSolid,     borderRadius: scaleSize(18),
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center',
     flexDirection: 'row', justifyContent: 'center', gap: scaleSize(6),
   },
-  tabText: { fontSize: scaleFont(14), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700'},
+  tabText: { fontSize: scaleFont(14), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 
   detailBox: {
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(14),
@@ -305,13 +305,13 @@ const styles = StyleSheet.create({
     marginBottom: scaleSize(12),
   },
   contentRow: { paddingVertical: scaleFont(10), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder },
-  contentLabel: { fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textLight },
-  contentValue: { fontSize: scaleFont(22), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(4) },
+  contentLabel: { fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight },
+  contentValue: { fontSize: scaleFont(22), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: scaleSize(4) },
 
   reportBtn: {
     flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), paddingTop: scaleSize(12),
   },
-  reportBtnText: { fontSize: scaleFont(15), color: COLORS.teal, fontFamily: 'Calibri', fontWeight: '700'},
+  reportBtnText: { fontSize: scaleFont(15), color: COLORS.teal, fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', padding: scaleSize(20) },
   modalCard: { backgroundColor: '#1a1a2e', borderRadius: scaleSize(18), borderWidth: 1.5, borderColor: COLORS.cardBorder, maxHeight: '80%' },
@@ -319,9 +319,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     padding: scaleSize(16), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder,
   },
-  modalTitle: { fontSize: scaleFont(18), color: COLORS.textWhite, fontFamily: 'Calibri', fontWeight: '700'},
+  modalTitle: { fontSize: scaleFont(18), color: COLORS.textWhite, fontFamily: 'Poppins_700Bold', fontWeight: '700'},
   modalBody: { padding: scaleSize(16), maxHeight: 350 },
-  reportText: { fontFamily: 'Calibri', color: COLORS.textLight, fontSize: scaleFont(12), lineHeight: scaleSize(20) },
+  reportText: { fontFamily: 'Poppins_400Regular', color: COLORS.textLight, fontSize: scaleFont(12), lineHeight: scaleSize(20) },
   modalActions: {
     flexDirection: 'row', justifyContent: 'space-between',
     padding: scaleSize(16), borderTopWidth: 1, borderTopColor: COLORS.cardBorder, gap: scaleSize(8),
@@ -330,5 +330,5 @@ const styles = StyleSheet.create({
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: scaleSize(4), borderRadius: scaleSize(10), paddingVertical: scaleSize(10),
   },
-  modalBtnText: { color: '#fff', fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700'},
+  modalBtnText: { color: '#fff', fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 });

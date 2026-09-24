@@ -80,13 +80,13 @@ const sidebarStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   logoLetter: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#ffffff',
     fontSize: 16,
   },
   appName: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textWhite,
     fontSize: 14,
@@ -97,7 +97,7 @@ const sidebarStyles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   navSectionLabel: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textDim,
     fontSize: 10,
@@ -120,7 +120,7 @@ const sidebarStyles = StyleSheet.create({
     backgroundColor: COLORS.sidebarActive,
   },
   navLabel: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.textMuted,
     fontSize: 13,
@@ -139,7 +139,7 @@ const sidebarStyles = StyleSheet.create({
     paddingVertical: 12,
   },
   versionText: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_400Regular',
     color: COLORS.textDim,
     fontSize: 10,
   },
@@ -168,7 +168,7 @@ export default function BottomNav({ activeTab, onTabPress }) {
                   color={isActive ? tab.color : COLORS.textMuted}
                 />
               </View>
-              <Text style={[styles.tabLabel, isActive && { color: tab.color, fontFamily: 'Calibri', fontWeight: '700'}]}>
+              <Text style={[styles.tabLabel, isActive && { color: tab.color, fontFamily: 'Poppins_700Bold', fontWeight: '700'}]}>
                 {tab.label}
               </Text>
             </TouchableOpacity>
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabLabel: {
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     color: COLORS.textMuted,
     fontSize: scaleFont(10),
     marginTop: 2,

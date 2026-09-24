@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   topGrid: { flexDirection: 'row', gap: 14, marginBottom: 8, flexWrap: 'wrap' },
   progressCard: { flex: 1, minWidth: 260, minHeight: 224, paddingVertical: 22, paddingHorizontal: 20, backgroundColor: COLORS.cardBgSolid },
   cardTitle: {
-    fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted,
+    fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textMuted,
     fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 18,
   },
   levelRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
@@ -220,14 +220,14 @@ const styles = StyleSheet.create({
     width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
   },
   levelInfo: { flex: 1 },
-  levelName: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 19 },
-  levelNext: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 3 },
+  levelName: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 19 },
+  levelNext: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 3 },
   progressTrack: {
     height: 9, borderRadius: 5, backgroundColor: 'rgba(255,255,255,0.08)',
     marginTop: 20, overflow: 'hidden',
   },
   progressFill: { height: '100%', borderRadius: 5 },
-  progressLabel: { fontFamily: 'Calibri', color: COLORS.textMuted, fontSize: 12, marginTop: 8 },
+  progressLabel: { fontFamily: 'Poppins_400Regular', color: COLORS.textMuted, fontSize: 12, marginTop: 8 },
 
   statsWrap: { flex: 1.6, flexDirection: 'row', flexWrap: 'wrap', gap: 10, minWidth: 340 },
   statCardX: {
@@ -237,11 +237,11 @@ const styles = StyleSheet.create({
   },
   statIcon: { width: 46, height: 46, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
   statInfo: { flex: 1 },
-  statValue: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 24 },
-  statLabel: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 3 },
+  statValue: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 24 },
+  statLabel: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 3 },
 
   sectionTitle: {
-    fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textLight,
+    fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight,
     fontSize: 15, marginTop: 20, marginBottom: 12,
   },
   quickRow: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOpacity: 0.3, shadowOffset: { width: 0, height: 4 }, shadowRadius: 8, elevation: 4,
   },
   quickCardLabel: {
-    flex: 1, fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textLight, fontSize: 15,
+    flex: 1, fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight, fontSize: 15,
   },
 
   focusGrid: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
@@ -270,8 +270,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   focusInfo: { flex: 1 },
-  focusTitle: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 16 },
-  focusSub: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12.5, marginTop: 3 },
+  focusTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 16 },
+  focusSub: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12.5, marginTop: 3 },
   bottomSpacer: { height: 30 },
   moreRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
   moreLink: {
@@ -280,5 +280,5 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
     paddingVertical: 12, paddingHorizontal: 16,
   },
-  moreLinkText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 13 },
+  moreLinkText: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 13 },
 });

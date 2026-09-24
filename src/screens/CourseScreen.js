@@ -197,32 +197,32 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
-  headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
+  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
 
   progressCard: {
     backgroundColor: COLORS.cardBg, borderRadius: scaleSize(14),
     borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(14), marginBottom: scaleSize(12),
   },
   progressHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8) },
-  progressTitle: { fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite },
+  progressTitle: { fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite },
   progressTrack: {
     height: scaleSize(7), borderRadius: scaleSize(4), backgroundColor: 'rgba(255,255,255,0.08)',
     marginTop: scaleSize(8), overflow: 'hidden',
   },
   progressFill: { height: '100%', borderRadius: scaleSize(4) },
-  progressSub: { fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted, marginTop: scaleSize(6) },
+  progressSub: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textMuted, marginTop: scaleSize(6) },
   viewResultBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleSize(6),
     borderRadius: scaleSize(10), paddingVertical: scaleSize(8), marginTop: scaleSize(8),
   },
-  viewResultBtnText: { color: '#fff', fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700'},
+  viewResultBtnText: { color: '#fff', fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 
   lessonsCard: {
     backgroundColor: COLORS.cardBgSolid, borderRadius: scaleSize(14),
     borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(12),
     marginTop: scaleSize(10),
   },
-  sectionTitle: { fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },
+  sectionTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },
   lessonItem: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: scaleSize(10),
     borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder, gap: scaleSize(8),
@@ -232,10 +232,10 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   lessonTextWrap: { flex: 1 },
-  lessonNum: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700'},
-  lessonTitle: { fontSize: scaleFont(12), fontFamily: 'Calibri', fontWeight: '700'},
+  lessonNum: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700'},
+  lessonTitle: { fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
   doneBadge: { borderRadius: scaleSize(6), paddingHorizontal: scaleSize(8), paddingVertical: scaleSize(3) },
-  doneBadgeText: { fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700'},
+  doneBadgeText: { fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
   currentBadge: { borderRadius: scaleSize(6), paddingHorizontal: scaleSize(8), paddingVertical: scaleSize(3) },
-  currentBadgeText: { fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700'},
+  currentBadgeText: { fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 });

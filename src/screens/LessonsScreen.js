@@ -416,8 +416,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerTextWrap: { flex: 1 },
-  title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
-  subtitle: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
+  title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },
+  subtitle: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
 
   langToggle: {
     flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.04)',
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'center', gap: 6,
   },
   langBtnActive: { backgroundColor: '#0e9488' },
-  langBtnText: { color: COLORS.textMuted, fontSize: 13.5, fontFamily: 'Calibri', fontWeight: '700' },
+  langBtnText: { color: COLORS.textMuted, fontSize: 13.5, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   langBtnTextActive: { color: '#fff' },
 
   layoutRow: {
@@ -444,14 +444,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: 6,
   },
   segmentItemActive: { backgroundColor: COLORS.cyan + '22', borderWidth: 1, borderColor: COLORS.cyan },
-  segmentText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Calibri', fontWeight: '700' },
+  segmentText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   segmentTextActive: { color: COLORS.cyan },
   charMapBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     backgroundColor: 'rgba(14,116,144,0.1)', borderWidth: 1, borderColor: 'rgba(14,116,144,0.4)',
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8,
   },
-  charMapBtnText: { color: COLORS.cyan, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
+  charMapBtnText: { color: COLORS.cyan, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   progressCard: {
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: 14,
@@ -459,8 +459,8 @@ const styles = StyleSheet.create({
   },
   progressHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   progressLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  progressTitle: { color: COLORS.textLight, fontSize: 13, fontFamily: 'Calibri', fontWeight: '700' },
-  progressPct: { color: COLORS.cyan, fontSize: 15, fontFamily: 'Calibri', fontWeight: '700' },
+  progressTitle: { color: COLORS.textLight, fontSize: 13, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  progressPct: { color: COLORS.cyan, fontSize: 15, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   progressTrack: {
     height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)',
     marginTop: 10, overflow: 'hidden',
@@ -474,9 +474,9 @@ const styles = StyleSheet.create({
     borderColor: COLORS.cardBorder, borderRadius: 20,
     paddingHorizontal: 13, paddingVertical: 8,
   },
-  catPillText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Calibri', fontWeight: '700' },
+  catPillText: { color: COLORS.textMuted, fontSize: 12.5, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   catCount: { borderRadius: 9, paddingHorizontal: 7, paddingVertical: 2 },
-  catCountText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 10 },
+  catCountText: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 10 },
 
   lessonCard: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -492,22 +492,22 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   lessonInfo: { marginLeft: 12, flex: 1 },
-  lessonNum: { fontSize: 10, fontFamily: 'Calibri', fontWeight: '700', letterSpacing: 1, marginBottom: 1 },
-  lessonTitle: { color: '#fff', fontSize: 14.5, fontFamily: 'Calibri', fontWeight: '700' },
-  lessonDesc: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 11, marginTop: 1 },
+  lessonNum: { fontSize: 10, fontFamily: 'Poppins_700Bold', fontWeight: '700', letterSpacing: 1, marginBottom: 1 },
+  lessonTitle: { color: '#fff', fontSize: 14.5, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  lessonDesc: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 11, marginTop: 1 },
   badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 7 },
   badge: {
     flexDirection: 'row', alignItems: 'center', gap: 3,
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2,
   },
-  badgeText: { color: COLORS.textMuted, fontSize: 10, fontFamily: 'Calibri', fontWeight: '700' },
+  badgeText: { color: COLORS.textMuted, fontSize: 10, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   lessonRight: { marginLeft: 10 },
   startBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     borderRadius: 10, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 9,
   },
-  startBtnText: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 12.5 },
+  startBtnText: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 12.5 },
 
   // CharMap modal
   cmOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'flex-end' },
@@ -521,7 +521,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     padding: 16, paddingBottom: 10,
   },
-  cmTitle: { color: '#fff', fontSize: 18, fontFamily: 'Calibri', fontWeight: '700' },
+  cmTitle: { color: '#fff', fontSize: 18, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   cmClose: {
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center',
@@ -533,12 +533,12 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
   },
   cmTabActive: { backgroundColor: COLORS.cyan + '22', borderColor: COLORS.cyan },
-  cmTabText: { color: COLORS.textMuted, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
+  cmTabText: { color: COLORS.textMuted, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   cmTabTextActive: { color: COLORS.cyan },
   cmScroll: { flex: 1 },
   cmScrollContent: { padding: 16, paddingBottom: 40 },
   cmSectionTitle: {
-    color: '#fff', fontSize: 13, fontFamily: 'Calibri', fontWeight: '700',
+    color: '#fff', fontSize: 13, fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginBottom: 8, marginTop: 14,
   },
   cmGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
@@ -547,6 +547,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
-  cmUnicode: { color: '#fff', fontSize: 18, fontFamily: 'Calibri', fontWeight: '700' },
-  cmKey: { color: COLORS.textMuted, fontSize: 9, fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
+  cmUnicode: { color: '#fff', fontSize: 18, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  cmKey: { color: COLORS.textMuted, fontSize: 9, fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 2 },
 });

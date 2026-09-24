@@ -334,18 +334,18 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   headerText: { flex: 1 },
-  headerTitle: { color: COLORS.textWhite, fontSize: 22, fontFamily: 'Calibri', fontWeight: '700' },
-  headerSub: { color: COLORS.textMuted, fontSize: 11.5, fontFamily: 'Calibri', fontWeight: '600', marginTop: 1 },
+  headerTitle: { color: COLORS.textWhite, fontSize: 22, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  headerSub: { color: COLORS.textMuted, fontSize: 11.5, fontFamily: 'Poppins_600SemiBold', fontWeight: '600', marginTop: 1 },
 
   noteBar: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     backgroundColor: COLORS.green + '1c', borderWidth: 1, borderColor: COLORS.green + '55',
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, marginTop: 8,
   },
-  noteText: { color: COLORS.green, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
+  noteText: { color: COLORS.green, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   sectionTitle: {
-    color: COLORS.textMuted, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700',
+    color: COLORS.textMuted, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700',
     letterSpacing: 1.5, textTransform: 'uppercase',
     marginTop: 18, marginBottom: 8,
   },
@@ -361,14 +361,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#0e9488', alignItems: 'center', justifyContent: 'center',
   },
   profileInfo: { flex: 1, marginLeft: 12 },
-  profileName: { color: COLORS.textWhite, fontSize: 17, fontFamily: 'Calibri', fontWeight: '700' },
-  profileSub: { color: COLORS.textMuted, fontSize: 11, fontFamily: 'Calibri', fontWeight: '700', marginTop: 2 },
+  profileName: { color: COLORS.textWhite, fontSize: 17, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  profileSub: { color: COLORS.textMuted, fontSize: 11, fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 2 },
   switchBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 5,
     borderRadius: 10, borderWidth: 1, borderColor: COLORS.cyan + '50',
     backgroundColor: COLORS.cyan + '15', paddingHorizontal: 10, paddingVertical: 7,
   },
-  switchBtnText: { color: COLORS.cyan, fontSize: 11, fontFamily: 'Calibri', fontWeight: '700' },
+  switchBtnText: { color: COLORS.cyan, fontSize: 11, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   settingRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   settingIcon: {
@@ -406,15 +406,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)',
     paddingVertical: 10,
   },
-  segmentText: { color: COLORS.textWhite, fontSize: 13, fontFamily: 'Calibri', fontWeight: '700' },
+  segmentText: { color: COLORS.textWhite, fontSize: 13, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   dataRowWrap: { borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.07)', paddingTop: 10, marginTop: 10 },
   dataRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   dataIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   dataInfo: { flex: 1 },
-  dataTitle: { color: COLORS.textWhite, fontSize: 14, fontFamily: 'Calibri', fontWeight: '700' },
-  dataSub: { color: COLORS.textMuted, fontSize: 11, fontFamily: 'Calibri', fontWeight: '600', marginTop: 2 },
-  layoutHint: { color: COLORS.textMuted, fontSize: 11, fontFamily: 'Calibri', fontWeight: '600', marginTop: 10, lineHeight: 16 },
+  dataTitle: { color: COLORS.textWhite, fontSize: 14, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  dataSub: { color: COLORS.textMuted, fontSize: 11, fontFamily: 'Poppins_600SemiBold', fontWeight: '600', marginTop: 2 },
+  layoutHint: { color: COLORS.textMuted, fontSize: 11, fontFamily: 'Poppins_600SemiBold', fontWeight: '600', marginTop: 10, lineHeight: 16 },
 
   confirmRow: { flexDirection: 'row', gap: 8, marginTop: 10, marginLeft: 46 },
   confirmBtn: {
@@ -423,13 +423,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.04)',
     paddingHorizontal: 14, paddingVertical: 8,
   },
-  confirmBtnText: { fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
+  confirmBtnText: { fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   cancelBtn: {
     borderRadius: 10, borderWidth: 1.5, borderColor: COLORS.cardBorder,
     backgroundColor: 'rgba(255,255,255,0.04)',
     paddingHorizontal: 14, paddingVertical: 8,
   },
-  cancelBtnText: { color: COLORS.textMuted, fontSize: 12, fontFamily: 'Calibri', fontWeight: '700' },
+  cancelBtnText: { color: COLORS.textMuted, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   aboutRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   aboutLogo: {
@@ -437,7 +437,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.cyan, alignItems: 'center', justifyContent: 'center',
   },
   aboutText: {
-    color: COLORS.textMuted, fontSize: 12, fontFamily: 'Calibri', fontWeight: '600',
+    color: COLORS.textMuted, fontSize: 12, fontFamily: 'Poppins_600SemiBold', fontWeight: '600',
     marginTop: 12, lineHeight: 18,
   },
 });

@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: scaleSize(8),
   },
-  headerTitle: { fontFamily: 'Calibri', color: COLORS.textWhite,
+  headerTitle: { fontFamily: 'Poppins_400Regular', color: COLORS.textWhite,
     fontSize: scaleFont(18),
     letterSpacing: 0.5,
     flexShrink: 1,
@@ -616,14 +616,18 @@ const styles = StyleSheet.create({
   statLabel: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: scaleFont(11),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     letterSpacing: 0.5,
+    flexShrink: 1,
+    textAlign: 'center',
   },
   statValue: {
     color: COLORS.textWhite,
     fontSize: scaleFont(18),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: 2,
+    flexShrink: 1,
+    textAlign: 'center',
   },
   missDots: {
     flexDirection: 'row',
@@ -664,11 +668,11 @@ const styles = StyleSheet.create({
   wordText: {
     color: COLORS.teal,
     fontSize: scaleFont(22),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     letterSpacing: 1.2,
     textAlign: 'center',
   },
-  wordTyped: { fontFamily: 'Calibri', color: COLORS.teal,
+  wordTyped: { fontFamily: 'Poppins_400Regular', color: COLORS.teal,
   },
   wallReady: {
     backgroundColor: COLORS.teal,
@@ -678,13 +682,13 @@ const styles = StyleSheet.create({
   wordReady: {
     color: COLORS.teal,
     fontSize: scaleFont(20),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     letterSpacing: 1,
     textAlign: 'center',
   },
   wordReadyKey: {
     color: COLORS.teal,
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
 
   typedBox: {
@@ -700,7 +704,7 @@ const styles = StyleSheet.create({
   typedLabel: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: scaleFont(11),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginBottom: 4,
   },
   typedLetters: {
@@ -712,16 +716,16 @@ const styles = StyleSheet.create({
   typedChar: {
     color: 'rgba(255,255,255,0.5)',
     fontSize: scaleFont(26),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
-  typedCharDone: { fontFamily: 'Calibri', color: COLORS.teal,
+  typedCharDone: { fontFamily: 'Poppins_400Regular', color: COLORS.teal,
   },
-  typedCharWrong: { fontFamily: 'Calibri', color: COLORS.rose,
+  typedCharWrong: { fontFamily: 'Poppins_400Regular', color: COLORS.rose,
   },
   typedHint: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: scaleFont(11),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: scaleSize(4),
   },
 
@@ -732,7 +736,7 @@ const styles = StyleSheet.create({
     borderRadius: scaleSize(16),
     color: COLORS.textWhite,
     fontSize: scaleFont(20),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     paddingVertical: scaleSize(12),
     paddingHorizontal: scaleSize(16),
     marginBottom: scaleSize(4),
@@ -750,7 +754,7 @@ const styles = StyleSheet.create({
   dangerLabel: {
     color: COLORS.textWhite,
     fontSize: scaleFont(12),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginBottom: scaleSize(6),
   },
   dangerTrack: {
@@ -780,13 +784,13 @@ const styles = StyleSheet.create({
   resultTitle: {
     color: COLORS.textWhite,
     fontSize: scaleFont(24),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: scaleSize(12),
   },
   resultSub: {
     color: 'rgba(255,255,255,0.85)',
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     textAlign: 'center',
     marginTop: scaleSize(6),
     marginBottom: scaleSize(20),
@@ -806,13 +810,17 @@ const styles = StyleSheet.create({
   doneVal: {
     color: COLORS.teal,
     fontSize: scaleFont(26),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
+    flexShrink: 1,
+    textAlign: 'center',
   },
   doneLabel: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: scaleFont(12),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: 2,
+    flexShrink: 1,
+    textAlign: 'center',
   },
   restartBtn: {
     flexDirection: 'row',
@@ -829,7 +837,7 @@ const styles = StyleSheet.create({
   restartBtnText: {
     color: COLORS.teal,
     fontSize: scaleFont(15),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
   backToReviewBtn: {
     flexDirection: 'row',
@@ -845,6 +853,6 @@ const styles = StyleSheet.create({
   backToReviewText: {
     color: COLORS.textWhite,
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700'
+    fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
 });

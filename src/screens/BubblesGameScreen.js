@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     marginRight: scaleSize(10),
   },
   headerTitle: {
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     fontSize: scaleFont(18),
     letterSpacing: 0.5,
     flexShrink: 1,
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     maxWidth: scaleSize(150),
   },
   modePillText: {
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     fontSize: scaleFont(12),
     letterSpacing: 0.5,
   },
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
   infoChipText: {
     color: COLORS.textWhite,
     fontSize: scaleFont(12),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
   },
 
   lifeBarTrack: {
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bubbleText: {
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     fontSize: scaleFont(22),
   },
   playHintWrap: {
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
   playHintText: {
     color: COLORS.textDim,
     fontSize: scaleFont(12),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
   },
 
   feedbackArea: {
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
   hintText: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: scaleFont(12),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
   },
 
   hiddenInput: {
@@ -608,13 +608,13 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     fontSize: scaleFont(26),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: scaleSize(12),
   },
   resultSub: {
     color: 'rgba(255,255,255,0.85)',
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: scaleSize(4),
     marginBottom: scaleSize(20),
     textAlign: 'center',
@@ -634,14 +634,17 @@ const styles = StyleSheet.create({
   resultRowLabel: {
     color: COLORS.textWhite,
     fontSize: scaleFont(15),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     flex: 1,
+    flexShrink: 1,
     marginLeft: scaleSize(10),
   },
   resultRowValue: {
     fontSize: scaleFont(20),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
     fontVariant: ['tabular-nums'],
+    flexShrink: 1,
+    textAlign: 'right',
   },
   restartBtn: {
     flexDirection: 'row',
@@ -656,7 +659,7 @@ const styles = StyleSheet.create({
   },
   restartBtnText: {
     fontSize: scaleFont(15),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
   },
   backBtn: {
     flexDirection: 'row',
@@ -672,6 +675,6 @@ const styles = StyleSheet.create({
   backBtnText: {
     color: COLORS.textWhite,
     fontSize: scaleFont(14),
-    fontFamily: 'Calibri', fontWeight: '700',
+    fontFamily: 'Poppins_700Bold', fontWeight: '700',
   },
 });

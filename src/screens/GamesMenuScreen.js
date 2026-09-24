@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder, marginRight: scaleSize(6),
   },
   headerText: { flex: 1 },
-  headerTitle: { fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(22) },
-  headerSub: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: scaleFont(12), marginTop: 1 },
+  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(22) },
+  headerSub: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: scaleFont(12), marginTop: 1 },
 
   // Grid - row/column layout
   grid: {
@@ -276,10 +276,10 @@ const styles = StyleSheet.create({
   gameBadge: {
     borderRadius: 10, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 2,
   },
-  gameBadgeText: { fontSize: scaleFont(9), fontFamily: 'Calibri', fontWeight: '700' },
-  gameLabel: { color: COLORS.textWhite, fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(4) },
+  gameBadgeText: { fontSize: scaleFont(9), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  gameLabel: { color: COLORS.textWhite, fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: scaleSize(4) },
   gameDesc: {
-    color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '600',
+    color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Poppins_600SemiBold', fontWeight: '600',
     marginTop: scaleSize(4), lineHeight: scaleFont(14), minHeight: scaleSize(28),
   },
   footerRow: {
@@ -298,8 +298,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderColor: '#fff',
   },
-  footerText: { fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textMuted },
-  footerActiveText: { fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '700', color: '#fff' },
+  footerText: { fontSize: scaleFont(10.5), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textMuted },
+  footerActiveText: { fontSize: scaleFont(10.5), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff' },
 
   // Details of selected game
   detailCard: {
@@ -312,21 +312,21 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   detailText: { flex: 1 },
-  detailTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Calibri', fontWeight: '700' },
-  detailDesc: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '600', marginTop: scaleSize(2) },
+  detailTitle: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  detailDesc: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Poppins_600SemiBold', fontWeight: '600', marginTop: scaleSize(2) },
 
   modeRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(10), marginTop: scaleSize(12) },
-  modeLabel: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', letterSpacing: 0.5 },
+  modeLabel: { color: COLORS.textMuted, fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', letterSpacing: 0.5 },
   modePills: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(6), flex: 1 },
   modePill: {
     borderRadius: 10, borderWidth: 1.5, borderColor: COLORS.cardBorder,
     paddingHorizontal: scaleSize(10), paddingVertical: scaleSize(5),
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
-  modePillText: { color: COLORS.textLight, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '600' },
+  modePillText: { color: COLORS.textLight, fontSize: scaleFont(11), fontFamily: 'Poppins_600SemiBold', fontWeight: '600' },
 
   rulesRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(7), marginTop: scaleSize(12) },
-  rulesText: { flex: 1, color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Calibri', fontWeight: '600', lineHeight: scaleFont(14) },
+  rulesText: { flex: 1, color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Poppins_600SemiBold', fontWeight: '600', lineHeight: scaleFont(14) },
 
   startBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -344,10 +344,10 @@ const styles = StyleSheet.create({
     elevation: 0,
   },
   startBtnText: {
-    color: '#fff', fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700',
+    color: '#fff', fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700',
   },
   hint: {
-    color: COLORS.textDim, fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '600',
+    color: COLORS.textDim, fontSize: scaleFont(11), fontFamily: 'Poppins_600SemiBold', fontWeight: '600',
     textAlign: 'center', marginTop: scaleSize(10),
   },
 });

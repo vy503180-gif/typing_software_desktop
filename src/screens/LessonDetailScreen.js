@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.cardBg, marginRight: scaleSize(8),
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
-  headerTitle: { fontFamily: 'Calibri', fontWeight: '700', fontSize: scaleFont(18), color: COLORS.textWhite, flex: 1 },
+  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: scaleFont(18), color: COLORS.textWhite, flex: 1 },
 
   tabRow: { flexDirection: 'row', gap: scaleSize(5), marginBottom: scaleSize(8), marginTop: scaleSize(8) },
   tab: {
@@ -170,15 +170,15 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
-  tabText: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700'},
+  tabText: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 
-  lessonTitle: { fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },
+  lessonTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },
 
   lessonDoneBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     borderRadius: scaleSize(8), paddingHorizontal: scaleSize(10), paddingVertical: scaleSize(6), marginBottom: scaleSize(8),
   },
-  lessonDoneText: { fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700'},
+  lessonDoneText: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 
   sideNavBtn: {
     position: 'absolute', width: scaleSize(52), height: scaleSize(52), borderRadius: scaleSize(26),
@@ -188,14 +188,14 @@ const styles = StyleSheet.create({
   sideNavLeft: { left: 20, top: 460 },
   sideNavRight: { right: 20, top: 460 },
   sideNavDisabled: { opacity: 0.3 },
-  sideNavLabel: { fontSize: scaleFont(10), fontFamily: 'Calibri', fontWeight: '700', marginTop: scaleSize(2) },
+  sideNavLabel: { fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: scaleSize(2) },
 
   subLessonsCard: { flex: 1, borderRadius: scaleSize(12), borderWidth: 2, padding: scaleSize(10) },
   subLessonsScroll: { flex: 1 },
   subLessonsCardWrap: { paddingBottom: scaleSize(60) },
   lockBox: { alignItems: 'center', paddingVertical: scaleSize(18), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder, marginBottom: scaleSize(4) },
-  lockBoxTitle: { fontSize: scaleFont(14), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textLight, marginTop: scaleSize(6) },
-  lockBoxSub: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(4) },
+  lockBoxTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight, marginTop: scaleSize(6) },
+  lockBoxSub: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(4) },
 
   subLessonItem: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   subLessonLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: scaleSize(6) },
   radio: { width: scaleSize(16), height: scaleSize(16), borderRadius: scaleSize(8), borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   radioInner: { width: scaleSize(8), height: scaleSize(8), borderRadius: scaleSize(4) },
-  subLessonNum: { fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', color: COLORS.textLight, width: scaleSize(24) },
-  subLessonTitle: { fontSize: scaleFont(11), fontFamily: 'Calibri', fontWeight: '700', textDecorationLine: 'underline', flex: 1 },
-  subLessonDuration: { fontSize: scaleFont(10), color: COLORS.textMuted, fontFamily: 'Calibri', fontWeight: '700', marginLeft: scaleSize(4) },
+  subLessonNum: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight, width: scaleSize(24) },
+  subLessonTitle: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', textDecorationLine: 'underline', flex: 1 },
+  subLessonDuration: { fontSize: scaleFont(10), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700', marginLeft: scaleSize(4) },
 });

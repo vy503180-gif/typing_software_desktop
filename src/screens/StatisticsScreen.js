@@ -40,9 +40,9 @@ function KpiCard({ icon, label, value, color, sub }) {
         <View style={[styles.kpiIcon, { backgroundColor: color + '1c' }]}>
           <Ionicons name={icon} size={18} color={color} />
         </View>
-        <Text style={[styles.kpiValue, { color }]}>{value}</Text>
+        <Text style={[styles.kpiValue, { color }]} numberOfLines={1} ellipsizeMode="tail">{value}</Text>
       </View>
-      <Text style={styles.kpiLabel}>{label}</Text>
+      <Text style={styles.kpiLabel} numberOfLines={1} ellipsizeMode="tail">{label}</Text>
       {sub ? <Text style={styles.kpiSub}>{sub}</Text> : null}
     </View>
   );
@@ -253,36 +253,36 @@ const styles = StyleSheet.create({
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
   },
   headerText: { flex: 1 },
-  title: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 24 },
-  subtitle: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
+  title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },
+  subtitle: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },
   exportBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
     backgroundColor: 'rgba(14,116,144,0.12)', borderWidth: 1, borderColor: 'rgba(14,116,144,0.4)',
     borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8,
   },
-  exportText: { color: COLORS.cyan, fontFamily: 'Calibri', fontWeight: '700', fontSize: 12 },
+  exportText: { color: COLORS.cyan, fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 12 },
 
   kpiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 8 },
   kpi: {
-    flex: 1, minWidth: 140,
+    flex: 1, minWidth: 140, maxWidth: '100%',
     backgroundColor: 'rgba(30,46,84,0.45)',
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
-    borderRadius: 14, padding: 13,
+    borderRadius: 14, padding: 13, overflow: 'hidden',
   },
   kpiTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   kpiIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  kpiValue: { fontFamily: 'Calibri', fontWeight: '700', fontSize: 22 },
-  kpiLabel: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 11, marginTop: 8 },
-  kpiSub: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textDim, fontSize: 10, marginTop: 1 },
+  kpiValue: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 22, flexShrink: 1, textAlign: 'center' },
+  kpiLabel: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 11, marginTop: 8, flexShrink: 1, textAlign: 'center' },
+  kpiSub: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textDim, fontSize: 10, marginTop: 1, flexShrink: 1, textAlign: 'center' },
 
   chartCard: {
     backgroundColor: 'rgba(30,46,84,0.45)',
     borderWidth: 1.5, borderColor: COLORS.cardBorder,
     borderRadius: 16, padding: 16, marginTop: 12,
   },
-  chartTitle: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 15 },
-  chartSub: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 11.5, marginBottom: 14 },
-  chartLabel: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 9, marginTop: 5 },
+  chartTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 15 },
+  chartSub: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 11.5, marginBottom: 14 },
+  chartLabel: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 9, marginTop: 5 },
 
   table: {
     borderRadius: 10, overflow: 'hidden',
@@ -291,11 +291,11 @@ const styles = StyleSheet.create({
   tableRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 9 },
   tableHeader: { backgroundColor: 'rgba(59,130,246,0.15)' },
   tableRowAlt: { backgroundColor: 'rgba(255,255,255,0.03)' },
-  tableCell: { flex: 1, fontFamily: 'Calibri', fontWeight: '700', fontSize: 12, color: COLORS.textLight },
+  tableCell: { flex: 1, fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 12, color: COLORS.textLight },
   tableHeadText: { fontSize: 10.5, color: COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.6 },
   tableLesson: { color: COLORS.textLight },
 
   empty: { alignItems: 'center', paddingVertical: 70 },
-  emptyTitle: { fontFamily: 'Calibri', fontWeight: '700', color: '#fff', fontSize: 18, marginTop: 14 },
-  emptySub: { fontFamily: 'Calibri', fontWeight: '600', color: COLORS.textMuted, fontSize: 13, marginTop: 5, textAlign: 'center' },
+  emptyTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 18, marginTop: 14 },
+  emptySub: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 13, marginTop: 5, textAlign: 'center' },
 });

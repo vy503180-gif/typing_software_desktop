@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   keyLabel: {
     fontSize: 15,
     color: '#cdd9f0',
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     includeFontPadding: false,
   },
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     bottom: 1,
     fontSize: 8,
     color: 'rgba(205,217,240,0.7)',
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
   },
   keyPressed: {

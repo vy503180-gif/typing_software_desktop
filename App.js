@@ -35,6 +35,7 @@ import InfoScreen from './src/screens/InfoScreen';
 import { LESSON_ORDER, getNextLesson } from './src/data/lessons';
 import { BG, BG_DEEP, COLORS } from './src/theme';
 import { applyLightTheme } from './src/lightTheme';
+import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 
 LogBox.ignoreAllLogs();
 
@@ -62,6 +63,8 @@ const DEFAULT_SETTINGS = {
 };
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({ Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold });
+  const fontsReady = fontsLoaded || !!fontError;
   const [tab, setTab] = useState('Home');
   const [studentName, setStudentName] = useState('');
   const [unlockedLessons, setUnlockedLessons] = useState(DEFAULT_UNLOCKED);
@@ -563,10 +566,10 @@ export default function App() {
     }
   };
 
-  if (!loaded) {
+  if (!loaded || !fontsReady) {
     return (
       <View style={[styles.app, { alignItems: 'center', justifyContent: 'center', backgroundColor: BG }]}>
-        <Text style={{ color: '#f8fafc', fontSize: 18, letterSpacing: 2, fontFamily: 'Calibri', fontWeight: '700' }}>Typing Master</Text>
+        <Text style={{ color: '#f8fafc', fontSize: 18, letterSpacing: 2, fontFamily: 'Poppins_700Bold', fontWeight: '700' }}>Typing Master</Text>
         <Text style={{ color: 'rgba(226,232,240,0.65)', fontSize: 12, marginTop: 6 }}>Loading...</Text>
       </View>
     );

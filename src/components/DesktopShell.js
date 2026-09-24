@@ -265,14 +265,14 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   logoTitle: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 17,
     letterSpacing: 0.5,
   },
   logoTag: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.textDim,
     fontSize: 9.5,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   navSectionLabel: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textDim,
     fontSize: 10,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   navLabel: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.textMuted,
     fontSize: 13.5,
@@ -370,19 +370,19 @@ const styles = StyleSheet.create({
   },
   userAvatarText: {
     color: '#fff',
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     fontSize: 15,
   },
   userInfo: { flex: 1 },
   userName: {
     color: '#fff',
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     fontSize: 13,
   },
   userLevel: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     fontSize: 10.5,
     marginTop: 1,
@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingBottom: 12,
     color: COLORS.textDim,
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_400Regular',
     fontSize: 10,
   },
 
@@ -412,14 +412,14 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   headerTitle: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
     fontSize: 17,
     letterSpacing: 0.5,
   },
   headerTagline: {
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.textDim,
     fontSize: 11,
@@ -493,13 +493,13 @@ const styles = StyleSheet.create({
   },
   headerAvatarText: {
     color: '#fff',
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     fontSize: 12,
   },
   headerUserName: {
     color: COLORS.textLight,
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     fontSize: 13,
     maxWidth: 110,
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
   },
   dropdownItemText: {
     color: COLORS.textLight,
-    fontFamily: 'Calibri',
+    fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     fontSize: 13,
     flex: 1,
