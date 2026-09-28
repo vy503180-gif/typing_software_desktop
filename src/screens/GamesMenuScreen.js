@@ -179,13 +179,13 @@ export default function GamesMenuScreen({
               <View style={styles.rulesRow}>
                 <Ionicons name="information-circle" size={15} color={currentGame.color} />
                 <Text style={styles.rulesText}>
-                  {currentGame.id === 'speed'
-                    ? 'Type as many words as you can in 60s. Combo grows when you never miss a letter!'
-                    : currentGame.id === 'wordrush'
-                      ? 'Words rush in one after another. Each word adds to your streak — and the multiplier.'
-                      : currentGame.id === 'accuracy'
-                        ? 'Every mistake hurts your accuracy. Stay above 98% to score big.'
-                        : 'Finish the paragraph before the 40 second clock hits zero. Words give you time back.'}
+                    {currentGame.id === 'speed'
+                      ? 'Type as many words as you can in 60s. Combo grows when you never miss a letter!'
+                      : currentGame.id === 'wordrush'
+                        ? 'Words rush in one after another. Each word adds to your streak — and the multiplier.'
+                        : currentGame.id === 'accuracy'
+                          ? 'Every mistake hurts your accuracy. Stay above 98% to score big.'
+                          : 'Finish the paragraph before the 40 second clock hits zero. Words give you time back.'}
                 </Text>
               </View>
             )}

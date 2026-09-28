@@ -17,7 +17,7 @@ const SCREEN_W = SCREEN.width;
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
 export default function HistoryScreen({ studentName, onBack }) {
   const [records, setRecords] = useState([]);

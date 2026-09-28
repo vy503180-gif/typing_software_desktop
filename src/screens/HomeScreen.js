@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BG, COLORS, card, levelForWpm, IS_DESKTOP } from '../theme';
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
 function GradientPill({ icon, label, colors }) {
   return (
@@ -38,6 +38,7 @@ export default function HomeScreen({
   onReview,
   onExplore,
   onInfo,
+  onCarRace,
 }) {
   const [stats, setStats] = useState({
     totalTests: 0,
@@ -101,7 +102,8 @@ export default function HomeScreen({
     { label: 'Typing Practice', icon: 'keypad', colors: ['#0e9488', '#0e7490'], onPress: onStartTyping },
     { label: 'Typing Games', icon: 'game-controller', colors: ['#10b981', '#f59e0b'], onPress: onGames },
     { label: 'Certificates', icon: 'ribbon', colors: ['#f59e0b', '#f43f5e'], onPress: onCertificates },
-  ];
+    { label: 'Car Race', icon: 'car-sport', colors: ['#fb923c', '#f59e0b'], onPress: onCarRace },
+  ].filter((q) => q.onPress);
 
   const focusCards = [
     { title: 'Improve Speed', sub: 'Boost your WPM with focused drills', icon: 'speedometer', color: COLORS.blue, onPress: onTests },

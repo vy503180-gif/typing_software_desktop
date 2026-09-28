@@ -4,10 +4,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SIDEBAR_WIDTH, HEADER_HEIGHT, levelForWpm, card } from '../theme';
+import { COLORS, SIDEBAR_WIDTH, HEADER_HEIGHT, card } from '../theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
 const MAIN_NAV = [
   { key: 'Home', label: 'Home', icon: 'home', iconOutline: 'home-outline' },
@@ -24,13 +24,20 @@ const DATA_NAV = [
   { key: 'Profile', label: 'Profile', icon: 'person', iconOutline: 'person-outline' },
 ];
 
+const ABOUT_NAV = [
+  { key: 'Developer', label: 'More', icon: 'ellipsis-horizontal', iconOutline: 'ellipsis-horizontal' },
+];
+
 export function Sidebar({ activeTab, onTabPress, studentName, bestWpm }) {
-  const level = levelForWpm(bestWpm);
   return (
     <View style={styles.sidebar}>
       <View style={styles.logoArea}>
         <View style={styles.logoBox}>
           <Ionicons name="keypad" size={20} color="#fff" />
+        </View>
+        <View style={styles.logoText}>
+          <Text style={styles.logoTitle} numberOfLines={1}>Antriksh</Text>
+          <Text style={styles.logoTag}>Typing Master</Text>
         </View>
       </View>
 
@@ -80,20 +87,30 @@ export function Sidebar({ activeTab, onTabPress, studentName, bestWpm }) {
             </TouchableOpacity>
           );
         })}
-      </ScrollView>
 
-      {studentName ? (
-        <TouchableOpacity style={styles.userCard} onPress={() => onTabPress('Profile')} activeOpacity={0.8}>
-          <View style={styles.userAvatar}>
-            <Text style={styles.userAvatarText}>{studentName.trim()[0].toUpperCase()}</Text>
-          </View>
-          <View style={styles.userInfo}>
-            <Text style={styles.userName} numberOfLines={1}>{studentName}</Text>
-            <Text style={[styles.userLevel, { color: level.color }]}>{level.name}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={14} color={COLORS.textDim} />
-        </TouchableOpacity>
-      ) : null}
+        <Text style={[styles.navSectionLabel, { marginTop: 20 }]}>MORE</Text>
+        {ABOUT_NAV.map((item) => {
+          const active = activeTab === item.key;
+          return (
+            <TouchableOpacity
+              key={item.key}
+              style={[styles.navItem, active && styles.navItemActive]}
+              onPress={() => onTabPress(item.key)}
+              activeOpacity={0.75}
+            >
+              <View style={[styles.navIconWrap, active && styles.navIconWrapActive]}>
+                <Ionicons
+                  name={active ? item.icon : item.iconOutline}
+                  size={18}
+                  color={active ? '#fff' : COLORS.textMuted}
+                />
+              </View>
+              <Text style={[styles.navLabel, active && styles.navLabelActive]}>{item.label}</Text>
+              {active && <View style={styles.activeBar} />}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
 
       <Text style={styles.version}>v2.0</Text>
     </View>
@@ -154,7 +171,7 @@ export function Header({ studentName, bestWpm, onNavigate, onSwitchUser }) {
     <View style={styles.header} ref={wrapRef}>
       <View style={styles.headerBrand}>
         <Text style={styles.headerTitle}>Typing Master</Text>
-        <Text style={styles.headerTagline}>Type Better • Faster • Smarter</Text>
+        <Text style={styles.headerTagline}>Type Better â€¢ Faster â€¢ Smarter</Text>
       </View>
 
       <View style={styles.headerActions}>
@@ -264,6 +281,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 6,
   },
+  logoText: { flex: 1 },
   logoTitle: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
@@ -347,45 +365,6 @@ const styles = StyleSheet.create({
     shadowColor: '#0e7490',
     shadowOpacity: 0.8,
     shadowRadius: 4,
-  },
-  userCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginHorizontal: 12,
-    marginBottom: 8,
-    padding: 10,
-    borderRadius: 12,
-    backgroundColor: 'rgba(59,130,246,0.08)',
-    borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
-  },
-  userAvatar: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#0e9488',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  userAvatarText: {
-    color: '#fff',
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-  userInfo: { flex: 1 },
-  userName: {
-    color: '#fff',
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 13,
-  },
-  userLevel: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 10.5,
-    marginTop: 1,
   },
   version: {
     paddingHorizontal: 18,

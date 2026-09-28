@@ -196,7 +196,7 @@ function VirtualKeyboardInner({
                   {k.id !== 'space' && (
                     <Text style={[styles.keySub, compact && { fontSize: 7 }]} numberOfLines={1}>
                       {showFingerGuide
-                        ? fingerName.replace(' or Left or Right Thumb', '').split(' ')[1] || ''
+                        ? (fingerName || '').replace(' or Left or Right Thumb', '').split(' ')[1] || ''
                         : overlay
                           ? k.label
                           : ''}

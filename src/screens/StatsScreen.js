@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SCREEN_W = SCREEN.width;
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
 export default function StatsScreen({ studentName, onBack }) {
   const [records, setRecords] = useState([]);

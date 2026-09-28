@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BG, COLORS } from '../theme';
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
 function BarChart({ data = [], height = 140, color = COLORS.blue }) {
   const max = Math.max(...data.map((d) => d.value), 1);

@@ -11,9 +11,9 @@ import { BG, COLORS } from '../theme';
 
 const APP_VERSION = '1.0.0';
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
-const getUnlockedKey = (name) => `antriksh_unlocked_lessons_${name || 'default'}`;
-const getCourseKey = (name) => `antriksh_course_progress_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
+const getUnlockedKey = () => `antriksh_unlocked_lessons`;
+const getCourseKey = () => `antriksh_course_progress`;
 
 const DURATIONS = [
   { label: '1 min', value: 60 },
@@ -281,7 +281,7 @@ export default function SettingsScreen({
           </View>
           <Text style={styles.layoutHint}>
             {hindiLayout === 'krutidev'
-              ? 'Type using the Kruti Dev (Remington) layout — the app converts it to Unicode Devanagari (Mangal) automatically.'
+              ? 'Type using the Kruti Dev (Remington) layout â€” the app converts it to Unicode Devanagari (Mangal) automatically.'
               : 'Type using a normal Unicode Devanagari keyboard (Mangal), like the standard Hindi keyboard.'}
           </Text>
         </View>
@@ -291,7 +291,7 @@ export default function SettingsScreen({
         <View style={styles.card}>
           {renderDataRow('history', 'time-outline', COLORS.teal, 'Clear typing history', 'Remove all saved test results', clearHistory)}
           {renderDataRow('progress', 'refresh-outline', COLORS.amber, 'Reset lesson progress', 'Re-unlock all lessons', resetProgress)}
-          {renderDataRow('all', 'trash-outline', COLORS.red, 'Reset all data', 'Name, progress and history — everything', resetAll)}
+          {renderDataRow('all', 'trash-outline', COLORS.red, 'Reset all data', 'Name, progress and history â€” everything', resetAll)}
         </View>
 
         {/* About */}
@@ -306,7 +306,7 @@ export default function SettingsScreen({
             </View>
           </View>
           <Text style={styles.aboutText}>
-            Learn typing with lessons, games and speed tests — English and Hindi.
+            Learn typing with lessons, games and speed tests â€” English and Hindi.
           </Text>
         </View>
 

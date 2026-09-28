@@ -18,11 +18,12 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
+import { wordUnits } from '../utils/wordUnits';
 
 const SCREEN_W = SCREEN.width;
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
-// ── Speed Test Data (duration wise) ──
+// â”€â”€ Speed Test Data (duration wise) â”€â”€
 const SPEED_SHORT = [
   'The quick brown fox jumps over the lazy dog.',
   'Pack my box with five dozen liquor jugs.',
@@ -56,7 +57,7 @@ const getSPEED_POOL = (dur) => {
   return SPEED_LONG;
 };
 
-// ── Daily Challenge Data ──
+// â”€â”€ Daily Challenge Data â”€â”€
 const DAILY_PARAGRAPHS = [
   'Technology has changed the way we live our daily lives in so many ways. From the moment we wake up to the time we sleep, we are surrounded by devices that make our tasks easier. Smartphones help us stay connected with friends, manage work schedules, and track our health. The internet has opened a world of information at our fingertips.',
   'Reading books is one of the most valuable habits a person can develop. When you read regularly, you improve your vocabulary and expand your understanding of different cultures and ideas. Books can transport you to different worlds and teach you lessons you might never learn from experience.',
@@ -73,7 +74,7 @@ const getDailyIndex = () => {
   return (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate()) % DAILY_PARAGRAPHS.length;
 };
 
-// ── Keyboard Layout Data ──
+// â”€â”€ Keyboard Layout Data â”€â”€
 const QWERTY_ROWS = [
   ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'],
@@ -103,7 +104,7 @@ const FINGER_LABELS = {
   RI: 'Index', RM: 'Middle', RR: 'Ring', RP: 'Little',
 };
 
-// ── Sub-components ──
+// â”€â”€ Sub-components â”€â”€
 
 function SectionHeader({ icon, color, title, subtitle }) {
   return (
@@ -129,7 +130,7 @@ function SpeedTestCard({ onStart }) {
 
   return (
     <View style={styles.card}>
-      <SectionHeader icon="flash" color={COLORS.amber} title="Speed Test" subtitle="Quick typing test — apna WPM check karo" />
+      <SectionHeader icon="flash" color={COLORS.amber} title="Speed Test" subtitle="Quick typing test â€” apna WPM check karo" />
       <View style={styles.durRow}>
         {DURATIONS.map((d) => {
           const sel = duration === d.value;
@@ -176,7 +177,7 @@ function DailyChallengeCard({ studentName, onStart }) {
 
   return (
     <View style={styles.card}>
-      <SectionHeader icon="calendar" color={COLORS.green} title="Daily Challenge" subtitle="Aaj ka fixed paragraph — har din naya" />
+      <SectionHeader icon="calendar" color={COLORS.green} title="Daily Challenge" subtitle="Aaj ka fixed paragraph â€” har din naya" />
       <View style={styles.dailyPreview}>
         <Text style={styles.dailyText} numberOfLines={3}>{dailyText}</Text>
         <Text style={styles.dailyLen}>{dailyText.length} characters</Text>
@@ -307,13 +308,13 @@ function BestScoresCard({ studentName }) {
         </View>
       </View>
       {best.totalTests === 0 && (
-        <Text style={styles.noData}>Abhi tak koi test nahi hua — pehla speed test karo!</Text>
+        <Text style={styles.noData}>Abhi tak koi test nahi hua â€” pehla speed test karo!</Text>
       )}
     </View>
   );
 }
 
-// ── Inline Speed Test (mini typing test) ──
+// â”€â”€ Inline Speed Test (mini typing test) â”€â”€
 function InlineSpeedTest({ duration, text, onDone, onBack }) {
   const [currentText] = useState(text || (() => {
     const pool = getSPEED_POOL(duration);
@@ -433,19 +434,24 @@ function InlineSpeedTest({ duration, text, onDone, onBack }) {
         <>
           <TouchableOpacity style={styles.testTextBox} onPress={handleCharPress} activeOpacity={1}>
             <View style={styles.charRow}>
-              {currentText.split('').map((char, i) => {
-                const typed = userInput[i];
-                let color = COLORS.textMuted;
-                const isFixated = i < userInput.length;
-                if (isFixated) color = typed === char ? COLORS.green : COLORS.rose;
-                const isCursorHere = i === userInput.length;
-                return (
-                  <View key={i} style={styles.charWrap}>
-                    {isCursorHere && <Animated.View style={[styles.cursor, { opacity: cursorOpacity }]} />}
-                    <Text style={[styles.char, { color }]}>{char}</Text>
-                  </View>
-                );
-              })}
+              {wordUnits(currentText).map((u, ui) => (
+                <View key={ui} style={styles.wordUnit}>
+                  {currentText.slice(u.s, u.e).split('').map((char, ci) => {
+                    const i = u.s + ci;
+                    const typed = userInput[i];
+                    let color = COLORS.textMuted;
+                    const isFixated = i < userInput.length;
+                    if (isFixated) color = typed === char ? COLORS.green : COLORS.rose;
+                    const isCursorHere = i === userInput.length;
+                    return (
+                      <View key={i} style={styles.charWrap}>
+                        {isCursorHere && <Animated.View style={[styles.cursor, { opacity: cursorOpacity }]} />}
+                        <Text style={[styles.char, { color }]}>{char === ' ' ? '\u00A0' : char}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              ))}
             </View>
           </TouchableOpacity>
 
@@ -470,7 +476,7 @@ function InlineSpeedTest({ duration, text, onDone, onBack }) {
   );
 }
 
-// ── Main ExploreScreen ──
+// â”€â”€ Main ExploreScreen â”€â”€
 export default function ExploreScreen({ studentName, onBack }) {
   const [testMode, setTestMode] = useState(null); // { duration, text }
   const [dailyMode, setDailyMode] = useState(false);
@@ -529,7 +535,7 @@ export default function ExploreScreen({ studentName, onBack }) {
   );
 }
 
-// ── Styles ──
+// â”€â”€ Styles â”€â”€
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   container: { flex: 1, padding: scaleSize(16) },
@@ -624,7 +630,7 @@ const styles = StyleSheet.create({
   scoreLabel: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   noData: { color: COLORS.textDim, fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(8) },
 
-  // ── Inline Test ──
+  // â”€â”€ Inline Test â”€â”€
   testContainer: {
     flex: 1, padding: IS_DESKTOP ? 24 : scaleSize(16),
     maxWidth: IS_DESKTOP ? CONTENT_MAX_WIDTH : undefined,
@@ -648,6 +654,7 @@ const styles = StyleSheet.create({
     padding: scaleSize(14), marginBottom: scaleSize(10),
   },
   charRow: { flexDirection: 'row', flexWrap: 'wrap' },
+  wordUnit: { flexDirection: 'row' },
   charWrap: { position: 'relative' },
   char: { fontSize: scaleFont(18), fontFamily: 'Poppins_400Regular', fontWeight: '400' },
   cursor: {

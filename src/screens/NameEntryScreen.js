@@ -33,8 +33,6 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
     else BackHandler.exitApp();
   };
 
-  const initial = (user) => (user && user.trim() ? user.trim()[0].toUpperCase() : '?');
-
   // Mobile layout (original feel)
   if (!IS_DESKTOP) {
     return (
@@ -99,23 +97,18 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
               </TouchableOpacity>
 
               {users.length > 0 && (
-                <View style={s.mobileUsersSection}>
-                  <Text style={s.mobileUsersTitle}>OR CONTINUE AS</Text>
-                  <View style={s.mobileUsersList}>
-                    {users.slice(0, 3).map((user, idx) => (
-                      <TouchableOpacity
-                        key={user}
-                        style={s.mobileUserChip}
-                        onPress={() => setName(user)}
-                        activeOpacity={0.7}
-                      >
-                        <View style={[s.mobileUserAvatar, { backgroundColor: ['#16a34a', '#d97706', '#e11d48'][idx % 3] }]}>
-                          <Text style={s.mobileUserAvatarText}>{initial(user)}</Text>
-                        </View>
-                        <Text style={s.mobileUserName} numberOfLines={1}>{user}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                <View style={s.mobileDropdown}>
+                  <Text style={s.simpleHeader}>RECENT NAMES</Text>
+                  {users.slice(0, 5).map((user, idx) => (
+                    <TouchableOpacity
+                      key={user}
+                      style={[s.simpleItem, idx > 0 && s.simpleItemBorder]}
+                      onPress={() => { setName(user); }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={s.simpleItemText} numberOfLines={1}>{user}</Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               )}
 
@@ -175,6 +168,22 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
             )}
           </View>
 
+          {users.length > 0 && (
+            <View style={s.desktopDropdown}>
+              <Text style={s.simpleHeader}>RECENT NAMES</Text>
+              {users.slice(0, 5).map((user, idx) => (
+                <TouchableOpacity
+                  key={user}
+                  style={[s.simpleItem, idx > 0 && s.simpleItemBorder]}
+                  onPress={() => { setName(user); }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={s.simpleItemText} numberOfLines={1}>{user}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
           <TouchableOpacity
             style={[s.desktopBtn, !canSubmit && s.desktopBtnDim]}
             onPress={handleSubmit}
@@ -190,31 +199,6 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
               color={COLORS.textWhite}
             />
           </TouchableOpacity>
-
-          {users.length > 0 && (
-            <View style={s.desktopUsersSection}>
-              <View style={s.desktopUsersDivider}>
-                <View style={s.desktopUsersDividerLine} />
-                <Text style={s.desktopUsersDividerText}>OR CONTINUE AS</Text>
-                <View style={s.desktopUsersDividerLine} />
-              </View>
-              <View style={s.desktopUsersList}>
-                {users.slice(0, 4).map((user, idx) => (
-                  <TouchableOpacity
-                    key={user}
-                    style={s.desktopUserChip}
-                    onPress={() => setName(user)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={[s.desktopUserAvatar, { backgroundColor: ['#16a34a', '#d97706', '#e11d48', '#0d9488'][idx % 4] }]}>
-                      <Text style={s.desktopUserAvatarText}>{initial(user)}</Text>
-                    </View>
-                    <Text style={s.desktopUserName} numberOfLines={1}>{user}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          )}
 
           <TouchableOpacity onPress={handleCancel} activeOpacity={0.7} style={s.desktopSkipBtn}>
             <Text style={s.desktopSkipText}>Skip for now</Text>
@@ -352,52 +336,6 @@ const s = StyleSheet.create({
   mobileBtnTextDim: {
     color: 'rgba(255,255,255,0.9)',
   },
-  mobileUsersSection: {
-    marginTop: 20,
-  },
-  mobileUsersTitle: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: '#444',
-    fontSize: 10,
-    letterSpacing: 1.5,
-    marginBottom: 10,
-  },
-  mobileUsersList: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  mobileUserChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderWidth: 1.5,
-    borderColor: '#252525',
-  },
-  mobileUserAvatar: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mobileUserAvatarText: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: '#fff',
-    fontSize: 11,
-  },
-  mobileUserName: {
-    fontFamily: 'Poppins_600SemiBold',
-    fontWeight: '600',
-    color: '#999',
-    fontSize: 12,
-    maxWidth: 80,
-  },
   mobileSkipBtn: {
     alignItems: 'center',
     marginTop: 16,
@@ -409,6 +347,40 @@ const s = StyleSheet.create({
     fontSize: 13,
   },
 
+  // ---- DROPDOWN (recent names - simple list) ----
+  mobileDropdown: {
+    alignSelf: 'stretch',
+    marginTop: 10,
+  },
+  desktopDropdown: {
+    alignSelf: 'stretch',
+    marginTop: 10,
+  },
+  simpleHeader: {
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    color: '#666',
+    fontSize: 10,
+    letterSpacing: 1.2,
+    paddingHorizontal: 4,
+    paddingBottom: 6,
+  },
+  simpleItem: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#111',
+    borderRadius: 8,
+  },
+  simpleItemBorder: {
+    marginTop: 4,
+  },
+  simpleItemText: {
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: '500',
+    color: '#bbb',
+    fontSize: 12,
+  },
+
   // ---- DESKTOP ----
   desktopCenter: {
     flex: 1,
@@ -418,15 +390,16 @@ const s = StyleSheet.create({
     padding: 24,
   },
   desktopCard: {
-    width: 500,
-    height: 500,
+    width: Math.min(540, SCREEN.width - 60),
+    maxHeight: SCREEN.height - 48,
     backgroundColor: '#0e0e0e',
     borderRadius: 28,
     borderWidth: 2,
     borderColor: 'rgba(13,148,136,0.45)',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 44,
+    paddingHorizontal: 40,
+    paddingVertical: 24,
     shadowColor: '#14b8a6',
     shadowOpacity: 0.18,
     shadowOffset: { width: 0, height: 12 },
@@ -434,13 +407,13 @@ const s = StyleSheet.create({
     elevation: 10,
   },
   desktopLogoCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
+    width: 56,
+    height: 56,
+    borderRadius: 16,
     backgroundColor: COLORS.teal,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 14,
     shadowColor: '#14b8a6',
     shadowOpacity: 0.55,
     shadowOffset: { width: 0, height: 6 },
@@ -451,45 +424,45 @@ const s = StyleSheet.create({
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
-    fontSize: 32,
+    fontSize: 28,
   },
   desktopAppName: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textWhite,
-    fontSize: 23,
+    fontSize: 22,
     textAlign: 'center',
   },
   desktopTagline: {
     fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#999',
-    fontSize: 13,
+    fontSize: 12.5,
     textAlign: 'center',
-    marginTop: 6,
+    marginTop: 4,
   },
   desktopDivider: {
     width: 44,
     height: 3,
     borderRadius: 2,
     backgroundColor: COLORS.teal,
-    marginVertical: 22,
+    marginVertical: 14,
   },
   desktopFormTitle: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: COLORS.textWhite,
-    fontSize: 24,
+    fontSize: 22,
     textAlign: 'center',
   },
   desktopFormSubtitle: {
     fontFamily: 'Poppins_500Medium',
     fontWeight: '500',
     color: '#888',
-    fontSize: 13.5,
+    fontSize: 13,
     textAlign: 'center',
-    marginTop: 5,
-    marginBottom: 22,
+    marginTop: 4,
+    marginBottom: 14,
   },
 
   desktopInputWrap: {
@@ -516,8 +489,8 @@ const s = StyleSheet.create({
     fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: COLORS.textWhite,
-    fontSize: 15,
-    paddingVertical: 14,
+    fontSize: 14.5,
+    paddingVertical: 12,
     outlineStyle: 'none',
     outlineWidth: 0,
   },
@@ -530,8 +503,8 @@ const s = StyleSheet.create({
     gap: 8,
     backgroundColor: COLORS.teal,
     borderRadius: 12,
-    paddingVertical: 14,
-    marginTop: 18,
+    paddingVertical: 12,
+    marginTop: 14,
     borderWidth: 2,
     borderColor: COLORS.teal,
     shadowColor: '#14b8a6',
@@ -547,88 +520,28 @@ const s = StyleSheet.create({
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#fff',
-    fontSize: 15,
+    fontSize: 14.5,
   },
   desktopBtnTextDim: {
     color: 'rgba(255,255,255,0.9)',
   },
 
-  desktopUsersSection: {
-    alignSelf: 'stretch',
-    marginTop: 20,
-  },
-  desktopUsersDivider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginBottom: 12,
-  },
-  desktopUsersDividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#222',
-  },
-  desktopUsersDividerText: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: '#555',
-    fontSize: 10,
-    letterSpacing: 1.5,
-  },
-  desktopUsersList: {
-    flexDirection: 'row',
-    gap: 8,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  desktopUserChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#111',
-    borderRadius: 20,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderWidth: 1.5,
-    borderColor: '#2a2a2a',
-  },
-  desktopUserAvatar: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  desktopUserAvatarText: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: '#fff',
-    fontSize: 11,
-  },
-  desktopUserName: {
-    fontFamily: 'Poppins_600SemiBold',
-    fontWeight: '600',
-    color: '#aaa',
-    fontSize: 13,
-    maxWidth: 100,
-  },
-
   desktopSkipBtn: {
     alignItems: 'center',
-    marginTop: 18,
+    marginTop: 14,
   },
   desktopSkipText: {
     fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     color: '#777',
-    fontSize: 13,
+    fontSize: 12.5,
   },
 
   desktopCopyright: {
     fontFamily: 'Poppins_500Medium',
     fontWeight: '500',
     color: '#333',
-    fontSize: 11,
-    marginTop: 20,
+    fontSize: 10.5,
+    marginTop: 14,
   },
 });

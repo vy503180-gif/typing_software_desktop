@@ -2,6 +2,10 @@ appId: com.antriksh.typingmaster
 productName: Antriksh Typing Master
 copyright: Copyright © 2024 Antriksh
 
+compression: maximum
+electronLanguages: ["en-US"]
+electronDist: node_modules/electron/dist
+
 directories:
   output: release
 
@@ -33,7 +37,7 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: Antriksh Typing Master
-  deleteAppDataOnUninstall: false
+  deleteAppDataOnUninstall: true
   runAfterFinish: true
 
 portable:

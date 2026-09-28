@@ -21,7 +21,7 @@ import { generateTypingText, sentencesText, paragraphText, wordsText, rushWordLi
 import { krutiToUnicode, krutiKeyProgress } from '../utils/krutiToUnicode';
 import { COLORS, BG, levelForWpm, scaleFont } from '../theme';
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DURATIONS = [
@@ -127,6 +127,8 @@ export default function TypingScreen({
   const [countdown, setCountdown] = useState(config.timeSec || 60);
   const [useTimed, setUseTimed] = useState((config.timeSec || 0) > 0);
   const [result, setResult] = useState(null);
+  const [textWidth, setTextWidth] = useState(0);
+  const [charW, setCharW] = useState(null);
 
   // --- keyboard feedback state ---
   const [pressedId, setPressedId] = useState(null);
@@ -140,6 +142,7 @@ export default function TypingScreen({
   const rawRef = useRef('');
   const scrollRef = useRef(null);
   const lastScrollRow = useRef(0);
+  const textRowsRef = useRef([]);
   const cursorOpacity = useRef(new Animated.Value(1)).current;
   const textBoxRef = useRef(null);
 
@@ -254,14 +257,19 @@ export default function TypingScreen({
   // autoscroll
   useEffect(() => {
     if (!isStarted || isPaused || isFinished || !scrollRef.current) return;
-    const areaWidth = isDesktop ? winW - rightPanelWidth - 80 : winW - 40;
-    const charsPerRow = Math.max(1, Math.floor(areaWidth / (typeSize * 0.95)));
-    const row = Math.floor(userInput.length / charsPerRow);
-    if (row > lastScrollRow.current && userInput.length > 0) {
-      lastScrollRow.current = row;
-      scrollRef.current.scrollTo({ y: row * (typeSize + 8), animated: true });
+    const rows = textRowsRef.current;
+    let r = 0;
+    if (rows && rows.length) {
+      for (let i = 0; i < rows.length; i++) {
+        if (rows[i][0] <= userInput.length) r = i;
+        else break;
+      }
     }
-  }, [userInput, isStarted, isPaused, isFinished, winW, isDesktop, rightPanelWidth, typeSize]);
+    if (r > lastScrollRow.current && userInput.length > 0) {
+      lastScrollRow.current = r;
+      scrollRef.current.scrollTo({ y: r * (typeSize + 8), animated: true });
+    }
+  }, [userInput, isStarted, isPaused, isFinished, typeSize]);
 
   const focusInput = () => {
     requestAnimationFrame(() => {
@@ -469,7 +477,7 @@ export default function TypingScreen({
         setTimeout(() => setCorrectId(null), 180);
         if (soundEnabled) playKeySound('correct');
       } else if (kp.pending) {
-        // Multi-key abhi adhura hai — abhi red/galt mat karo, next letter dabaoge to green hoga
+        // Multi-key abhi adhura hai â€” abhi red/galt mat karo, next letter dabaoge to green hoga
         if (soundEnabled) playKeySound('key');
       } else if (kId) {
         setWrongId(kId);
@@ -579,7 +587,7 @@ export default function TypingScreen({
               <Ionicons name={result.timedOut ? 'time' : 'trophy'} size={34} color={result.timedOut ? COLORS.amber : COLORS.green} />
             </View>
             <Text style={styles.resultTitle}>{isCert ? (passed ? 'Certificate Earned!' : 'So Close — Try Again') : result.timedOut ? 'Time Up!' : 'Test Complete!'}</Text>
-            <Text style={styles.resultSub}>{config.title || (isTest ? 'Typing Test' : 'Practice')} — {level.name}</Text>
+            <Text style={styles.resultSub}>{config.title || (isTest ? 'Typing Test' : 'Practice')} â€” {level.name}</Text>
             {isCert && certTargetLabel && (
               <View style={[styles.certVerdict, passed ? styles.certVerdictPass : styles.certVerdictFail]}>
                 <Ionicons name={passed ? 'checkmark-circle' : 'flag'} size={14} color={passed ? COLORS.green : COLORS.amber} />
@@ -625,15 +633,18 @@ export default function TypingScreen({
           </View>
 
           <View style={styles.resultActions}>
-            {config.type === 'lesson' && config.nextLesson && !result.timedOut && onNextLesson && (
+            {config.type === 'lesson' && config.nextLesson && onNextLesson && (
               <TouchableOpacity
-                style={[styles.resultBtn, { backgroundColor: '#0e9488', minWidth: 190 }]}
+                style={[styles.resultBtn, styles.resultNextBtn]}
                 onPress={() => onNextLesson(config.lang, config.id, config.nextLesson)}
                 activeOpacity={0.8}
               >
-                <Ionicons name="play-skip-forward" size={15} color="#fff" />
-                <Text style={styles.resultBtnText} numberOfLines={1}>
-                  {config.nextLesson.label} · {config.nextLesson.title}
+                <View style={styles.resultNextTop}>
+                  <Ionicons name="play-skip-forward" size={15} color="#fff" />
+                  <Text style={styles.resultBtnText}>Next Lesson</Text>
+                </View>
+                <Text style={styles.resultNextName} numberOfLines={1} ellipsizeMode="tail">
+                  {config.nextLesson.label} Â· {config.nextLesson.title}
                 </Text>
               </TouchableOpacity>
             )}
@@ -656,7 +667,7 @@ export default function TypingScreen({
 const renderTextArea = () => {
     if (isFinished && result) return null;
     const kp = kpLive;
-    // Kruti me userInput ke converted extras (jaise '[' -> 'ख्') target slots se zyada
+    // Kruti me userInput ke converted extras (jaise '[' -> 'à¤–à¥') target slots se zyada
     // ho sakte hain, isliye display/cursor target slot (kp.ok) par rakhte hain.
     const typedCursor = isKrutiLayout
       ? Math.min(currentText.length, (kp ? kp.ok : 0) + (kp && kp.pending ? 1 : 0))
@@ -676,20 +687,83 @@ const renderTextArea = () => {
       if (typedCursor < w.e && typedCursor >= w.s) { currentWord = w; break; }
       if (typedCursor <= w.s) { currentWord = w; break; }
     }
+
+    // ---- Whole-word soft wrap: har row me words poore rakhen, beech se nahi katen ----
+    const areaW = textWidth || (isDesktop ? winW - rightPanelWidth - 80 : winW - 40);
+    const effCharW = charW || typeSize * 0.6;
+    const cols = Math.max(4, Math.floor(areaW / (effCharW * 1.05)));
+    const isBrk = (c) => c === ' ' || c === '\n' || c === '\t';
+    const rowsOfIdx = [];
+    {
+      let row = [];
+      let i = 0;
+      const n = currentText.length;
+      while (i < n) {
+        let j = i;
+        while (j < n && !isBrk(currentText[j])) j++;
+        const wordLen = j - i;
+        let k = j;
+        while (k < n && isBrk(currentText[k])) k++;
+        const spaceEnd = k;
+        if (wordLen > 0) {
+          if (row.length > 0 && row.length + wordLen > cols) {
+            rowsOfIdx.push(row);
+            row = [];
+          }
+          if (wordLen > cols) {
+            let off = 0;
+            while (off < wordLen) {
+              if (row.length >= cols) { rowsOfIdx.push(row); row = []; }
+              const take = Math.min(wordLen - off, cols - row.length);
+              for (let t = 0; t < take; t++) row.push(i + off + t);
+              off += take;
+            }
+          } else {
+            for (let t = 0; t < wordLen; t++) row.push(i + t);
+          }
+        }
+        for (let s = j; s < spaceEnd; s++) {
+          if (row.length >= cols) { rowsOfIdx.push(row); row = []; }
+          row.push(s);
+        }
+        i = spaceEnd;
+      }
+      if (row.length > 0) rowsOfIdx.push(row);
+    }
+    textRowsRef.current = rowsOfIdx;
+
     return (
       <ScrollView
         ref={scrollRef}
         style={styles.textScroll}
-        onLayout={(e) => {}}
+        onLayout={() => {}}
       >
         <TouchableOpacity
           ref={textBoxRef}
           onPress={() => { if (!isPaused && !isFinished) focusInput(); }}
           activeOpacity={1}
           style={styles.textBox}
+          onLayout={(e) => setTextWidth(Math.max(0, e.nativeEvent.layout.width - 24))}
         >
-          <View style={styles.charRow}>
-            {currentText.split('').map((char, i) => {
+          <View style={styles.measureRow} pointerEvents="none">
+            <Text
+              key={`m-${typeSize}-${currentText.slice(0, 24)}`}
+              onLayout={(e) => {
+                const w = e.nativeEvent.layout.width;
+                const n = Math.min(40, currentText.length);
+                if (w > 4 && n > 1) {
+                  const avg = w / n;
+                  setCharW((prev) => (prev == null || Math.abs(avg - prev) > 0.05 ? avg : prev));
+                }
+              }}
+              style={[styles.char, { fontSize: typeSize, color: 'transparent' }]}
+            >
+              {currentText.slice(0, 40)}
+            </Text>
+          </View>
+          {rowsOfIdx.map((row, ri) => (
+            <View key={ri} style={styles.charRow}>
+              {row.map((i) => {
               const typed = userInput[i];
               let color = '#5a667a';
               let bg = 'transparent';
@@ -700,17 +774,17 @@ const renderTextArea = () => {
                   else if (kp.pending) { color = COLORS.green; }
                   else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
                 } else {
-                  const status = getCharStatus(typed, char);
+                  const status = getCharStatus(typed, currentText[i]);
                   if (status === 'correct') { color = COLORS.green; }
                   else if (status === 'partial') { color = COLORS.amber; }
                   else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
                 }
               } else if (kp && !kp.pending && i < userInput.length) {
-                // galat keys — red dikhao
+                // galat keys â€” red dikhao
                 color = COLORS.rose;
                 bg = 'rgba(244,63,94,0.14)';
-              } else if (char === ' ' && i === progressCursor && progressCursor < currentText.length) {
-                // space dabani hai — sirf space ke neeche underline
+              } else if (currentText[i] === ' ' && i === progressCursor && progressCursor < currentText.length) {
+                // space dabani hai â€” sirf space ke neeche underline
                 color = '#14222e';
                 extraStyle = styles.charUpcoming;
               } else if (
@@ -718,7 +792,7 @@ const renderTextArea = () => {
                 i >= currentWord.s && i < currentWord.e &&
                 currentText[progressCursor] !== ' '
               ) {
-                // current word ke baaki letters type karne hain — unke neeche underline
+                // current word ke baaki letters type karne hain â€” unke neeche underline
                 color = '#14222e';
                 extraStyle = styles.charUpcoming;
               }
@@ -728,11 +802,12 @@ const renderTextArea = () => {
                 <View key={i} style={styles.charWrap}>
                   {isCursorHere && <Animated.View style={[styles.cursor, { opacity: cursorOpacity }]} />}
                   {isNext && <View style={styles.nextCaret} />}
-                  <Text style={[styles.char, { color, backgroundColor: bg, fontSize: typeSize }, extraStyle]}>{char}</Text>
+                  <Text style={[styles.char, { color, backgroundColor: bg, fontSize: typeSize }, extraStyle]}>{currentText[i] === ' ' ? '\u00A0' : currentText[i]}</Text>
                 </View>
               );
-            })}
-          </View>
+              })}
+            </View>
+          ))}
         </TouchableOpacity>
       </ScrollView>
     );
@@ -755,13 +830,13 @@ const renderTextArea = () => {
         {showNextKey && nextKeyId ? (
           <>
             <View style={styles.nextKeyDisplay}>
-              <Text style={styles.nextKeyBig}>{nextChar === ' ' ? '␣' : nextChar}</Text>
+              <Text style={styles.nextKeyBig}>{nextChar === ' ' ? 'â£' : nextChar}</Text>
             </View>
             <Text style={styles.guideKeyName}>{nextKeyId === 'space' ? 'Space Bar' : nextKeyId.toUpperCase()}</Text>
           </>
         ) : (
           <Text style={styles.guideEmpty}>
-            {!isStarted ? 'Start typing to begin' : isFinished ? 'Test finished' : '—'}
+            {!isStarted ? 'Start typing to begin' : isFinished ? 'Test finished' : 'â€”'}
           </Text>
         )}
         {showFingerGuide && nextFinger && (
@@ -806,8 +881,8 @@ const renderTextArea = () => {
               <View>
                 <Text style={styles.title}>{config.title || (isTest ? 'Typing Test' : isGame ? 'Typing Game' : 'Typing Practice')}</Text>
                 <Text style={styles.subtitle}>
-                  {config.difficulty ? `${config.difficulty} • ` : ''}
-                  {duration ? `${Math.round(duration / 60)} min • ` : ''}
+                  {config.difficulty ? `${config.difficulty} â€¢ ` : ''}
+                  {duration ? `${Math.round(duration / 60)} min â€¢ ` : ''}
                   {mode ? mode : ''}
                 </Text>
               </View>
@@ -890,7 +965,7 @@ const renderTextArea = () => {
                 Click on the text and start typing to begin
               </Text>
             )}
-            {isPaused && !isFinished && <Text style={styles.pausedHint}>Paused — click Resume or press any key to continue</Text>}
+            {isPaused && !isFinished && <Text style={styles.pausedHint}>Paused â€” click Resume or press any key to continue</Text>}
           </ScrollView>
 
           {showVKeyboard && (
@@ -900,11 +975,11 @@ const renderTextArea = () => {
                 <Text style={styles.nextKeyBarLabel}>Next Key</Text>
                 {showNextKey && nextKeyId ? (
                   <View style={styles.nextKeyBarKey}>
-                    <Text style={styles.nextKeyBarKeyText}>{nextChar === ' ' ? '␣' : nextChar}</Text>
+                    <Text style={styles.nextKeyBarKeyText}>{nextChar === ' ' ? 'â£' : nextChar}</Text>
                   </View>
                 ) : (
                   <Text style={styles.nextKeyBarEmpty}>
-                    {isStarted ? 'Keep typing…' : 'Click the text and start typing'}
+                    {isStarted ? 'Keep typingâ€¦' : 'Click the text and start typing'}
                   </Text>
                 )}
                 {showFingerGuide && nextFinger ? (
@@ -1158,8 +1233,14 @@ const styles = StyleSheet.create({
   },
   charRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     lineHeight: 20,
+  },
+  measureRow: {
+    position: 'absolute',
+    left: -9999,
+    top: 0,
+    opacity: 0,
   },
   charWrap: {
     flexDirection: 'row',
@@ -1566,6 +1647,7 @@ const styles = StyleSheet.create({
   },
   resultActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   resultBtn: {
@@ -1578,4 +1660,14 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
   },
   resultBtnText: { color: '#fff', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 13 },
+  resultNextBtn: {
+    backgroundColor: '#0e9488',
+    minWidth: 200,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    paddingVertical: 9,
+    paddingHorizontal: 14,
+  },
+  resultNextTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  resultNextName: { color: 'rgba(255,255,255,0.9)', fontFamily: 'Poppins_600SemiBold', fontWeight: '600', fontSize: 11, textAlign: 'center', marginTop: 3 },
 });

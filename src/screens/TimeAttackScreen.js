@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { BG, COLORS, scaleFont, scaleSize, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 import { paragraphText } from '../data/typingTexts';
+import { wordUnits } from '../utils/wordUnits';
 
 const START_SECONDS = 40;
 const WORD_TIME_BONUS = 0.6;
@@ -145,11 +146,12 @@ export default function TimeAttackScreen({ onBack }) {
   const danger = timeLeft <= 10;
 
   const renderChar = (ch, i) => {
+    const show = ch === ' ' ? '\u00A0' : ch;
     if (i < g.typedCount) {
       const wasWrong = g.wrong.includes(i);
       return (
         <Text key={i} style={[styles.plainLetter, wasWrong ? styles.plainWrong : styles.plainGood]}>
-          {ch}
+          {show}
         </Text>
       );
     }
@@ -157,11 +159,11 @@ export default function TimeAttackScreen({ onBack }) {
       return (
         <View key={i} style={styles.currentWrap}>
           <View style={styles.caret} />
-          <Text style={styles.plainLetter}>{ch}</Text>
+          <Text style={styles.plainLetter}>{show}</Text>
         </View>
       );
     }
-    return <Text key={i} style={styles.plainLetterFuture}>{ch}</Text>;
+    return <Text key={i} style={styles.plainLetterFuture}>{show}</Text>;
   };
 
   return (
@@ -282,7 +284,13 @@ export default function TimeAttackScreen({ onBack }) {
             <View style={styles.passageCard}>
               <Text style={styles.passageLabel}>Type the paragraph</Text>
               <View style={styles.passageLine}>
-                {g.text ? g.text.split('').map((ch, i) => renderChar(ch, i)) : null}
+                {g.text
+                  ? wordUnits(g.text).map((u, ui) => (
+                    <View key={ui} style={styles.wordUnit}>
+                      {g.text.slice(u.s, u.e).split('').map((ch, ci) => renderChar(ch, u.s + ci))}
+                    </View>
+                  ))
+                  : null}
               </View>
             </View>
           </>
@@ -370,6 +378,7 @@ const styles = StyleSheet.create({
   },
   passageLabel: { color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Poppins_700Bold', fontWeight: '700', letterSpacing: 1.2, marginBottom: scaleSize(10) },
   passageLine: { flexDirection: 'row', flexWrap: 'wrap', lineHeight: scaleFont(24) },
+  wordUnit: { flexDirection: 'row' },
   plainLetter: {
     fontSize: scaleFont(18), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite,
     lineHeight: scaleFont(24),

@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BG, COLORS, levelForWpm } from '../theme';
 import { certsFromRecords } from '../data/certificates';
 
-const getHistoryKey = (name) => `antriksh_typing_history_${name || 'default'}`;
+const getHistoryKey = () => `antriksh_typing_history`;
 
 function Section({ title, children }) {
   return (
@@ -200,7 +200,7 @@ export default function ProfileScreen({ studentName = '', onBack, onSwitchUser, 
           {recent.length === 0 ? (
             <View style={styles.emptyCard}>
               <Ionicons name="time-outline" size={26} color={COLORS.textDim} />
-              <Text style={styles.emptyText}>No activity yet — take your first test!</Text>
+              <Text style={styles.emptyText}>No activity yet â€” take your first test!</Text>
             </View>
           ) : (
             <View style={styles.recentCard}>
@@ -211,7 +211,7 @@ export default function ProfileScreen({ studentName = '', onBack, onSwitchUser, 
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.recentTitle} numberOfLines={1}>{r.lesson || 'Practice Session'}</Text>
-                    <Text style={styles.recentDate}>{r.date} • {r.time}</Text>
+                    <Text style={styles.recentDate}>{r.date} â€¢ {r.time}</Text>
                   </View>
                   <Text style={styles.recentWpm}>{r.wpm || 0} WPM</Text>
                   <Text style={[styles.recentAcc, { color: COLORS.green }]}>{r.accuracy || 0}%</Text>

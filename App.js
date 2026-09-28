@@ -28,14 +28,22 @@ import SpeedChallengeScreen from './src/screens/SpeedChallengeScreen';
 import WordRushScreen from './src/screens/WordRushScreen';
 import AccuracyChallengeScreen from './src/screens/AccuracyChallengeScreen';
 import TimeAttackScreen from './src/screens/TimeAttackScreen';
+import CarRaceScreen from './src/screens/CarRaceScreen';
 import GamesMenuScreen from './src/screens/GamesMenuScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import ExploreScreen from './src/screens/ExploreScreen';
 import InfoScreen from './src/screens/InfoScreen';
+import DeveloperScreen from './src/screens/DeveloperScreen';
 import { LESSON_ORDER, getNextLesson } from './src/data/lessons';
 import { BG, BG_DEEP, COLORS } from './src/theme';
 import { applyLightTheme } from './src/lightTheme';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import {
+  NotoSansDevanagari_400Regular,
+  NotoSansDevanagari_500Medium,
+  NotoSansDevanagari_600SemiBold,
+  NotoSansDevanagari_700Bold,
+} from '@expo-google-fonts/noto-sans-devanagari';
 
 LogBox.ignoreAllLogs();
 
@@ -45,9 +53,9 @@ const STORAGE_KEYS = {
   settings: 'antriksh_settings',
 };
 
-const unlockedKeyFor = (name) => `antriksh_unlocked_lessons_${name || 'default'}`;
-const courseProgressKeyFor = (name) => `antriksh_course_progress_${name || 'default'}`;
-const historyKeyFor = (name) => `antriksh_typing_history_${name || 'default'}`;
+const unlockedKeyFor = () => `antriksh_unlocked_lessons`;
+const courseProgressKeyFor = () => `antriksh_course_progress`;
+const historyKeyFor = () => `antriksh_typing_history`;
 
 const DEFAULT_UNLOCKED = { english: [1], hindi: [1] };
 
@@ -63,7 +71,16 @@ const DEFAULT_SETTINGS = {
 };
 
 export default function App() {
-  const [fontsLoaded, fontError] = useFonts({ Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold });
+  const [fontsLoaded, fontError] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+    NotoSansDevanagari_400Regular,
+    NotoSansDevanagari_500Medium,
+    NotoSansDevanagari_600SemiBold,
+    NotoSansDevanagari_700Bold,
+  });
   const fontsReady = fontsLoaded || !!fontError;
   const [tab, setTab] = useState('Home');
   const [studentName, setStudentName] = useState('');
@@ -92,7 +109,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Project ka fixed background #D5EEF2 hai — sirf light theme.
+    // Project ka fixed background #D5EEF2 hai â€” sirf light theme.
     applyLightTheme();
   }, []);
 
@@ -183,8 +200,7 @@ export default function App() {
     AsyncStorage.setItem(STORAGE_KEYS.name, safe).catch(() => {});
     loadBestWpm(safe);
     setUsers((prev) => {
-      if (prev.includes(safe)) return prev;
-      const next = [...prev, safe];
+      const next = [safe, ...prev.filter((n) => n !== safe)].slice(0, 5);
       AsyncStorage.setItem(STORAGE_KEYS.users, JSON.stringify(next)).catch(() => {});
       return next;
     });
@@ -519,6 +535,8 @@ export default function App() {
         return <AccuracyChallengeScreen onBack={() => setTab('Games')} />;
       case 'TimeAttack':
         return <TimeAttackScreen onBack={() => setTab('Games')} />;
+      case 'CarRace':
+        return <CarRaceScreen onBack={() => setTab('Home')} />;
       case 'Settings':
         return (
           <SettingsScreen
@@ -543,6 +561,8 @@ export default function App() {
         );
       case 'Info':
         return <InfoScreen onBack={() => setTab('Home')} />;
+      case 'Developer':
+        return <DeveloperScreen onBack={() => setTab('Home')} />;
       case 'Home':
       default:
         return (
@@ -561,6 +581,7 @@ export default function App() {
             onReview={() => setTab('Review')}
             onExplore={() => setTab('Explore')}
             onInfo={() => setTab('Info')}
+            onCarRace={() => setTab('CarRace')}
           />
         );
     }
@@ -648,7 +669,7 @@ export default function App() {
     );
   }
 
-  const mobileHiddenTabs = ['Type', 'WordDrill', 'ReviewDrill', 'CloudsGame', 'WordTrisGame', 'AlphabetGame', 'BubblesGame', 'Settings', 'Games', 'Tests', 'Statistics', 'Certificates', 'Profile', 'SpeedChallenge', 'WordRush', 'AccuracyChallenge', 'TimeAttack'];
+  const mobileHiddenTabs = ['Type', 'WordDrill', 'ReviewDrill', 'CloudsGame', 'WordTrisGame', 'AlphabetGame', 'BubblesGame', 'Settings', 'Games', 'Tests', 'Statistics', 'Certificates', 'Profile', 'SpeedChallenge', 'WordRush', 'AccuracyChallenge', 'TimeAttack', 'CarRace'];
 
   return (
     <View style={styles.app}>
