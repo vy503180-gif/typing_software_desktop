@@ -18,7 +18,7 @@ import VirtualKeyboard, { keyIdForChar, FINGERS, KRUTI_KEYCAPS } from '../compon
 import { playKeySound } from '../audio/keySound';
 import { LESSON_TEXTS, LESSON_DIFFICULTY } from '../data/lessons';
 import { generateTypingText, sentencesText, paragraphText, wordsText, rushWordList, certText } from '../data/typingTexts';
-import { krutiToUnicode, krutiKeyProgress } from '../utils/krutiToUnicode';
+import { krutiToUnicode, krutiKeyProgress, krutiSequenceProgress } from '../utils/krutiToUnicode';
 import { COLORS, BG, levelForWpm, scaleFont } from '../theme';
 
 const getHistoryKey = () => `antriksh_typing_history`;
@@ -83,6 +83,56 @@ function OptionPills({ options, value, onChange, color = COLORS.blue, small }) {
   );
 }
 
+// Ek character cell. React.memo se har keystroke par sirf 2-3 chars
+// dobara render hote hain (cursor + pichla char), baaki 1000+ cells skip.
+const MemoChar = React.memo(function MemoChar({
+  ch, color, bg, upcoming, isCursorHere, isNext,
+  typeSize, lineHeight, started, finished, cursorOpacity, isHindi,
+}) {
+  return (
+    <View style={styles.charWrap}>
+      {isCursorHere && <Animated.View style={[styles.cursor, { opacity: cursorOpacity }]} />}
+      {isNext && <View style={styles.nextCaret} />}
+      <Text
+        style={[
+          styles.char,
+          { color, backgroundColor: bg, fontSize: typeSize, lineHeight },
+          isHindi && styles.charHindi,
+          upcoming && styles.charUpcoming,
+        ]}
+      >
+        {ch === ' ' ? '\u00A0' : ch}
+      </Text>
+    </View>
+  );
+});
+
+// Hindi text ke liye nested Text elements - continuous text run mein
+// per-character coloring. Isse Devanagari shaping (matras, halants,
+// conjuncts) sahi se render hoti hai.
+export const HindiTextRun = React.memo(function HindiTextRun({
+  chars, colors, bgs, upcomings, typeSize, lineHeight,
+}) {
+  return (
+    <Text style={[styles.char, styles.charHindi, { fontSize: typeSize, lineHeight }]}>
+      {chars.map((ch, i) => (
+        <Text
+          key={i}
+          style={{
+            color: colors[i],
+            backgroundColor: bgs[i],
+            textDecorationLine: upcomings[i] ? 'underline' : 'none',
+            textDecorationStyle: 'solid',
+            textDecorationColor: '#0e7490',
+          }}
+        >
+          {ch === ' ' ? '\u00A0' : ch}
+        </Text>
+      ))}
+    </Text>
+  );
+});
+
 export default function TypingScreen({
   config = {},
   settings = {},
@@ -90,7 +140,7 @@ export default function TypingScreen({
   onNextLesson = null,
   studentName = null,
   onBack = null,
-  hindiLayout = 'mangal',
+  hindiLayout = 'krutidev',
 }) {
   const { width: winW } = useWindowDimensions();
   const isDesktop = winW >= 1000 && Platform.OS === 'web';
@@ -155,6 +205,8 @@ export default function TypingScreen({
   const showNextKey = settings.nextKeyHighlight !== false;
   const fontSize = settings.fontSize || 22;
   const typeSize = Math.max(15, Math.round(fontSize * 0.8));
+  const charLineH = Math.max(22, Math.round(typeSize * 1.32));
+  const rowH = charLineH + 6;
 
   const buildInitialText = useCallback(() => {
     if (config.text) return config.text;
@@ -267,11 +319,11 @@ export default function TypingScreen({
     }
     if (r > lastScrollRow.current && userInput.length > 0) {
       lastScrollRow.current = r;
-      scrollRef.current.scrollTo({ y: r * (typeSize + 8), animated: true });
+      scrollRef.current.scrollTo({ y: Math.max(0, r * rowH), animated: true });
     }
-  }, [userInput, isStarted, isPaused, isFinished, typeSize]);
+  }, [userInput, isStarted, isPaused, isFinished, rowH]);
 
-  const focusInput = () => {
+  const focusInput = useCallback(() => {
     requestAnimationFrame(() => {
       if (inputRef.current) {
         inputRef.current.focus();
@@ -282,7 +334,7 @@ export default function TypingScreen({
         } catch (e) {}
       }
     });
-  };
+  }, [rawInput.length]);
 
   const resetTest = (nextText) => {
     if (certCloseRef.current) { clearTimeout(certCloseRef.current); certCloseRef.current = null; }
@@ -335,7 +387,7 @@ export default function TypingScreen({
     const cpm = Math.round((userInput.length / elapsed) * 60);
     let correctChars = 0;
     if (isKrutiLayout) {
-      correctChars = krutiKeyProgress(rawRef.current || rawInput, currentText).ok;
+      correctChars = krutiSequenceProgress(rawRef.current || rawInput, currentText).ok;
     } else {
       for (let i = 0; i < userInput.length; i++) {
         if (isCharCorrect(userInput[i], currentText[i])) correctChars++;
@@ -403,31 +455,57 @@ export default function TypingScreen({
   };
   const isCharCorrect = (typed, target) => getCharStatus(typed, target) === 'correct';
 
+  // Incremental counters: har keystroke par poora text scan karne ke bajaye
+  // sirf naye chars count hote hain. Text badalne par cache reset ho jata hai.
+  const scanRef = useRef({ text: null, len: 0, correct: 0, words: 0 });
+  const scan = (input, target) => {
+    const c = scanRef.current;
+    const stale = c.text !== target || input.length < c.len;
+    let correct = stale ? 0 : c.correct;
+    const from = stale ? 0 : c.len;
+    let words = stale ? 0 : c.words;
+    let prevWasSpace = from > 0 ? /\s/.test(input[from - 1]) : true;
+    for (let i = from; i < input.length; i++) {
+      const ch = input[i];
+      if (isCharCorrect(ch, target[i])) correct++;
+      if (!/\s/.test(ch) && prevWasSpace) words++;
+      prevWasSpace = /\s/.test(ch);
+    }
+    c.text = target;
+    c.len = input.length;
+    c.correct = correct;
+    c.words = words;
+    return { correct, words: input.trim() ? words : 0 };
+  };
+
   // live stats
   const stats = useMemo(() => {
     const elapsed = seconds > 0 ? seconds : 1;
-    const wordsTyped = userInput.trim().split(/\s+/).filter((w) => w !== '').length;
-    const wpm = isStarted ? Math.round((wordsTyped / elapsed) * 60) : 0;
-    const cpm = isStarted ? Math.round((userInput.length / elapsed) * 60) : 0;
     let correct = 0;
     let effLen = userInput.length;
+    let wordsTyped = 0;
     if (isKrutiLayout) {
-      const kp = krutiKeyProgress(rawInput || rawRef.current, currentText);
-      correct = kp.ok;
-      if (kp.pending) effLen = kp.ok;
+      const sp = krutiSequenceProgress(rawInput || rawRef.current, currentText);
+      correct = sp.ok;
+      if (sp.pending) effLen = sp.ok;
     } else {
-      for (let i = 0; i < userInput.length; i++) {
-        if (isCharCorrect(userInput[i], currentText[i])) correct++;
-      }
+      const s = scan(userInput, currentText);
+      correct = s.correct;
+      wordsTyped = s.words;
     }
+    const wpm = isStarted ? Math.round((wordsTyped / elapsed) * 60) : 0;
+    const cpm = isStarted ? Math.round((userInput.length / elapsed) * 60) : 0;
     const accuracy = effLen > 0 ? Math.round((correct / effLen) * 100) : 100;
     const mistakes = effLen - correct;
     const progress = currentText.length > 0 ? Math.min(1, userInput.length / currentText.length) : 0;
     return { wpm, cpm, accuracy, mistakes, correct, progress };
-  }, [seconds, isStarted, userInput, currentText]);
+  }, [seconds, isStarted, userInput, currentText, isKrutiLayout, rawInput]);
 
   // next char guidance
-  const kpLive = isKrutiLayout ? krutiKeyProgress(rawRef.current || rawInput, currentText) : null;
+  const kpLive = useMemo(
+    () => (isKrutiLayout ? krutiSequenceProgress(rawInput || rawRef.current, currentText) : null),
+    [isKrutiLayout, rawInput, currentText]
+  );
   const progressCursor = isKrutiLayout ? (kpLive ? kpLive.ok : 0) : userInput.length;
   const nextChar = !isFinished && isStarted && progressCursor < currentText.length ? currentText[progressCursor] : null;
   const nextKeyId = nextChar ? keyIdForChar(nextChar) : null;
@@ -451,17 +529,29 @@ export default function TypingScreen({
     if (!isStarted) setIsStarted(true);
   };
 
+  // Keyboard flash: pehle ka timer clear karke naya set karo. Isse har
+  // keystroke par 3 pending timers ki jagah sirf 3 re-render hote hain,
+  // aur same value par setState skip ho jaata hai.
+  const flashTimers = useRef({});
+  const flash = useCallback((setter, value, ms) => {
+    setter(value);
+    const t = flashTimers.current[value];
+    if (t) clearTimeout(t);
+    flashTimers.current[value] = setTimeout(() => setter(null), ms);
+  }, []);
+
+  useEffect(() => () => {
+    Object.values(flashTimers.current).forEach(clearTimeout);
+  }, []);
+
   const handleKeyPress = (e) => {
     if (!isStarted || isPaused || isFinished) return;
     const key = e.nativeEvent && e.nativeEvent.key;
     if (!key) return;
     const kId = keyIdForChar(key) || (key === 'Backspace' ? 'backspace' : null);
-    if (kId) {
-      setPressedId(kId);
-      setTimeout(() => setPressedId(null), 140);
-    }
+    if (kId) flash(setPressedId, kId, 140);
     if (key === 'Backspace') {
-      playKeySound(soundEnabled ? 'key' : 'off');
+      if (soundEnabled) playKeySound('key');
       return;
     }
     // Physical keys: keydown AB input update hone se pehle fire hota hai,
@@ -471,41 +561,36 @@ export default function TypingScreen({
 
     if (isKrutiLayout) {
       const rawNow = (rawRef.current || '') + key;
-      const kp = krutiKeyProgress(rawNow, currentText);
-      if (kp.ok > 0) {
-        setCorrectId(kId);
-        setTimeout(() => setCorrectId(null), 180);
+      const sp = krutiSequenceProgress(rawNow, currentText);
+      if (sp.ok > 0 && !sp.pending) {
+        flash(setCorrectId, kId, 180);
         if (soundEnabled) playKeySound('correct');
-      } else if (kp.pending) {
-        // Multi-key abhi adhura hai â€” abhi red/galt mat karo, next letter dabaoge to green hoga
+      } else if (sp.pending) {
         if (soundEnabled) playKeySound('key');
       } else if (kId) {
-        setWrongId(kId);
-        setTimeout(() => setWrongId(null), 200);
+        flash(setWrongId, kId, 200);
         if (soundEnabled) playKeySound('wrong');
       }
       return;
     }
 
-    let isCorrectKey = false;
     const expected = currentText[userInput.length];
-    isCorrectKey =
+    const isCorrectKey =
       expected !== undefined &&
       ((key.toLowerCase && key.toLowerCase() === String(expected).toLowerCase()) ||
         (key === ' ' && expected === ' '));
     if (isCorrectKey) {
-      setCorrectId(kId);
-      setTimeout(() => setCorrectId(null), 180);
+      flash(setCorrectId, kId, 180);
       if (soundEnabled) playKeySound('correct');
     } else if (kId) {
-      setWrongId(kId);
-      setTimeout(() => setWrongId(null), 200);
+      flash(setWrongId, kId, 200);
       if (soundEnabled) playKeySound('wrong');
     }
   };
 
-  // Simulated virtual-key typing (click-to-type)
-  const simulateKey = (id) => {
+  // Stable callback: VirtualKeyboard memoized hai, isliye har render par naya
+  // function dene se uska memo toot jata tha aur keyboard bhi rerender hota tha.
+  const simulateKey = useCallback((id) => {
     if (isFinished || isPaused) return;
     if (id === 'backspace') {
       rawRef.current = rawRef.current.slice(0, -1);
@@ -534,7 +619,7 @@ export default function TypingScreen({
       if (soundEnabled) playKeySound(expected !== undefined && expected === ch ? 'correct' : 'wrong');
     }
     focusInput();
-  };
+  }, [isFinished, isPaused, isStarted, isKrutiLayout, currentText, soundEnabled, userInput.length, focusInput]);
 
   const timerStr = useMemo(() => {
     const v = useTimed ? countdown : seconds;
@@ -664,6 +749,68 @@ export default function TypingScreen({
     );
   };
 
+  // ---- Text layout: word ranges + soft-wrap rows (memoized) ----
+  // Ye renderTextArea ke andar nahi, component body me hai — warna hooks
+  // rule toot jaata (early return par hook count change hota).
+  const areaW = textWidth || (isDesktop ? winW - rightPanelWidth - 80 : winW - 40);
+  const effCharW = charW || typeSize * 0.6;
+  const cols = Math.max(4, Math.floor(areaW / (effCharW * 1.05)));
+
+  const wordRanges = useMemo(() => {
+    const out = [];
+    let start = -1;
+    for (let i = 0; i <= currentText.length; i++) {
+      const isBoundary =
+        i >= currentText.length || currentText[i] === ' ' || currentText[i] === '\n' || currentText[i] === '\t';
+      if (!isBoundary && start === -1) start = i;
+      if (isBoundary && start !== -1) { out.push({ s: start, e: i }); start = -1; }
+    }
+    return out;
+  }, [currentText]);
+
+  // ---- Whole-word soft wrap: har row me words poore rakhen, beech se nahi katen ----
+  const rowsOfIdx = useMemo(() => {
+    const isBrk = (c) => c === ' ' || c === '\n' || c === '\t';
+    const out = [];
+    let row = [];
+    let i = 0;
+    const n = currentText.length;
+    while (i < n) {
+      let j = i;
+      while (j < n && !isBrk(currentText[j])) j++;
+      const wordLen = j - i;
+      let k = j;
+      while (k < n && isBrk(currentText[k])) k++;
+      const spaceEnd = k;
+      if (wordLen > 0) {
+        if (row.length > 0 && row.length + wordLen > cols) {
+          out.push(row);
+          row = [];
+        }
+        if (wordLen > cols) {
+          let off = 0;
+          while (off < wordLen) {
+            if (row.length >= cols) { out.push(row); row = []; }
+            const take = Math.min(wordLen - off, cols - row.length);
+            for (let t = 0; t < take; t++) row.push(i + off + t);
+            off += take;
+          }
+        } else {
+          for (let t = 0; t < wordLen; t++) row.push(i + t);
+        }
+      }
+      for (let s = j; s < spaceEnd; s++) {
+        if (row.length >= cols) { out.push(row); row = []; }
+        row.push(s);
+      }
+      i = spaceEnd;
+    }
+    if (row.length > 0) out.push(row);
+    return out;
+  }, [currentText, cols]);
+
+  textRowsRef.current = rowsOfIdx;
+
 const renderTextArea = () => {
     if (isFinished && result) return null;
     const kp = kpLive;
@@ -672,65 +819,11 @@ const renderTextArea = () => {
     const typedCursor = isKrutiLayout
       ? Math.min(currentText.length, (kp ? kp.ok : 0) + (kp && kp.pending ? 1 : 0))
       : Math.min(userInput.length, currentText.length);
-    // current word boundaries (non-space words)
-    const wordRanges = [];
-    {
-      let start = -1;
-      for (let i = 0; i <= currentText.length; i++) {
-        const isBoundary = i >= currentText.length || currentText[i] === ' ' || currentText[i] === '\n' || currentText[i] === '\t';
-        if (!isBoundary && start === -1) start = i;
-        if (isBoundary && start !== -1) { wordRanges.push({ s: start, e: i }); start = -1; }
-      }
-    }
     let currentWord = null;
     for (const w of wordRanges) {
       if (typedCursor < w.e && typedCursor >= w.s) { currentWord = w; break; }
       if (typedCursor <= w.s) { currentWord = w; break; }
     }
-
-    // ---- Whole-word soft wrap: har row me words poore rakhen, beech se nahi katen ----
-    const areaW = textWidth || (isDesktop ? winW - rightPanelWidth - 80 : winW - 40);
-    const effCharW = charW || typeSize * 0.6;
-    const cols = Math.max(4, Math.floor(areaW / (effCharW * 1.05)));
-    const isBrk = (c) => c === ' ' || c === '\n' || c === '\t';
-    const rowsOfIdx = [];
-    {
-      let row = [];
-      let i = 0;
-      const n = currentText.length;
-      while (i < n) {
-        let j = i;
-        while (j < n && !isBrk(currentText[j])) j++;
-        const wordLen = j - i;
-        let k = j;
-        while (k < n && isBrk(currentText[k])) k++;
-        const spaceEnd = k;
-        if (wordLen > 0) {
-          if (row.length > 0 && row.length + wordLen > cols) {
-            rowsOfIdx.push(row);
-            row = [];
-          }
-          if (wordLen > cols) {
-            let off = 0;
-            while (off < wordLen) {
-              if (row.length >= cols) { rowsOfIdx.push(row); row = []; }
-              const take = Math.min(wordLen - off, cols - row.length);
-              for (let t = 0; t < take; t++) row.push(i + off + t);
-              off += take;
-            }
-          } else {
-            for (let t = 0; t < wordLen; t++) row.push(i + t);
-          }
-        }
-        for (let s = j; s < spaceEnd; s++) {
-          if (row.length >= cols) { rowsOfIdx.push(row); row = []; }
-          row.push(s);
-        }
-        i = spaceEnd;
-      }
-      if (row.length > 0) rowsOfIdx.push(row);
-    }
-    textRowsRef.current = rowsOfIdx;
 
     return (
       <ScrollView
@@ -756,58 +849,127 @@ const renderTextArea = () => {
                   setCharW((prev) => (prev == null || Math.abs(avg - prev) > 0.05 ? avg : prev));
                 }
               }}
-              style={[styles.char, { fontSize: typeSize, color: 'transparent' }]}
+              style={[styles.char, { fontSize: typeSize, lineHeight: charLineH, color: 'transparent' }, config.lang === 'hindi' && styles.charHindi]}
             >
               {currentText.slice(0, 40)}
             </Text>
           </View>
-          {rowsOfIdx.map((row, ri) => (
-            <View key={ri} style={styles.charRow}>
-              {row.map((i) => {
-              const typed = userInput[i];
-              let color = '#5a667a';
-              let bg = 'transparent';
-              let extraStyle = null;
-              if (i < typedCursor) {
-                if (kp) {
-                  if (i < kp.ok) { color = COLORS.green; }
-                  else if (kp.pending) { color = COLORS.green; }
-                  else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
-                } else {
-                  const status = getCharStatus(typed, currentText[i]);
-                  if (status === 'correct') { color = COLORS.green; }
-                  else if (status === 'partial') { color = COLORS.amber; }
-                  else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
+          {rowsOfIdx.map((row, ri) => {
+            const isHindi = config.lang === 'hindi';
+            if (isHindi) {
+              const chars = [];
+              const colors = [];
+              const bgs = [];
+              const upcomings = [];
+              row.forEach((i) => {
+                const typed = userInput[i];
+                let color = '#5a667a';
+                let bg = 'transparent';
+                let upcoming = false;
+                if (i < typedCursor) {
+                  if (kp) {
+                    if (i < kp.ok) { color = COLORS.green; }
+                    else if (kp.pending) { color = COLORS.green; }
+                    else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
+                  } else {
+                    const status = getCharStatus(typed, currentText[i]);
+                    if (status === 'correct') { color = COLORS.green; }
+                    else if (status === 'partial') { color = COLORS.amber; }
+                    else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
+                  }
+                } else if (kp && !kp.pending && i < userInput.length) {
+                  color = COLORS.rose;
+                  bg = 'rgba(244,63,94,0.14)';
+                } else if (currentText[i] === ' ' && i === progressCursor && progressCursor < currentText.length) {
+                  color = '#14222e';
+                  upcoming = true;
+                } else if (
+                  currentWord &&
+                  i >= currentWord.s && i < currentWord.e &&
+                  currentText[progressCursor] !== ' '
+                ) {
+                  color = '#14222e';
+                  upcoming = true;
                 }
-              } else if (kp && !kp.pending && i < userInput.length) {
-                // galat keys â€” red dikhao
-                color = COLORS.rose;
-                bg = 'rgba(244,63,94,0.14)';
-              } else if (currentText[i] === ' ' && i === progressCursor && progressCursor < currentText.length) {
-                // space dabani hai â€” sirf space ke neeche underline
-                color = '#14222e';
-                extraStyle = styles.charUpcoming;
-              } else if (
-                currentWord &&
-                i >= currentWord.s && i < currentWord.e &&
-                currentText[progressCursor] !== ' '
-              ) {
-                // current word ke baaki letters type karne hain â€” unke neeche underline
-                color = '#14222e';
-                extraStyle = styles.charUpcoming;
-              }
-              const isCursorHere = i === typedCursor && !isFinished && isStarted;
-              const isNext = i === typedCursor && !isStarted && i < 1;
+                chars.push(currentText[i]);
+                colors.push(color);
+                bgs.push(bg);
+                upcomings.push(upcoming);
+              });
+              const cursorIdx = row.indexOf(typedCursor);
               return (
-                <View key={i} style={styles.charWrap}>
-                  {isCursorHere && <Animated.View style={[styles.cursor, { opacity: cursorOpacity }]} />}
-                  {isNext && <View style={styles.nextCaret} />}
-                  <Text style={[styles.char, { color, backgroundColor: bg, fontSize: typeSize }, extraStyle]}>{currentText[i] === ' ' ? '\u00A0' : currentText[i]}</Text>
+                <View key={ri} style={styles.charRow}>
+                  <HindiTextRun
+                    chars={chars}
+                    colors={colors}
+                    bgs={bgs}
+                    upcomings={upcomings}
+                    typeSize={typeSize}
+                    lineHeight={charLineH}
+                  />
+                  {cursorIdx >= 0 && !isFinished && isStarted && (
+                    <View style={[styles.cursorWrap, { left: cursorIdx * charW }]}>
+                      <Animated.View style={[styles.cursor, { opacity: cursorOpacity }]} />
+                    </View>
+                  )}
                 </View>
               );
-              })}
-            </View>
-          ))}
+            }
+            return (
+              <View key={ri} style={styles.charRow}>
+                {row.map((i) => {
+                const typed = userInput[i];
+                let color = '#5a667a';
+                let bg = 'transparent';
+                let upcoming = false;
+                if (i < typedCursor) {
+                  if (kp) {
+                    if (i < kp.ok) { color = COLORS.green; }
+                    else if (kp.pending) { color = COLORS.green; }
+                    else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
+                  } else {
+                    const status = getCharStatus(typed, currentText[i]);
+                    if (status === 'correct') { color = COLORS.green; }
+                    else if (status === 'partial') { color = COLORS.amber; }
+                    else { color = COLORS.rose; bg = 'rgba(244,63,94,0.14)'; }
+                  }
+                } else if (kp && !kp.pending && i < userInput.length) {
+                  color = COLORS.rose;
+                  bg = 'rgba(244,63,94,0.14)';
+                } else if (currentText[i] === ' ' && i === progressCursor && progressCursor < currentText.length) {
+                  color = '#14222e';
+                  upcoming = true;
+                } else if (
+                  currentWord &&
+                  i >= currentWord.s && i < currentWord.e &&
+                  currentText[progressCursor] !== ' '
+                ) {
+                  color = '#14222e';
+                  upcoming = true;
+                }
+                const isCursorHere = i === typedCursor && !isFinished && isStarted;
+                const isNext = i === typedCursor && !isStarted && i < 1;
+                return (
+                  <MemoChar
+                    key={i}
+                    ch={currentText[i]}
+                    color={color}
+                    bg={bg}
+                    upcoming={upcoming}
+                    isCursorHere={isCursorHere}
+                    isNext={isNext}
+                    typeSize={typeSize}
+                    lineHeight={charLineH}
+                    started={isStarted}
+                    finished={isFinished}
+                    cursorOpacity={cursorOpacity}
+                    isHindi={config.lang === 'hindi'}
+                  />
+                );
+                })}
+              </View>
+            );
+          })}
         </TouchableOpacity>
       </ScrollView>
     );
@@ -1234,7 +1396,6 @@ const styles = StyleSheet.create({
   charRow: {
     flexDirection: 'row',
     flexWrap: 'nowrap',
-    lineHeight: 20,
   },
   measureRow: {
     position: 'absolute',
@@ -1246,12 +1407,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  cursorWrap: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 2,
+    justifyContent: 'center',
+  },
   char: {
     fontFamily: 'Poppins_400Regular',
     fontWeight: '400',
     letterSpacing: 0.3,
-    lineHeight: 22,
     borderRadius: 3,
+  },
+  charHindi: {
+    fontFamily: 'NotoSansDevanagari_400Regular',
+    fontWeight: '400',
   },
   charUpcoming: {
     textDecorationLine: 'underline',

@@ -47,36 +47,36 @@ const LESSONS = {
     { id: 30, title: 'Final Exam', desc: 'typing fast and...', time: '10 min', characters: 118 },
   ],
   hindi: [
-    { id: 1, title: 'à¤•, à¤–, à¤—', desc: 'à¤µà¤°à¥à¤£à¤®à¤¾à¤²à¤¾ à¤…à¤­à¥à¤¯à¤¾à¤¸', time: '2 min', characters: 48 },
-    { id: 2, title: 'à¤¸à¥à¤µà¤°', desc: 'à¤… à¤† à¤‡ à¤ˆ', time: '2 min', characters: 28 },
-    { id: 3, title: 'à¤¶à¤¬à¥à¤¦ à¤…à¤­à¥à¤¯à¤¾à¤¸', desc: 'à¤¨à¤®à¤¸à¥à¤¤à¥‡, à¤§à¤¨à¥à¤¯à¤µà¤¾à¤¦', time: '3 min', characters: 48 },
-    { id: 4, title: 'à¤µà¤¾à¤•à¥à¤¯ à¤²à¥‡à¤–à¤¨', desc: 'à¤›à¥‹à¤Ÿà¥‡ à¤µà¤¾à¤•à¥à¤¯ à¤Ÿà¤¾à¤‡à¤ª à¤•à¤°à¥‹', time: '5 min', characters: 90 },
-    { id: 5, title: 'à¤ªà¥ˆà¤°à¤¾à¤—à¥à¤°à¤¾à¤«', desc: 'à¤²à¤‚à¤¬à¤¾ à¤ªà¤¾à¤  à¤…à¤­à¥à¤¯à¤¾à¤¸', time: '5 min', characters: 100 },
-    { id: 6, title: 'à¤š, à¤›, à¤œ, à¤, à¤ž', desc: 'à¤¦à¥‚à¤¸à¤°à¤¾ à¤µà¤°à¥à¤£ à¤¸à¤®à¥‚à¤¹', time: '2 min', characters: 40 },
-    { id: 7, title: 'à¤Ÿ, à¤ , à¤¡, à¤¢, à¤£', desc: 'à¤¤à¥€à¤¸à¤°à¤¾ à¤µà¤°à¥à¤£ à¤¸à¤®à¥‚à¤¹', time: '2 min', characters: 40 },
-    { id: 8, title: 'à¤¤, à¤¥, à¤¦, à¤§, à¤¨', desc: 'à¤šà¥Œà¤¥à¤¾ à¤µà¤°à¥à¤£ à¤¸à¤®à¥‚à¤¹', time: '2 min', characters: 40 },
-    { id: 9, title: 'à¤ª, à¤«, à¤¬, à¤­, à¤®', desc: 'à¤ªà¤¾à¤à¤šà¤µà¤¾à¤ à¤µà¤°à¥à¤£ à¤¸à¤®à¥‚à¤¹', time: '2 min', characters: 40 },
-    { id: 10, title: 'à¤¯, à¤°, à¤², à¤µ, à¤¶, à¤·, à¤¸, à¤¹', desc: 'à¤…à¤‚à¤¤à¤¿à¤® à¤µà¤°à¥à¤£ à¤¸à¤®à¥‚à¤¹', time: '3 min', characters: 40 },
-    { id: 11, title: 'à¤›à¥‹à¤Ÿà¥‡ à¤µà¤¾à¤•à¥à¤¯', desc: 'à¤°à¥‹à¤œà¤¼à¤®à¤°à¥à¤°à¤¾ à¤•à¥‡ à¤µà¤¾à¤•à¥à¤¯', time: '4 min', characters: 88 },
-    { id: 12, title: 'à¤¸à¤‚à¤µà¤¾à¤¦ à¤…à¤­à¥à¤¯à¤¾à¤¸', desc: 'à¤¬à¤¾à¤¤à¤šà¥€à¤¤ à¤•à¥‡ à¤µà¤¾à¤•à¥à¤¯', time: '5 min', characters: 104 },
-    { id: 13, title: 'à¤­à¤¾à¤°à¤¤ à¤ªà¤°à¤¿à¤šà¤¯', desc: 'à¤¦à¥‡à¤¶ à¤•à¥‡ à¤¬à¤¾à¤°à¥‡ à¤®à¥‡à¤‚', time: '5 min', characters: 96 },
-    { id: 14, title: 'à¤ªà¥à¤°à¥Œà¤¦à¥à¤¯à¥‹à¤—à¤¿à¤•à¥€', desc: 'à¤¤à¤•à¤¨à¥€à¤• à¤ªà¤° à¤¨à¤¿à¤¬à¤‚à¤§', time: '6 min', characters: 120 },
-    { id: 15, title: 'à¤…à¤­à¥à¤¯à¤¾à¤¸ à¤ªà¤°à¥€à¤•à¥à¤·à¤¾', desc: 'à¤²à¤‚à¤¬à¤¾ à¤ªà¤¾à¤  â€” à¤¸à¤®à¤¯ à¤¸à¥€à¤®à¤¾', time: '8 min', characters: 160 },
-    { id: 16, title: 'à¤¸à¤‚à¤¯à¥à¤•à¥à¤¤ à¤…à¤•à¥à¤·à¤°', desc: 'à¤•à¥à¤·, à¤¤à¥à¤°, à¤œà¥à¤ž, à¤¶à¥à¤°', time: '2 min', characters: 48 },
-    { id: 17, title: 'à¤®à¤¾à¤¤à¥à¤°à¤¾ à¤…à¤­à¥à¤¯à¤¾à¤¸', desc: 'à¤•à¤¾, à¤•à¥€, à¤•à¥, à¤•à¥‡, à¤•à¥Œ', time: '3 min', characters: 60 },
-    { id: 18, title: 'à¤†à¤® à¤¶à¤¬à¥à¤¦', desc: 'à¤ªà¤¾à¤¨à¥€, à¤˜à¤°, à¤¸à¥à¤•à¥‚à¤²', time: '3 min', characters: 70 },
-    { id: 19, title: 'à¤°à¥‹à¤œà¤¼-à¤­à¤° à¤•à¥‡ à¤µà¤¾à¤•à¥à¤¯', desc: 'à¤®à¥ˆà¤‚ à¤°à¥‹à¤œà¤¼ à¤µà¤¿à¤¦à¥à¤¯à¤¾à¤²à¤¯ à¤œà¤¾à¤¤à¤¾ à¤¹à¥‚à¤', time: '4 min', characters: 80 },
-    { id: 20, title: 'à¤¦à¤¿à¤¨ à¤”à¤° à¤®à¤¹à¥€à¤¨à¥‡', desc: 'à¤¸à¥‹à¤®à¤µà¤¾à¤°...à¤°à¤µà¤¿à¤µà¤¾à¤°', time: '4 min', characters: 90 },
-    { id: 21, title: 'à¤—à¤¿à¤¨à¤¤à¥€', desc: 'à¤à¤•...à¤šà¤¾à¤²à¥€à¤¸', time: '4 min', characters: 85 },
-    { id: 22, title: 'à¤ªà¥à¤°à¤¶à¥à¤¨ à¤µà¤¾à¤•à¥à¤¯', desc: 'à¤†à¤ª à¤•à¥ˆà¤¸à¥‡ à¤¹à¥ˆà¤‚? à¤•à¥à¤¯à¤¾ à¤¹à¥ˆ?', time: '4 min', characters: 78 },
-    { id: 23, title: 'à¤ªà¥à¤°à¤•à¥ƒà¤¤à¤¿', desc: 'à¤¸à¥‚à¤°à¤œ, à¤¬à¤¾à¤¦à¤², à¤¨à¤¦à¤¿à¤¯à¤¾à¤', time: '5 min', characters: 90 },
-    { id: 24, title: 'à¤­à¤¾à¤°à¤¤ à¤ªà¤°à¤¿à¤šà¤¯', desc: 'à¤¹à¤®à¤¾à¤°à¤¾ à¤¦à¥‡à¤¶', time: '5 min', characters: 85 },
-    { id: 25, title: 'à¤¸à¤®à¤¯ à¤•à¤¾ à¤®à¤¹à¤¤à¥à¤µ', desc: 'à¤…à¤¨à¥à¤šà¥à¤›à¥‡à¤¦', time: '5 min', characters: 120 },
-    { id: 26, title: 'à¤¶à¤¿à¤•à¥à¤·à¤¾', desc: 'à¤µà¤¿à¤¦à¥à¤¯à¤¾ à¤•à¤¾ à¤®à¤¹à¤¤à¥à¤µ', time: '6 min', characters: 110 },
-    { id: 27, title: 'à¤•à¤‚à¤ªà¥à¤¯à¥‚à¤Ÿà¤°', desc: 'à¤†à¤§à¥à¤¨à¤¿à¤• à¤¯à¥à¤—', time: '6 min', characters: 140 },
-    { id: 28, title: 'à¤ªà¥à¤°à¥Œà¤¦à¥à¤¯à¥‹à¤—à¤¿à¤•à¥€ 2', desc: 'à¤¡à¤¿à¤œà¤¿à¤Ÿà¤² à¤œà¥€à¤µà¤¨', time: '7 min', characters: 160 },
-    { id: 29, title: 'à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯', desc: 'à¤¸à¥à¤µà¤¾à¤¸à¥à¤¥à¥à¤¯ à¤¹à¥€ à¤§à¤¨', time: '7 min', characters: 150 },
-    { id: 30, title: 'à¤…à¤‚à¤¤à¤¿à¤® à¤ªà¤°à¥€à¤•à¥à¤·à¤¾', desc: 'à¤¸à¤‚à¤¸à¥à¤•à¥ƒà¤¤à¤¿ à¤”à¤° à¤•à¤°à¥à¤¤à¤µà¥à¤¯', time: '10 min', characters: 220 },
+    { id: 1, title: 'क, ख, ग', desc: 'वर्णमाला अभ्यास', time: '2 min', characters: 48 },
+    { id: 2, title: 'स्वर', desc: 'अ आ इ ई', time: '2 min', characters: 28 },
+    { id: 3, title: 'शब्द अभ्यास', desc: 'नमस्ते, धन्यवाद', time: '3 min', characters: 48 },
+    { id: 4, title: 'वाक्य लेखन', desc: 'छोटे वाक्य टाइप करो', time: '5 min', characters: 90 },
+    { id: 5, title: 'पैराग्राफ', desc: 'लंबा पाठ अभ्यास', time: '5 min', characters: 100 },
+    { id: 6, title: 'च, छ, ज, झ, ञ', desc: 'दूसरा वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 7, title: 'ट, ठ, ड, ढ, ण', desc: 'तीसरा वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 8, title: 'त, थ, द, ध, न', desc: 'चौथा वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 9, title: 'प, फ, ब, भ, म', desc: 'पाँचवाँ वर्ण समूह', time: '2 min', characters: 40 },
+    { id: 10, title: 'य, र, ल, व, श, ष, स, ह', desc: 'अंतिम वर्ण समूह', time: '3 min', characters: 40 },
+    { id: 11, title: 'छोटे वाक्य', desc: 'रोज़मर्रा के वाक्य', time: '4 min', characters: 88 },
+    { id: 12, title: 'संवाद अभ्यास', desc: 'बातचीत के वाक्य', time: '5 min', characters: 104 },
+    { id: 13, title: 'भारत परिचय', desc: 'देश के बारे में', time: '5 min', characters: 96 },
+    { id: 14, title: 'प्रौद्योगिकी', desc: 'तकनीक पर निबंध', time: '6 min', characters: 120 },
+    { id: 15, title: 'अभ्यास परीक्षा', desc: 'लंबा पाठ — समय सीमा', time: '8 min', characters: 160 },
+    { id: 16, title: 'संयुक्त अक्षर', desc: 'क्ष, त्र, ज्ञ, श्र', time: '2 min', characters: 48 },
+    { id: 17, title: 'मात्रा अभ्यास', desc: 'का, की, कु, के, कौ', time: '3 min', characters: 60 },
+    { id: 18, title: 'आम शब्द', desc: 'पानी, घर, स्कूल', time: '3 min', characters: 70 },
+    { id: 19, title: 'रोज़-भर के वाक्य', desc: 'मैं रोज़ विद्यालय जाता हूँ', time: '4 min', characters: 80 },
+    { id: 20, title: 'दिन और महीने', desc: 'सोमवार...रविवार', time: '4 min', characters: 90 },
+    { id: 21, title: 'गिनती', desc: 'एक...चालीस', time: '4 min', characters: 85 },
+    { id: 22, title: 'प्रश्न वाक्य', desc: 'आप कैसे हैं? क्या है?', time: '4 min', characters: 78 },
+    { id: 23, title: 'प्रकृति', desc: 'सूरज, बादल, नदियाँ', time: '5 min', characters: 90 },
+    { id: 24, title: 'भारत परिचय', desc: 'हमारा देश', time: '5 min', characters: 85 },
+    { id: 25, title: 'समय का महत्व', desc: 'अनुच्छेद', time: '5 min', characters: 120 },
+    { id: 26, title: 'शिक्षा', desc: 'विद्या का महत्व', time: '6 min', characters: 110 },
+    { id: 27, title: 'कंप्यूटर', desc: 'आधुनिक युग', time: '6 min', characters: 140 },
+    { id: 28, title: 'प्रौद्योगिकी 2', desc: 'डिजिटल जीवन', time: '7 min', characters: 160 },
+    { id: 29, title: 'स्वास्थ्य', desc: 'स्वास्थ्य ही धन', time: '7 min', characters: 150 },
+    { id: 30, title: 'अंतिम परीक्षा', desc: 'संस्कृति और कर्तव्य', time: '10 min', characters: 220 },
   ],
 };
 
@@ -87,40 +87,40 @@ const CATEGORIES = [
 ];
 
 const CHARMAP_CONSONANTS = [
-  { unicode: 'à¤•', kruti: 'd' }, { unicode: 'à¤–', kruti: '[k' }, { unicode: 'à¤—', kruti: 'x' },
-  { unicode: 'à¤˜', kruti: '?k' }, { unicode: 'à¤™', kruti: '\xb3' }, { unicode: 'à¤š', kruti: 'p' },
-  { unicode: 'à¤›', kruti: 'N' }, { unicode: 'à¤œ', kruti: 't' }, { unicode: 'à¤', kruti: '>' },
-  { unicode: 'à¤ž', kruti: '\xa5' }, { unicode: 'à¤Ÿ', kruti: 'V' }, { unicode: 'à¤ ', kruti: 'B' },
-  { unicode: 'à¤¡', kruti: 'M' }, { unicode: 'à¤¢', kruti: '<' }, { unicode: 'à¤£', kruti: '.k' },
-  { unicode: 'à¤¤', kruti: 'r' }, { unicode: 'à¤¥', kruti: 'Fk' }, { unicode: 'à¤¦', kruti: 'n' },
-  { unicode: 'à¤§', kruti: '/k' }, { unicode: 'à¤¨', kruti: 'u' }, { unicode: 'à¤ª', kruti: 'i' },
-  { unicode: 'à¤«', kruti: 'Q' }, { unicode: 'à¤¬', kruti: 'c' }, { unicode: 'à¤­', kruti: 'Hk' },
-  { unicode: 'à¤®', kruti: 'e' }, { unicode: 'à¤¯', kruti: ';' }, { unicode: 'à¤°', kruti: 'j' },
-  { unicode: 'à¤²', kruti: 'y' }, { unicode: 'à¤µ', kruti: 'o' }, { unicode: 'à¤¶', kruti: "'k" },
-  { unicode: 'à¤·', kruti: '"k' }, { unicode: 'à¤¸', kruti: 'l' }, { unicode: 'à¤¹', kruti: 'g' },
+  { unicode: 'क', kruti: 'd' }, { unicode: 'ख', kruti: '[k' }, { unicode: 'ग', kruti: 'x' },
+  { unicode: 'घ', kruti: '?k' }, { unicode: 'ङ', kruti: '\xb3' }, { unicode: 'च', kruti: 'p' },
+  { unicode: 'छ', kruti: 'N' }, { unicode: 'ज', kruti: 't' }, { unicode: 'झ', kruti: '>' },
+  { unicode: 'ञ', kruti: '\xa5' }, { unicode: 'ट', kruti: 'V' }, { unicode: 'ठ', kruti: 'B' },
+  { unicode: 'ड', kruti: 'M' }, { unicode: 'ढ', kruti: '<' }, { unicode: 'ण', kruti: '.k' },
+  { unicode: 'त', kruti: 'r' }, { unicode: 'थ', kruti: 'Fk' }, { unicode: 'द', kruti: 'n' },
+  { unicode: 'ध', kruti: '/k' }, { unicode: 'न', kruti: 'u' }, { unicode: 'प', kruti: 'i' },
+  { unicode: 'फ', kruti: 'Q' }, { unicode: 'ब', kruti: 'c' }, { unicode: 'भ', kruti: 'Hk' },
+  { unicode: 'म', kruti: 'e' }, { unicode: 'य', kruti: ';' }, { unicode: 'र', kruti: 'j' },
+  { unicode: 'ल', kruti: 'y' }, { unicode: 'व', kruti: 'o' }, { unicode: 'श', kruti: "'k" },
+  { unicode: 'ष', kruti: '"k' }, { unicode: 'स', kruti: 'l' }, { unicode: 'ह', kruti: 'g' },
 ];
 
 const CHARMAP_VOWELS = [
-  { unicode: 'à¤…', kruti: 'v' }, { unicode: 'à¤†', kruti: 'vk' }, { unicode: 'à¤‡', kruti: 'b' },
-  { unicode: 'à¤ˆ', kruti: 'bZ' }, { unicode: 'à¤‰', kruti: 'm' }, { unicode: 'à¤Š', kruti: '\xc5' },
-  { unicode: 'à¤', kruti: ',' }, { unicode: 'à¤', kruti: ',s' }, { unicode: 'à¤“', kruti: 'vks' },
-  { unicode: 'à¤”', kruti: 'vkS' },
+  { unicode: 'अ', kruti: 'v' }, { unicode: 'आ', kruti: 'vk' }, { unicode: 'इ', kruti: 'b' },
+  { unicode: 'ई', kruti: 'bZ' }, { unicode: 'उ', kruti: 'm' }, { unicode: 'ऊ', kruti: '\xc5' },
+  { unicode: 'ए', kruti: ',' }, { unicode: 'ऐ', kruti: ',s' }, { unicode: 'ओ', kruti: 'vks' },
+  { unicode: 'औ', kruti: 'vkS' },
 ];
 
 const CHARMAP_MATRAS = [
-  { unicode: 'à¤¾', kruti: 'k' }, { unicode: 'à¤¿', kruti: 'f' }, { unicode: 'à¥€', kruti: 'h' },
-  { unicode: 'à¥', kruti: 'q' }, { unicode: 'à¥‚', kruti: 'w' }, { unicode: 'à¥ƒ', kruti: '`' },
-  { unicode: 'à¥‡', kruti: 's' }, { unicode: 'à¥ˆ', kruti: 'S' }, { unicode: 'à¥‹', kruti: 'ks' },
-  { unicode: 'à¥Œ', kruti: 'kS' }, { unicode: 'à¤‚', kruti: 'a' }, { unicode: 'à¤ƒ', kruti: '%' },
-  { unicode: 'à¤', kruti: '\xa1' }, { unicode: 'à¥…', kruti: 'W' },
+  { unicode: 'ा', kruti: 'k' }, { unicode: 'ि', kruti: 'f' }, { unicode: 'ी', kruti: 'h' },
+  { unicode: 'ु', kruti: 'q' }, { unicode: 'ू', kruti: 'w' }, { unicode: 'ृ', kruti: '`' },
+  { unicode: 'े', kruti: 's' }, { unicode: 'ै', kruti: 'S' }, { unicode: 'ो', kruti: 'ks' },
+  { unicode: 'ौ', kruti: 'kS' }, { unicode: 'ं', kruti: 'a' }, { unicode: 'ः', kruti: '%' },
+  { unicode: 'ँ', kruti: '\xa1' }, { unicode: 'ॅ', kruti: 'W' },
 ];
 
 const CHARMAP_NUMBERS = [
-  { unicode: 'à¥¦', kruti: '\xe5' }, { unicode: 'à¥§', kruti: '\x0192' },
-  { unicode: 'à¥¨', kruti: '\u201e' }, { unicode: 'à¥©', kruti: '\u2026' },
-  { unicode: 'à¥ª', kruti: '\u2020' }, { unicode: 'à¥«', kruti: '\u2021' },
-  { unicode: 'à¥¬', kruti: '\u02c6' }, { unicode: 'à¥­', kruti: '\u2030' },
-  { unicode: 'à¥®', kruti: '\u0160' }, { unicode: 'à¥¯', kruti: '\u2039' },
+  { unicode: '०', kruti: '\xe5' }, { unicode: '१', kruti: '\x0192' },
+  { unicode: '२', kruti: '\u201e' }, { unicode: '३', kruti: '\u2026' },
+  { unicode: '४', kruti: '\u2020' }, { unicode: '५', kruti: '\u2021' },
+  { unicode: '६', kruti: '\u02c6' }, { unicode: '७', kruti: '\u2030' },
+  { unicode: '८', kruti: '\u0160' }, { unicode: '९', kruti: '\u2039' },
 ];
 
 const getDifficultyColor = (diff) => {
@@ -137,10 +137,11 @@ export default function LessonsScreen({
   onBack,
   studentName = '',
   unlockedLessons = { english: [1], hindi: [1] },
-  hindiLayout = 'mangal',
+  hindiLayout = 'krutidev',
   onChangeHindiLayout,
+  selectedLang = 'english',
+  onSelectLang,
 }) {
-  const [selectedLang, setSelectedLang] = useState('english');
   const [category, setCategory] = useState('beginner');
   const [showCharMap, setShowCharMap] = useState(false);
   const [charMapTab, setCharMapTab] = useState('mangal');
@@ -195,12 +196,12 @@ export default function LessonsScreen({
           <View style={styles.langToggle}>
             {[
               { label: 'English', value: 'english', icon: 'globe' },
-              { label: 'à¤¹à¤¿à¤‚à¤¦à¥€', value: 'hindi', icon: 'language' },
+              { label: 'हिंदी', value: 'hindi', icon: 'language' },
             ].map((d) => (
               <TouchableOpacity
                 key={d.value}
                 style={[styles.langBtn, selectedLang === d.value && styles.langBtnActive]}
-                onPress={() => { setSelectedLang(d.value); setCategory('beginner'); }}
+                onPress={() => { onSelectLang && onSelectLang(d.value); setCategory('beginner'); }}
                 activeOpacity={0.7}
               >
                 <Ionicons name={d.icon} size={15} color={selectedLang === d.value ? '#fff' : COLORS.textMuted} />
@@ -341,7 +342,7 @@ export default function LessonsScreen({
               <View style={styles.cmHeader}>
                 <Text style={styles.cmTitle}>Hindi Character Map</Text>
                 <TouchableOpacity onPress={() => setShowCharMap(false)} style={styles.cmClose}>
-                  <Ionicons name="close" size={20} color={COLORS.textWhite} />
+                  <Ionicons name="close" size={20} color="#000000" />
                 </TouchableOpacity>
               </View>
               <View style={styles.cmTabs}>
@@ -357,7 +358,7 @@ export default function LessonsScreen({
                 ))}
               </View>
               <ScrollView style={styles.cmScroll} contentContainerStyle={styles.cmScrollContent}>
-                <Text style={styles.cmSectionTitle}>à¤µà¥à¤¯à¤‚à¤œà¤¨ (Consonants)</Text>
+                <Text style={styles.cmSectionTitle}>व्यंजन (Consonants)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_CONSONANTS.map((c, i) => (
                     <View key={i} style={styles.cmItem}>
@@ -366,7 +367,7 @@ export default function LessonsScreen({
                     </View>
                   ))}
                 </View>
-                <Text style={styles.cmSectionTitle}>à¤¸à¥à¤µà¤° (Vowels)</Text>
+                <Text style={styles.cmSectionTitle}>स्वर (Vowels)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_VOWELS.map((c, i) => (
                     <View key={i} style={styles.cmItem}>
@@ -375,16 +376,16 @@ export default function LessonsScreen({
                     </View>
                   ))}
                 </View>
-                <Text style={styles.cmSectionTitle}>à¤®à¤¾à¤¤à¥à¤°à¤¾à¤à¤ (Matras)</Text>
+                <Text style={styles.cmSectionTitle}>मात्राएँ (Matras)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_MATRAS.map((c, i) => (
                     <View key={i} style={styles.cmItem}>
-                      <Text style={styles.cmUnicode}>{'à¤…' + c.unicode}</Text>
+                      <Text style={styles.cmUnicode}>{'अ' + c.unicode}</Text>
                       <Text style={styles.cmKey}>{charMapTab === 'krutidev' ? c.kruti : c.unicode}</Text>
                     </View>
                   ))}
                 </View>
-                <Text style={styles.cmSectionTitle}>à¤…à¤‚à¤• (Numbers)</Text>
+                <Text style={styles.cmSectionTitle}>अंक (Numbers)</Text>
                 <View style={styles.cmGrid}>
                   {CHARMAP_NUMBERS.map((c, i) => (
                     <View key={i} style={styles.cmItem}>
@@ -515,41 +516,41 @@ const styles = StyleSheet.create({
   // CharMap modal
   cmOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'flex-end' },
   cmCard: {
-    height: '85%', backgroundColor: '#101a30',
+    height: '85%', backgroundColor: '#ffffff',
     borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    borderWidth: 1.5, borderBottomWidth: 0, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderBottomWidth: 0, borderColor: '#e2e8f0',
     overflow: 'hidden',
   },
   cmHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     padding: 16, paddingBottom: 10,
   },
-  cmTitle: { color: '#fff', fontSize: 18, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  cmTitle: { color: '#000000', fontSize: 18, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   cmClose: {
     width: 32, height: 32, borderRadius: 16,
-    backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: 'rgba(0,0,0,0.06)', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: '#e2e8f0',
   },
   cmTabs: { flexDirection: 'row', marginHorizontal: 16, gap: 8, marginBottom: 12 },
   cmTab: {
     flex: 1, paddingVertical: 9, borderRadius: 10, alignItems: 'center',
-    borderWidth: 1.5, borderColor: COLORS.cardBorder, backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1.5, borderColor: '#e2e8f0', backgroundColor: 'rgba(0,0,0,0.04)',
   },
   cmTabActive: { backgroundColor: COLORS.cyan + '22', borderColor: COLORS.cyan },
-  cmTabText: { color: COLORS.textMuted, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  cmTabText: { color: '#333333', fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   cmTabTextActive: { color: COLORS.cyan },
   cmScroll: { flex: 1 },
   cmScrollContent: { padding: 16, paddingBottom: 40 },
   cmSectionTitle: {
-    color: '#fff', fontSize: 13, fontFamily: 'Poppins_700Bold', fontWeight: '700',
+    color: '#000000', fontSize: 13, fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginBottom: 8, marginTop: 14,
   },
   cmGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   cmItem: {
     width: 58, alignItems: 'center', paddingVertical: 8,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: 'rgba(0,0,0,0.06)', borderRadius: 8,
+    borderWidth: 1.5, borderColor: '#e2e8f0',
   },
-  cmUnicode: { color: '#fff', fontSize: 18, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
-  cmKey: { color: COLORS.textMuted, fontSize: 9, fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 2 },
+  cmUnicode: { color: '#000000', fontSize: 18, fontFamily: 'NotoSansDevanagari_700Bold', fontWeight: '700' },
+  cmKey: { color: '#333333', fontSize: 9, fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: 2 },
 });

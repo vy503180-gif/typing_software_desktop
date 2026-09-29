@@ -47,7 +47,7 @@ export default function SettingsScreen({
   onChangeSetting,
   practiceTimeSec = 300,
   onChangePracticeTime,
-  hindiLayout = 'mangal',
+  hindiLayout = 'krutidev',
   onChangeHindiLayout,
   onSwitchUser,
   onBack,

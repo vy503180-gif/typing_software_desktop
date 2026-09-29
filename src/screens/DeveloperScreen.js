@@ -1,7 +1,7 @@
 // src/screens/DeveloperScreen.js
-// About the developer + payment / donate support.
+// About the developer + contact & support.
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,7 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
-  Modal,
-  Alert,
 } from 'react-native';
-import { toQR } from 'toqr';
 import { Ionicons } from '@expo/vector-icons';
 import { Linking } from 'react-native';
 import { BG, COLORS, CONTENT_MAX_WIDTH } from '../theme';
@@ -22,10 +19,7 @@ import { BG, COLORS, CONTENT_MAX_WIDTH } from '../theme';
 const DEV = {
   name: 'Vicky Yadav',
   role: 'App Developer',
-  mobile: '6387693103',
   email: 'vy503180@gmail.com',
-  // UPI ID — jab bhejo, yahan daal do:
-  upiId: 'vy503180@okaxis',
   appName: 'Antriksh Typing Master',
   version: 'v2.0',
 };
@@ -65,82 +59,22 @@ const copyText = (text) => {
   }
 };
 
-const upiLink = () =>
-  `upi://pay?pa=${encodeURIComponent(DEV.upiId)}&pn=${encodeURIComponent(DEV.name)}&cu=INR`;
-
-// UPI ID se QR auto-generate hota hai (koi image file nahi chahiye)
-function QrCode({ value, cell = 3 }) {
-  const rows = useMemo(() => {
-    try {
-      // UPI link ASCII hai — TextEncoder ki zaroorat ke bina khud bytes bana dete hain
-      const bytes = new Uint8Array(value.length);
-      for (let i = 0; i < value.length; i++) bytes[i] = value.charCodeAt(i) & 0xff;
-      const bits = toQR(bytes);
-      const n = Math.round(Math.sqrt(bits.length));
-      const out = [];
-      for (let y = 0; y < n; y++) {
-        const row = [];
-        for (let x = 0; x < n; x++) row.push(!!bits[y * n + x]);
-        out.push(row);
-      }
-      return out;
-    } catch {
-      return null;
-    }
-  }, [value]);
-
-  if (!rows) {
-    return (
-      <View style={styles.qrPlaceholder}>
-        <Ionicons name="qr-code" size={54} color="#94a3b8" />
-        <Text style={styles.qrPhText}>QR Scan Code</Text>
-      </View>
-    );
+const handleEmail = () => {
+  const url = `mailto:${DEV.email}`;
+  if (typeof window !== 'undefined') {
+    window.location.href = url;
+  } else {
+    Linking.openURL(url).catch(() => {});
   }
-
-  const dim = rows.length * cell;
-  return (
-    <View style={{ padding: 10, backgroundColor: '#fff', borderRadius: 12 }}>
-      <View
-        style={{
-          width: dim,
-          height: dim,
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          backgroundColor: '#fff',
-        }}
-      >
-        {rows.map((row, y) =>
-          row.map((on, x) => (
-            <View
-              key={`${y}-${x}`}
-              style={{ width: cell, height: cell, backgroundColor: on ? '#000' : '#fff' }}
-            />
-          ))
-        )}
-      </View>
-    </View>
-  );
-}
+};
 
 export default function DeveloperScreen({ onBack }) {
-  const [showPay, setShowPay] = useState(false);
   const [copied, setCopied] = useState('');
-  const [payDismissed, setPayDismissed] = useState(false);
   const [lang, setLang] = useState('en'); // 'en' => English pehle, 'hi' => Hindi pehle (dono hamesha dikhengi)
 
   const notify = (msg) => {
     setCopied(msg);
     setTimeout(() => setCopied(''), 1800);
-  };
-
-  const handlePayUp = () => {
-    const link = upiLink();
-    if (typeof window !== 'undefined') {
-      window.location.href = link;
-    } else {
-      Linking.openURL(link).catch(() => {});
-    }
   };
 
   const handleSupport = (category, hint = '') => {
@@ -164,32 +98,6 @@ export default function DeveloperScreen({ onBack }) {
       <View style={{ marginBottom: 14 }}>
         <Text style={[styles.payDesc, { marginBottom: 2, fontFamily: mainFam }]}>{main}</Text>
         <Text style={[styles.langOther, { fontFamily: otherFam }]}>{other}</Text>
-      </View>
-    );
-  };
-
-  const DualRich = ({ hi, en }) => {
-    const isHiMain = lang === 'hi';
-    const main = isHiMain ? hi : en;
-    const other = isHiMain ? en : hi;
-    const mainFam = isHiMain ? F_HI.regular : 'Poppins_400Regular';
-    const otherFam = isHiMain ? 'Poppins_400Regular' : F_HI.regular;
-    const mainStrongFam = isHiMain ? F_HI.bold : 'Poppins_700Bold';
-    const otherStrongFam = isHiMain ? 'Poppins_700Bold' : F_HI.bold;
-    const renderLine = (line, fam, strongFam) => {
-      const parts = line.split('__');
-      return (
-        <Text style={[styles.valueText, { fontFamily: fam }]}>
-          {parts[0]}
-          <Text style={[styles.valueStrong, { fontFamily: strongFam }]}>{parts[1]}</Text>
-          {parts[2]}
-        </Text>
-      );
-    };
-    return (
-      <View style={{ flex: 1 }}>
-        {renderLine(main, mainFam, mainStrongFam)}
-        <View style={{ marginTop: 3 }}>{renderLine(other, otherFam, otherStrongFam)}</View>
       </View>
     );
   };
@@ -240,29 +148,27 @@ export default function DeveloperScreen({ onBack }) {
                   </View>
                 </View>
                 <View style={styles.payMethodBox}>
-                  <Text style={styles.payMethodLabel}>ONLINE PAYMENT</Text>
-                  <View style={styles.mobileRow}>
+                  <Text style={styles.payMethodLabel}>CONTACT</Text>
+                  <TouchableOpacity
+                    style={styles.mobileRow}
+                    onPress={handleEmail}
+                    activeOpacity={0.85}
+                  >
                     <View style={[styles.iconBadge, { backgroundColor: COLORS.green + '1f' }]}>
-                      <Ionicons name="wallet" size={16} color={COLORS.green} />
+                      <Ionicons name="mail" size={16} color={COLORS.green} />
                     </View>
-                    <Text style={styles.mobileText}>{DEV.mobile}</Text>
+                    <Text style={styles.mobileText} numberOfLines={1}>{DEV.email}</Text>
                     <TouchableOpacity
                       style={styles.copyIconBtn}
                       onPress={() => {
-                        copyText(DEV.mobile);
-                        notify('Number copied');
+                        copyText(DEV.email);
+                        notify('Email copied');
                       }}
                       activeOpacity={0.7}
                     >
-                      <Ionicons name={copied === 'Number copied' ? 'checkmark' : 'copy-outline'} size={16} color={copied === 'Number copied' ? COLORS.green : COLORS.textLight} />
+                      <Ionicons name={copied === 'Email copied' ? 'checkmark' : 'copy-outline'} size={16} color={copied === 'Email copied' ? COLORS.green : COLORS.textLight} />
                     </TouchableOpacity>
-                  </View>
-                  <View style={styles.optionalRow}>
-                    <Ionicons name="gift" size={12} color={COLORS.amber} />
-                    <Text style={[styles.optionalText, { fontFamily: lang === 'hi' ? F_HI.semi : 'Poppins_600SemiBold' }]}>
-                      {lang === 'hi' ? 'ऑप्शनल रिवार्ड — जो आप खुशी से दे सकते हैं' : 'Optional Reward — a token of appreciation, only if you wish'}
-                    </Text>
-                  </View>
+                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -314,148 +220,11 @@ export default function DeveloperScreen({ onBack }) {
                 ))}
               </View>
             </View>
-
-            {/* Support / Pay */}
-            <View style={styles.payCol}>
-              {/* PAY / DONATE card */}
-              <View style={styles.card}>
-                <Text style={styles.sectionLabel}>PAY / DONATE</Text>
-                <DualText
-                  hi="यह ऐप 100% फ्री है। Pay करें या डोनेशन दें — जैसा आपको ठीक लगे, कोई अमाउंट नहीं, कोई दबाव नहीं।"
-                  en="This app is 100% free. Pay or donate — whatever you prefer. No fixed amount, no pressure."
-                />
-
-                <View style={styles.payDonateRow}>
-                  <TouchableOpacity style={[styles.payOption, styles.payOptionActive]} onPress={() => setShowPay(true)} activeOpacity={0.85}>
-                    <Ionicons name="card" size={18} color="#0a241f" />
-                    <Text style={styles.payOptionText}>Pay</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.payOption} onPress={() => setShowPay(true)} activeOpacity={0.85}>
-                    <Ionicons name="heart" size={18} color={COLORS.rose} />
-                    <Text style={[styles.payOptionText, { color: COLORS.rose }]}>Donate</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <Text style={styles.detailLabel}>PAYMENT DETAILS</Text>
-                <View style={styles.detailRow}>
-                  <Ionicons name="wallet" size={15} color={COLORS.teal} />
-                  <Text style={styles.detailKey}>UPI ID</Text>
-                  <Text style={styles.detailValue} numberOfLines={1}>{DEV.upiId}</Text>
-                  <TouchableOpacity style={styles.copyIconBtn} onPress={() => { copyText(DEV.upiId); notify('UPI ID copied'); }} activeOpacity={0.7}>
-                    <Ionicons name={copied === 'UPI ID copied' ? 'checkmark' : 'copy-outline'} size={15} color={copied === 'UPI ID copied' ? COLORS.green : COLORS.textLight} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.detailRow}>
-                  <Ionicons name="phone-portrait" size={15} color={COLORS.green} />
-                  <Text style={styles.detailKey}>Mobile</Text>
-                  <Text style={styles.detailValue}>{DEV.mobile}</Text>
-                  <TouchableOpacity style={styles.copyIconBtn} onPress={() => { copyText(DEV.mobile); notify('Number copied'); }} activeOpacity={0.7}>
-                    <Ionicons name={copied === 'Number copied' ? 'checkmark' : 'copy-outline'} size={15} color={copied === 'Number copied' ? COLORS.green : COLORS.textLight} />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.detailRow}>
-                  <Ionicons name="qr-code" size={15} color={COLORS.amber} />
-                  <Text style={styles.detailKey}>QR Code</Text>
-                  <Text style={[styles.detailValue, { fontFamily: lang === 'hi' ? F_HI.bold : 'Poppins_700Bold' }]} numberOfLines={1}>
-                    {lang === 'hi' ? 'Pay/Donate पर क्लिक करें' : 'Click Pay / Donate to open'}
-                  </Text>
-                </View>
-
-                <View style={styles.optionalRow}>
-                  <Ionicons name="gift" size={12} color={COLORS.amber} />
-                  <Text style={[styles.optionalText, { fontFamily: lang === 'hi' ? F_HI.semi : 'Poppins_600SemiBold' }]}>
-                    {lang === 'hi' ? 'ऑप्शनल रिवार्ड — जो आप खुशी से दे सकते हैं' : 'Optional Reward — a token of appreciation, only if you wish'}
-                  </Text>
-                </View>
-
-                <TouchableOpacity style={styles.freeBtn} onPress={() => setPayDismissed(true)} activeOpacity={0.7}>
-                  <Text style={[styles.freeBtnText, { fontFamily: lang === 'hi' ? F_HI.semi : 'Poppins_600SemiBold' }]}>
-                    {lang === 'hi' ? 'ऐप फ्री है — बस फ्री इस्तेमाल करना है' : 'This app is free — just use it freely'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
           </View>
 
           <View style={{ height: 30 }} />
         </ScrollView>
       </View>
-
-      {/* Pay Modal — scanner (QR) + number + UPI */}
-      <Modal visible={showPay} transparent animationType="fade" onRequestClose={() => setShowPay(false)}>
-        <View style={styles.overlay}>
-          <View style={styles.modalCard}>
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHeaderIcon}>
-                <Ionicons name="heart" size={18} color="#fff" />
-              </View>
-              <Text style={styles.modalTitle}>Support {DEV.name}</Text>
-              <TouchableOpacity onPress={() => setShowPay(false)} style={styles.modalClose} activeOpacity={0.7}>
-                <Ionicons name="close" size={20} color="#475569" />
-              </TouchableOpacity>
-            </View>
-
-            {/* Scanner area */}
-            <View style={styles.qrArea}>
-              <Text style={styles.qrLabel}>SCAN & PAY</Text>
-              <View style={styles.qrBox}>
-                <QrCode value={upiLink()} />
-              </View>
-              <Text style={[styles.qrNote, { fontFamily: lang === 'hi' ? F_HI.regular : 'Poppins_400Regular' }]}>
-                  {lang === 'hi' ? 'किसी भी UPI ऐप को स्कैन करके pay कर सकते हैं।' : 'Scan with any UPI app and pay.'}
-                </Text>
-                <Text style={[styles.qrNote, styles.langOther, { fontFamily: lang === 'hi' ? 'Poppins_400Regular' : F_HI.regular }]}>
-                  {lang === 'hi' ? 'Scan with any UPI app and pay.' : 'किसी भी UPI ऐप को स्कैन करके pay कर सकते हैं।'}
-                </Text>
-            </View>
-
-            {/* Number + UPI */}
-            <View style={styles.payRows}>
-              <View style={styles.payRow}>
-                <Ionicons name="phone-portrait" size={16} color={COLORS.green} />
-                <Text style={styles.payRowLabel}>Mobile</Text>
-                <Text style={styles.payRowValue}>{DEV.mobile}</Text>
-                <TouchableOpacity
-                  style={styles.copyBtn}
-                  onPress={() => { copyText(DEV.mobile); notify('Mobile copied'); }}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="copy-outline" size={15} color="#64748b" />
-                </TouchableOpacity>
-              </View>
-              <View style={styles.payRow}>
-                <Ionicons name="qr-code-outline" size={16} color={COLORS.cyan} />
-                <Text style={styles.payRowLabel}>UPI ID</Text>
-                <Text style={styles.payRowValue} numberOfLines={1}>{DEV.upiId}</Text>
-                <TouchableOpacity
-                  style={styles.copyBtn}
-                  onPress={() => { copyText(DEV.upiId); notify('UPI ID copied'); }}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons name="copy-outline" size={15} color="#64748b" />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {copied !== '' && <Text style={styles.copiedNote}>{copied}</Text>}
-
-            {/* Actions */}
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.payNowBtn} onPress={handlePayUp} activeOpacity={0.85}>
-                <Ionicons name="wallet" size={17} color="#0a241f" />
-                <Text style={styles.payNowText}>Pay via UPI</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.doneBtn}
-                onPress={() => setShowPay(false)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.doneBtnText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 }
@@ -492,14 +261,9 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   contentRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'flex-start',
-    gap: 14,
     width: '100%',
   },
   detailCol: { flex: 1, minWidth: 300 },
-  payCol: { width: 320, minWidth: 280, flexShrink: 0 },
   appCard: {
     flexDirection: 'row',
     backgroundColor: COLORS.cardBgSolid,
@@ -566,7 +330,6 @@ const styles = StyleSheet.create({
     width: 30, height: 30, borderRadius: 9, alignItems: 'center', justifyContent: 'center',
   },
   mobileText: { color: COLORS.textLight, fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 14, flex: 1 },
-  copyHint: { color: COLORS.textDim, fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 10.5 },
   payMethodBox: {
     backgroundColor: 'rgba(45,212,191,0.06)',
     borderRadius: 12, padding: 10,
@@ -583,55 +346,11 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 1, borderColor: COLORS.cardBorder,
   },
-  optionalRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 8 },
-  optionalText: { color: COLORS.textMuted, fontFamily: 'Poppins_600SemiBold', fontWeight: '600', fontSize: 10.5, textAlign: 'center' },
 
   payDesc: {
     color: COLORS.textMuted, fontFamily: 'Poppins_400Regular', fontWeight: '400',
     fontSize: 12.5, lineHeight: 18, marginBottom: 14,
   },
-  payBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    backgroundColor: '#2dd4bf',
-    borderRadius: 12, paddingVertical: 13,
-    shadowColor: '#14b8a6', shadowOpacity: 0.4, shadowOffset: { width: 0, height: 5 }, shadowRadius: 12, elevation: 6,
-  },
-  payBtnText: { color: '#0a241f', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 14.5 },
-  payHint: { color: COLORS.textDim, fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 10.5, textAlign: 'center', marginTop: 8 },
-
-  payDonateRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
-  payOption: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 11, paddingVertical: 11,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
-  },
-  payOptionActive: { backgroundColor: '#2dd4bf', borderColor: '#2dd4bf' },
-  payOptionText: { color: '#0a241f', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 13.5 },
-
-  detailLabel: {
-    fontFamily: 'Poppins_700Bold', fontWeight: '700',
-    color: COLORS.textDim, fontSize: 9.5, letterSpacing: 1.5,
-    marginBottom: 8,
-  },
-  detailRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 9, paddingHorizontal: 10, paddingVertical: 8,
-    marginBottom: 7, borderWidth: 1, borderColor: COLORS.cardBorder,
-  },
-  detailKey: { color: COLORS.textMuted, fontFamily: 'Poppins_600SemiBold', fontWeight: '600', fontSize: 11 },
-  detailValue: { color: '#fff', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 12, flex: 1 },
-
-  valueText: { color: COLORS.textMuted, fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 11.5, lineHeight: 16, flex: 1 },
-  valueStrong: { color: COLORS.textLight, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
-  freeBtn: {
-    alignItems: 'center', justifyContent: 'center',
-    paddingVertical: 9, marginTop: 6,
-  },
-  freeBtnText: { color: COLORS.textDim, fontFamily: 'Poppins_600SemiBold', fontWeight: '600', fontSize: 11.5, textDecorationLine: 'underline' },
-  thanksBox: { alignItems: 'center', paddingVertical: 8, gap: 6 },
-  thanksTitle: { color: COLORS.green, fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 16, marginTop: 2 },
 
   techRow: {
     flexDirection: 'row', alignItems: 'center', gap: 11,
@@ -645,74 +364,4 @@ const styles = StyleSheet.create({
   techInfo: { flex: 1 },
   techTitle: { color: '#fff', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 13 },
   techSub: { color: COLORS.textMuted, fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 11, marginTop: 1 },
-
-  overlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.25)', alignItems: 'center', justifyContent: 'center', padding: 20 },
-  modalCard: {
-    width: '100%', maxWidth: 400,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    borderWidth: 1, borderColor: '#e2e8f0',
-    padding: 20,
-    shadowColor: '#0f172a',
-    shadowOpacity: 0.18,
-    shadowOffset: { width: 0, height: 12 },
-    shadowRadius: 30,
-    elevation: 12,
-  },
-  modalHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  modalHeaderIcon: {
-    width: 34, height: 34, borderRadius: 10,
-    backgroundColor: '#fb7185', alignItems: 'center', justifyContent: 'center', marginRight: 10,
-  },
-  modalTitle: { color: '#0f172a', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 15, flex: 1 },
-  modalClose: {
-    width: 30, height: 30, borderRadius: 15,
-    backgroundColor: '#f1f5f9', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: '#e2e8f0',
-  },
-
-  qrArea: { alignItems: 'center', marginBottom: 14 },
-  qrLabel: {
-    fontFamily: 'Poppins_700Bold', fontWeight: '700',
-    color: '#64748b', fontSize: 9.5, letterSpacing: 1.8, marginBottom: 8,
-  },
-  qrBox: {
-    width: 150, height: 150, borderRadius: 14,
-    backgroundColor: '#f8fafc',
-    alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: '#e2e8f0',
-    padding: 8,
-  },
-  qrPlaceholder: { alignItems: 'center' },
-  qrPhText: { color: '#64748b', fontFamily: 'Poppins_600SemiBold', fontWeight: '600', fontSize: 11, marginTop: 6 },
-  qrNote: { color: '#475569', fontFamily: 'Poppins_400Regular', fontWeight: '400', fontSize: 11, marginTop: 8, textAlign: 'center' },
-
-  payRows: { gap: 8 },
-  payRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: '#f8fafc',
-    borderRadius: 10, paddingHorizontal: 11, paddingVertical: 9,
-    borderWidth: 1, borderColor: '#e2e8f0',
-  },
-  payRowLabel: { color: '#64748b', fontFamily: 'Poppins_600SemiBold', fontWeight: '600', fontSize: 12 },
-  payRowValue: { color: '#0f172a', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 13, flex: 1 },
-  copyBtn: {
-    width: 28, height: 28, borderRadius: 8,
-    backgroundColor: '#eef2f7', alignItems: 'center', justifyContent: 'center',
-  },
-  copiedNote: { color: '#0d9488', fontFamily: 'Poppins_600SemiBold', fontWeight: '600', fontSize: 11.5, textAlign: 'center', marginTop: 10 },
-
-  modalActions: { flexDirection: 'row', gap: 8, marginTop: 16 },
-  payNowBtn: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7,
-    backgroundColor: '#14b8a6', borderRadius: 11, paddingVertical: 12,
-    shadowColor: '#14b8a6', shadowOpacity: 0.4, shadowOffset: { width: 0, height: 5 }, shadowRadius: 12, elevation: 5,
-  },
-  payNowText: { color: '#ffffff', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 13.5 },
-  doneBtn: {
-    flex: 1, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: '#f1f5f9', borderRadius: 11, paddingVertical: 12,
-    borderWidth: 1.5, borderColor: '#e2e8f0',
-  },
-  doneBtnText: { color: '#0f172a', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 13 },
 });

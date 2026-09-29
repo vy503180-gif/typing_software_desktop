@@ -41,7 +41,7 @@ function createWindow() {
     resizable: true,
     icon: iconPath,
     title: "Antriksh Typing Master",
-    autoHideMenuBar: false,
+    autoHideMenuBar: true,
     backgroundColor: "#0a0a0a",
     webPreferences: {
       contextIsolation: true,
@@ -49,33 +49,13 @@ function createWindow() {
     },
   });
 
-  // Custom menu bar with app name
-  const menuTemplate = [
-    {
-      label: "Antriksh Typing Master",
-      submenu: [
-        { label: "About Antriksh Typing Master", role: "about" },
-        { type: "separator" },
-        { label: "Quit", accelerator: "CmdOrCtrl+Q", click: () => app.quit() },
-      ],
-    },
-    {
-      label: "View",
-      submenu: [
-        { label: "Reload", accelerator: "CmdOrCtrl+R", click: () => win.reload() },
-        { label: "Toggle Developer Tools", accelerator: "F12", click: () => win.webContents.toggleDevTools() },
-        { type: "separator" },
-        { label: "Actual Size", accelerator: "CmdOrCtrl+0", click: () => win.webContents.setZoomLevel(0) },
-        { label: "Zoom In", accelerator: "CmdOrCtrl+=", click: () => win.webContents.setZoomLevel(win.webContents.getZoomLevel() + 0.5) },
-        { label: "Zoom Out", accelerator: "CmdOrCtrl+-", click: () => win.webContents.setZoomLevel(win.webContents.getZoomLevel() - 0.5) },
-        { type: "separator" },
-        { label: "Toggle Full Screen", accelerator: "F11", click: () => win.setFullScreen(!win.isFullScreen()) },
-      ],
-    },
-  ];
-
-  const menu = Menu.buildFromTemplate(menuTemplate);
-  Menu.setApplicationMenu(menu);
+  // Remove the default menu bar entirely
+  Menu.setApplicationMenu(null);
+  try {
+    win.removeMenu();
+  } catch (e) {
+    // removeMenu is unavailable on older Electron versions
+  }
 
   // Set window icon
   try {

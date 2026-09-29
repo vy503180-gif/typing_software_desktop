@@ -66,7 +66,7 @@ const DEFAULT_SETTINGS = {
   nextKeyHighlight: true,
   fontSize: 22,
   practiceTimeSec: 300,
-  hindiLayout: 'mangal',
+  hindiLayout: 'krutidev',
   theme: 'white',
 };
 
@@ -83,6 +83,7 @@ export default function App() {
   });
   const fontsReady = fontsLoaded || !!fontError;
   const [tab, setTab] = useState('Home');
+  const [selectedLang, setSelectedLang] = useState('english');
   const [studentName, setStudentName] = useState('');
   const [unlockedLessons, setUnlockedLessons] = useState(DEFAULT_UNLOCKED);
   const [users, setUsers] = useState([]);
@@ -374,8 +375,10 @@ export default function App() {
             studentName={studentName}
             unlockedLessons={unlockedLessons}
             onStartLesson={startLesson}
-            hindiLayout={settings.hindiLayout || 'mangal'}
+            hindiLayout={settings.hindiLayout || 'krutidev'}
             onChangeHindiLayout={changeHindiLayout}
+            selectedLang={selectedLang}
+            onSelectLang={setSelectedLang}
             onBack={() => setTab('Home')}
           />
         );
@@ -387,7 +390,7 @@ export default function App() {
             onComplete={handleTypingComplete}
             onNextLesson={handleNextLesson}
             studentName={studentName}
-            hindiLayout={settings.hindiLayout || 'mangal'}
+            hindiLayout={settings.hindiLayout || 'krutidev'}
             onBack={closeTyping}
           />
         );
@@ -545,7 +548,7 @@ export default function App() {
             onChangeSetting={setSetting}
             practiceTimeSec={settings.practiceTimeSec || 300}
             onChangePracticeTime={changePracticeTime}
-            hindiLayout={settings.hindiLayout || 'mangal'}
+            hindiLayout={settings.hindiLayout || 'krutidev'}
             onChangeHindiLayout={changeHindiLayout}
             onSwitchUser={() => setShowNameEntry(true)}
             onBack={() => setTab('Home')}

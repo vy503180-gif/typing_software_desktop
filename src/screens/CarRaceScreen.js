@@ -11,12 +11,19 @@ const RACE_TARGET = 100;
 const CHAR_STEP = 100 / 140;
 const WORD_BONUS = 2;
 const MISTAKE_PENALTY = 1.5;
-const RIVAL_PER_TICK = 1.75 / 10;
 const TICK_MS = 100;
 const ACCENT = '#fb923c';
 const RIVAL_COLOR = COLORS.rose;
 const ANCHOR_PX = 110;
 const CHAR_WHITE = Platform.OS === 'web' ? 'inherit' : '#ffffff';
+
+const SPEED_LEVELS = [
+  { id: 'cruise', label: 'Cruise', hi: 'आराम से', icon: 'leaf', rivalPerTick: 0.12, needWpm: 11, color: COLORS.green },
+  { id: 'rush', label: 'Rush', hi: 'रफ़्तार', icon: 'car-sport', rivalPerTick: 1.75 / 10, needWpm: 18, color: COLORS.amber },
+  { id: 'nitro', label: 'Nitro', hi: 'तेज़', icon: 'flash', rivalPerTick: 0.26, needWpm: 26, color: COLORS.indigo },
+  { id: 'blaze', label: 'Blaze', hi: 'ज़बरदस्त', icon: 'flame', rivalPerTick: 0.34, needWpm: 34, color: COLORS.rose },
+];
+const DEFAULT_SPEED = 'rush';
 
 const buildText = () => {
   let t = paragraphText('easy').replace(/\s+/g, ' ').trim();
@@ -30,6 +37,10 @@ export default function CarRaceScreen({ onBack }) {
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [won, setWon] = useState(false);
+  const [speedId, setSpeedId] = useState(DEFAULT_SPEED);
+  const speed = SPEED_LEVELS.find((s) => s.id === speedId) || SPEED_LEVELS[1];
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
 
   const gameRef = useRef({
     text: '',
@@ -85,9 +96,10 @@ export default function CarRaceScreen({ onBack }) {
 
   useEffect(() => {
     if (!started || finished) return;
+    const perTick = speedRef.current.rivalPerTick;
     const id = setInterval(() => {
       const g = gameRef.current;
-      g.rival = Math.min(RACE_TARGET, g.rival + RIVAL_PER_TICK);
+      g.rival = Math.min(RACE_TARGET, g.rival + perTick);
       if (g.rival >= RACE_TARGET) {
         clearInterval(id);
         forceRender();
@@ -220,6 +232,12 @@ export default function CarRaceScreen({ onBack }) {
               <Ionicons name={won ? 'trophy' : 'car-sport'} size={46} color={won ? COLORS.green : COLORS.rose} />
             </View>
             <Text style={styles.doneTitle}>{won ? 'You Won the Race!' : 'Rival Won the Race!'}</Text>
+            <View style={[styles.doneLevel, { borderColor: speed.color + '66', backgroundColor: speed.color + '1f' }]}>
+              <Ionicons name={speed.icon} size={13} color={speed.color} />
+              <Text style={[styles.doneLevelText, { color: speed.color }]}>
+                {speed.label} · {speed.hi}
+              </Text>
+            </View>
             <Text style={styles.doneSub}>
               {won
                 ? `You crossed the finish line first — ${g.wordsDone} words typed.`
@@ -272,15 +290,48 @@ export default function CarRaceScreen({ onBack }) {
               Ek line me paragraph scroll hota rahega.{'\n'}
               Sahi type karte raho — aapki car speed pakdegi. Galti = car peeche!
             </Text>
+
+            <Text style={styles.speedLabel}>RIVAL SPEED</Text>
+            <View style={styles.speedRow}>
+              {SPEED_LEVELS.map((s) => {
+                const on = s.id === speedId;
+                return (
+                  <TouchableOpacity
+                    key={s.id}
+                    style={[
+                      styles.speedCard,
+                      on && { backgroundColor: s.color + '26', borderColor: s.color },
+                    ]}
+                    onPress={() => setSpeedId(s.id)}
+                    activeOpacity={0.75}
+                  >
+                    <View style={[styles.speedCheck, on && { backgroundColor: s.color, borderColor: s.color }]}>
+                      {on && <Ionicons name="checkmark" size={12} color="#0a0e1a" />}
+                    </View>
+                    <Ionicons
+                      name={s.icon}
+                      size={20}
+                      color={on ? s.color : COLORS.textDim}
+                    />
+                    <Text style={[styles.speedName, on && { color: s.color }]}>{s.label}</Text>
+                    <Text style={styles.speedHi}>{s.hi}</Text>
+                    <Text style={[styles.speedWpm, on && { color: s.color }]}>
+                      ~{s.needWpm} WPM
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
             <TouchableOpacity style={styles.readyBtn} onPress={startRace} activeOpacity={0.85}>
               <Ionicons name="flag" size={17} color="#fff" />
-              <Text style={styles.readyBtnText}>Start Race</Text>
+              <Text style={styles.readyBtnText}>Start {speed.label} Race</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <>
             {renderLane('YOU', g.player, ACCENT)}
-            {renderLane('RIVAL', g.rival, RIVAL_COLOR)}
+            {renderLane(`RIVAL · ${speed.label.toUpperCase()}`, g.rival, RIVAL_COLOR)}
 
             <View style={styles.statsRow}>
               <View style={styles.statBox}>
@@ -441,6 +492,47 @@ const styles = StyleSheet.create({
     shadowColor: ACCENT, shadowOpacity: 0.45, shadowOffset: { width: 0, height: 6 }, shadowRadius: 16, elevation: 8,
   },
   readyBtnText: { color: '#fff', fontSize: scaleFont(15), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+
+  speedLabel: {
+    color: COLORS.textMuted, fontSize: scaleFont(10.5), fontFamily: 'Poppins_700Bold',
+    fontWeight: '700', letterSpacing: 1.2, marginBottom: scaleSize(10),
+  },
+  speedRow: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(8),
+    marginBottom: scaleSize(24), maxWidth: scaleSize(520), width: '100%',
+  },
+  speedCard: {
+    flexBasis: '22%', flexGrow: 1, minWidth: scaleSize(104),
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    borderRadius: scaleSize(14), paddingVertical: scaleSize(18), paddingHorizontal: scaleSize(6),
+    position: 'relative',
+  },
+  speedCheck: {
+    position: 'absolute', top: scaleSize(6), right: scaleSize(6),
+    width: scaleSize(18), height: scaleSize(18), borderRadius: scaleSize(5),
+    borderWidth: 1.5, borderColor: COLORS.cardBorderStrong,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  speedName: {
+    color: COLORS.textLight, fontSize: scaleFont(12.5), fontFamily: 'Poppins_700Bold',
+    fontWeight: '700', marginTop: scaleSize(6),
+  },
+  speedHi: { color: COLORS.textDim, fontSize: scaleFont(9.5), fontFamily: 'Poppins_600SemiBold', fontWeight: '600', marginTop: 1 },
+  speedWpm: {
+    color: COLORS.textMuted, fontSize: scaleFont(9.5), fontFamily: 'Poppins_700Bold',
+    fontWeight: '700', marginTop: scaleSize(5),
+  },
+
+  doneLevel: {
+    flexDirection: 'row', alignItems: 'center', gap: scaleSize(5),
+    borderWidth: 1, borderRadius: scaleSize(11),
+    paddingVertical: scaleSize(3), paddingHorizontal: scaleSize(10),
+    marginTop: scaleSize(8),
+  },
+  doneLevelText: { fontSize: scaleFont(10.5), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   doneCard: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: scaleSize(40) },
   doneIcon: {
