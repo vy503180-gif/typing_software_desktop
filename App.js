@@ -86,6 +86,7 @@ export default function App() {
   const [selectedLang, setSelectedLang] = useState('english');
   const [studentName, setStudentName] = useState('');
   const [unlockedLessons, setUnlockedLessons] = useState(DEFAULT_UNLOCKED);
+  const [completedLessons, setCompletedLessons] = useState({ english: [], hindi: [] });
   const [users, setUsers] = useState([]);
   const [showNameEntry, setShowNameEntry] = useState(true);
   const [loaded, setLoaded] = useState(false);
@@ -343,13 +344,24 @@ export default function App() {
     if (typingConfig && typingConfig.courseSubId) {
       completeCourseSubLesson(typingConfig.courseSubId);
     } else {
+      setCompletedLessons((prev) => {
+        const current = prev[lang] || [];
+        if (!current.includes(lessonId)) {
+          const next = { ...prev, [lang]: [...current, lessonId] };
+          AsyncStorage.setItem(`antriksh_completed_lessons`, JSON.stringify(next)).catch(() => {});
+          return next;
+        }
+        return prev;
+      });
       unlockNextLesson(lang, lessonId);
     }
   };
 
   const closeTyping = () => {
     loadBestWpm(studentName);
-    const returnTo = launchTab === 'Type' ? 'Home' : launchTab;
+    const wasLesson = typingConfig && typingConfig.type === 'lesson';
+    const lessonDone = wasLesson && completedLessons[typingConfig.lang]?.includes(typingConfig.id);
+    const returnTo = wasLesson && !lessonDone ? 'Lessons' : (launchTab === 'Type' ? 'Home' : launchTab);
     setTypingConfig(null);
     setTab(returnTo);
   };
@@ -374,6 +386,7 @@ export default function App() {
           <LessonsScreen
             studentName={studentName}
             unlockedLessons={unlockedLessons}
+            completedLessons={completedLessons}
             onStartLesson={startLesson}
             hindiLayout={settings.hindiLayout || 'krutidev'}
             onChangeHindiLayout={changeHindiLayout}

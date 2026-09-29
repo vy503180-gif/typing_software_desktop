@@ -137,6 +137,7 @@ export default function LessonsScreen({
   onBack,
   studentName = '',
   unlockedLessons = { english: [1], hindi: [1] },
+  completedLessons = { english: [], hindi: [] },
   hindiLayout = 'krutidev',
   onChangeHindiLayout,
   selectedLang = 'english',
@@ -274,6 +275,7 @@ export default function LessonsScreen({
           {/* Lesson cards */}
           {catLessons.map((lesson) => {
             const locked = false;
+            const isCompleted = (completedLessons[selectedLang] || []).includes(lesson.id);
             const diffColor = getDifficultyColor(LESSON_DIFFICULTY[lesson.id]);
             const st = statsForLesson(lesson.title);
             return (
@@ -285,11 +287,11 @@ export default function LessonsScreen({
                 disabled={locked}
               >
                 <View style={styles.lessonLeft}>
-                  <View style={[styles.lessonIcon, { backgroundColor: locked ? 'rgba(255,255,255,0.06)' : diffColor + '22' }]}>
-                    <Ionicons name={locked ? 'lock-closed' : 'keypad'} size={20} color={locked ? COLORS.textDim : diffColor} />
+                  <View style={[styles.lessonIcon, { backgroundColor: locked ? 'rgba(255,255,255,0.06)' : isCompleted ? COLORS.green + '22' : diffColor + '22' }]}>
+                    <Ionicons name={locked ? 'lock-closed' : isCompleted ? 'checkmark-circle' : 'keypad'} size={20} color={locked ? COLORS.textDim : isCompleted ? COLORS.green : diffColor} />
                   </View>
                   <View style={styles.lessonInfo}>
-                    <Text style={[styles.lessonNum, { color: diffColor }]}>LESSON {lesson.id}</Text>
+                    <Text style={[styles.lessonNum, { color: isCompleted ? COLORS.green : diffColor }]}>LESSON {lesson.id}</Text>
                     <Text style={[styles.lessonTitle, locked && { color: COLORS.textDim }]}>{lesson.title}</Text>
                     <Text style={styles.lessonDesc}>{lesson.desc}</Text>
                     <View style={styles.badgeRow}>
@@ -301,6 +303,12 @@ export default function LessonsScreen({
                         <Ionicons name="speedometer" size={10} color={diffColor} />
                         <Text style={[styles.badgeText, { color: diffColor }]}>{LESSON_DIFFICULTY[lesson.id]}</Text>
                       </View>
+                      {isCompleted && (
+                        <View style={[styles.badge, { backgroundColor: COLORS.green + '18' }]}>
+                          <Ionicons name="checkmark-circle" size={10} color={COLORS.green} />
+                          <Text style={[styles.badgeText, { color: COLORS.green }]}>Complete</Text>
+                        </View>
+                      )}
                       {st.done && (
                         <>
                           <View style={[styles.badge, { backgroundColor: COLORS.green + '18' }]}>
@@ -319,6 +327,13 @@ export default function LessonsScreen({
                 <View style={styles.lessonRight}>
                   {locked ? (
                     <Ionicons name="lock-closed" size={18} color={COLORS.textDim} />
+                  ) : isCompleted ? (
+                    <View
+                      style={[styles.startBtn, { backgroundColor: COLORS.green + '22', borderColor: COLORS.green + '66' }]}
+                    >
+                      <Text style={[styles.startBtnText, { color: COLORS.green }]}>Practice Again</Text>
+                      <Ionicons name="refresh" size={13} color={COLORS.green} />
+                    </View>
                   ) : (
                     <View
                       style={[styles.startBtn, { backgroundColor: diffColor + '22', borderColor: diffColor + '66' }]}
