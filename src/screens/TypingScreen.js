@@ -1043,7 +1043,7 @@ const renderTextArea = () => {
               <View>
                 <Text style={styles.title}>{config.title || (isTest ? 'Typing Test' : isGame ? 'Typing Game' : 'Typing Practice')}</Text>
                 <Text style={styles.subtitle}>
-                  {config.difficulty ? `${config.difficulty} â€¢ ` : ''}
+                  {config.difficulty ? `${config.difficulty} \u2022 ` : ''}
                   {duration ? `${Math.round(duration / 60)} min â€¢ ` : ''}
                   {mode ? mode : ''}
                 </Text>

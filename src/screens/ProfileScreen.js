@@ -211,7 +211,7 @@ export default function ProfileScreen({ studentName = '', onBack, onSwitchUser, 
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.recentTitle} numberOfLines={1}>{r.lesson || 'Practice Session'}</Text>
-                    <Text style={styles.recentDate}>{r.date} â€¢ {r.time}</Text>
+                    <Text style={styles.recentDate}>{r.date} \u2022 {r.time}</Text>
                   </View>
                   <Text style={styles.recentWpm}>{r.wpm || 0} WPM</Text>
                   <Text style={[styles.recentAcc, { color: COLORS.green }]}>{r.accuracy || 0}%</Text>
