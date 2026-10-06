@@ -297,7 +297,7 @@ const s = StyleSheet.create({
     backgroundColor: '#0e0e0e',
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#3f516c',
+    borderColor: '#7dd3fc',
     paddingHorizontal: 14,
     paddingVertical: 14,
     fontFamily: 'Poppins_600SemiBold',
@@ -368,16 +368,16 @@ const s = StyleSheet.create({
   simpleItem: {
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: '#111',
+    backgroundColor: '#f3f4f6',
     borderRadius: 8,
   },
   simpleItemBorder: {
     marginTop: 4,
   },
   simpleItemText: {
-    fontFamily: 'Poppins_500Medium',
-    fontWeight: '500',
-    color: '#bbb',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    color: '#000',
     fontSize: 12,
   },
 
@@ -472,7 +472,7 @@ const s = StyleSheet.create({
     backgroundColor: '#111',
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#3f516c',
+    borderColor: '#7dd3fc',
     paddingHorizontal: 14,
     gap: 10,
   },

@@ -13,6 +13,7 @@ const MAIN_NAV = [
   { key: 'Home', label: 'Home', icon: 'home', iconOutline: 'home-outline' },
   { key: 'Practice', label: 'Typing Practice', icon: 'keypad', iconOutline: 'keypad-outline' },
   { key: 'Lessons', label: 'Lessons', icon: 'book', iconOutline: 'book-outline' },
+  { key: 'Course', label: 'Professional Course', icon: 'school', iconOutline: 'school-outline' },
   { key: 'Tests', label: 'Tests', icon: 'timer', iconOutline: 'timer-outline' },
   { key: 'Games', label: 'Typing Games', icon: 'game-controller', iconOutline: 'game-controller-outline' },
 ];
@@ -171,7 +172,7 @@ export function Header({ studentName, bestWpm, onNavigate, onSwitchUser }) {
     <View style={styles.header} ref={wrapRef}>
       <View style={styles.headerBrand}>
         <Text style={styles.headerTitle}>Typing Master</Text>
-        <Text style={styles.headerTagline}>Type Better â€¢ Faster â€¢ Smarter</Text>
+        <Text style={styles.headerTagline}>Type Better | Faster | Smarter</Text>
       </View>
 
       <View style={styles.headerActions}>

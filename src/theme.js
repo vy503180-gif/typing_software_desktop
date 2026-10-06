@@ -61,6 +61,8 @@ export const COLORS = {
   purple: '#f97316',
   red: '#ef4444',
   indigo: '#fb923c',
+  backButtonBg: 'rgba(14,148,136,0.18)',
+  backButtonBorder: 'rgba(45,212,191,0.45)',
 
   // Text
   textWhite: '#ffffff',

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, LogBox, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, LogBox, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -37,6 +37,7 @@ import DeveloperScreen from './src/screens/DeveloperScreen';
 import { LESSON_ORDER, getNextLesson } from './src/data/lessons';
 import { BG, BG_DEEP, COLORS } from './src/theme';
 import { applyLightTheme } from './src/lightTheme';
+import { getPathForTab, getTabFromPath, isKnownPath } from './src/utils/webRoutes';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import {
   NotoSansDevanagari_400Regular,
@@ -53,17 +54,30 @@ const STORAGE_KEYS = {
   settings: 'antriksh_settings',
 };
 
-const unlockedKeyFor = () => `antriksh_unlocked_lessons`;
+const unlockedKeyFor = (name) => `antriksh_unlocked_lessons_${name}`;
 const courseProgressKeyFor = () => `antriksh_course_progress`;
 const historyKeyFor = () => `antriksh_typing_history`;
+const completedLessonsKeyFor = (name) => `antriksh_completed_lessons_${name}`;
 
 const DEFAULT_UNLOCKED = { english: [1], hindi: [1] };
 
+const getSequentialLessonProgress = (completedByLanguage = {}) => {
+  const completed = {};
+  const unlocked = {};
+
+  ['english', 'hindi'].forEach((lang) => {
+    const saved = new Set(Array.isArray(completedByLanguage[lang]) ? completedByLanguage[lang] : []);
+    let lastCompleted = 0;
+    while (lastCompleted < LESSON_ORDER.length && saved.has(lastCompleted + 1)) lastCompleted++;
+    completed[lang] = LESSON_ORDER.slice(0, lastCompleted);
+    unlocked[lang] = LESSON_ORDER.slice(0, Math.min(lastCompleted + 1, LESSON_ORDER.length));
+  });
+
+  return { completed, unlocked };
+};
+
 const DEFAULT_SETTINGS = {
   keyboardSound: true,
-  virtualKeyboard: true,
-  fingerGuide: false,
-  nextKeyHighlight: true,
   fontSize: 22,
   practiceTimeSec: 300,
   hindiLayout: 'krutidev',
@@ -82,7 +96,10 @@ export default function App() {
     NotoSansDevanagari_700Bold,
   });
   const fontsReady = fontsLoaded || !!fontError;
-  const [tab, setTab] = useState('Home');
+  const initialPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+  const initialRouteTab = getTabFromPath(initialPath);
+  const initialTab = initialRouteTab === 'LessonDetail' ? 'Course' : initialRouteTab;
+  const [tab, setTabState] = useState(() => initialTab);
   const [selectedLang, setSelectedLang] = useState('english');
   const [studentName, setStudentName] = useState('');
   const [unlockedLessons, setUnlockedLessons] = useState(DEFAULT_UNLOCKED);
@@ -90,7 +107,11 @@ export default function App() {
   const [users, setUsers] = useState([]);
   const [showNameEntry, setShowNameEntry] = useState(true);
   const [loaded, setLoaded] = useState(false);
-  const [typingConfig, setTypingConfig] = useState(null);
+  const [typingConfig, setTypingConfig] = useState(() => (
+    initialRouteTab === 'Type'
+      ? { type: 'practice', lang: 'english', title: 'Typing Practice', timeSec: 300, difficulty: 'Easy', mode: 'paragraph' }
+      : null
+  ));
   const [course, setCourse] = useState(null);
   const [lesson, setLesson] = useState(null);
   const [certTarget, setCertTarget] = useState(null);
@@ -103,6 +124,36 @@ export default function App() {
   const [bestWpm, setBestWpm] = useState(0);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
 
+  const setTab = useCallback((nextTab) => {
+    setTabState(nextTab);
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+    const nextPath = getPathForTab(nextTab);
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({ tab: nextTab }, '', nextPath);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof window === 'undefined') return undefined;
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (!isKnownPath(path)) {
+        window.history.replaceState({}, '', '/');
+        setTabState('Home');
+        return;
+      }
+      setTabState(getTabFromPath(path));
+    };
+
+    if (!isKnownPath(window.location.pathname)) {
+      window.history.replaceState({}, '', '/');
+    } else if (initialRouteTab !== initialTab) {
+      window.history.replaceState({ tab: initialTab }, '', getPathForTab(initialTab));
+    }
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   useEffect(() => {
     const sub = Dimensions.addEventListener('change', ({ window }) => {
       setDimensions(window);
@@ -111,7 +162,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // Project ka fixed background #D5EEF2 hai â€” sirf light theme.
+    // Project ka fixed background #D5EEF2 hai - sirf light theme.
     applyLightTheme();
   }, []);
 
@@ -129,16 +180,24 @@ export default function App() {
       .catch(() => {});
   };
 
+  const loadLessonProgress = async (name) => {
+    let raw = await AsyncStorage.getItem(completedLessonsKeyFor(name));
+
+    let saved = {};
+    try { saved = raw ? JSON.parse(raw) : {}; } catch {}
+    const progress = getSequentialLessonProgress(saved);
+    setCompletedLessons(progress.completed);
+    setUnlockedLessons(progress.unlocked);
+    await AsyncStorage.setItem(unlockedKeyFor(name), JSON.stringify(progress.unlocked));
+  };
+
   useEffect(() => {
     (async () => {
       try {
         const savedName = await AsyncStorage.getItem(STORAGE_KEYS.name);
         if (savedName) {
           setStudentName(savedName);
-          const savedUnlocked = await AsyncStorage.getItem(unlockedKeyFor(savedName));
-          if (savedUnlocked) {
-            try { setUnlockedLessons(JSON.parse(savedUnlocked)); } catch {}
-          }
+          await loadLessonProgress(savedName);
           const savedCourseProgress = await AsyncStorage.getItem(courseProgressKeyFor(savedName));
           if (savedCourseProgress) {
             try { setCompletedSubLessons(JSON.parse(savedCourseProgress)); } catch {}
@@ -185,13 +244,10 @@ export default function App() {
     if (!safe) return;
     setStudentName(safe);
     setShowNameEntry(false);
-    AsyncStorage.getItem(unlockedKeyFor(safe))
-      .then((raw) => {
-        if (raw) {
-          try { setUnlockedLessons(JSON.parse(raw)); } catch { setUnlockedLessons(DEFAULT_UNLOCKED); }
-        } else { setUnlockedLessons(DEFAULT_UNLOCKED); }
-      })
-      .catch(() => setUnlockedLessons(DEFAULT_UNLOCKED));
+    loadLessonProgress(safe).catch(() => {
+      setCompletedLessons({ english: [], hindi: [] });
+      setUnlockedLessons(DEFAULT_UNLOCKED);
+    });
     AsyncStorage.getItem(courseProgressKeyFor(safe))
       .then((raw) => {
         if (raw) {
@@ -263,7 +319,7 @@ export default function App() {
     setTab('Type');
   };
 
-  const startLesson = (lang, lessonId, title, timeSec) => {
+  const startLesson = (lang, lessonId, title, timeSec, autoAdvance = true) => {
     setTypingConfig({
       type: 'lesson',
       lang,
@@ -271,6 +327,7 @@ export default function App() {
       title,
       timeSec,
       nextLesson: getNextLesson(lang, lessonId),
+      autoAdvance,
     });
     setLaunchTab('Lessons');
     setTab('Type');
@@ -297,6 +354,7 @@ export default function App() {
         title: nextLessonData.title,
         timeSec: nextLessonData.timeSec,
         nextLesson: getNextLesson(lang, nextLessonData.id),
+        autoAdvance: true,
       });
       setLaunchTab('Lessons');
     }
@@ -335,12 +393,15 @@ export default function App() {
         return;
       }
     }
+
+    // Keep the current typing result visible for course exercises instead of immediately
+    // closing the screen. The user can exit manually to return to LessonDetail.
     setLaunchTab('LessonDetail');
-    setTypingConfig(null);
-    setTab('LessonDetail');
+    setTypingConfig((prev) => prev && prev.courseSubId ? prev : null);
   };
 
   const handleTypingComplete = (lang, lessonId) => {
+    if (typingConfig?.type !== 'lesson' || typingConfig.id !== lessonId || typingConfig.lang !== lang) return;
     if (typingConfig && typingConfig.courseSubId) {
       completeCourseSubLesson(typingConfig.courseSubId);
     } else {
@@ -348,12 +409,26 @@ export default function App() {
         const current = prev[lang] || [];
         if (!current.includes(lessonId)) {
           const next = { ...prev, [lang]: [...current, lessonId] };
-          AsyncStorage.setItem(`antriksh_completed_lessons`, JSON.stringify(next)).catch(() => {});
+          AsyncStorage.setItem(completedLessonsKeyFor(studentName), JSON.stringify(next)).catch(() => {});
           return next;
         }
         return prev;
       });
       unlockNextLesson(lang, lessonId);
+      const nextLesson = typingConfig?.autoAdvance ? getNextLesson(lang, lessonId) : null;
+      if (nextLesson) {
+        setTypingConfig({
+          type: 'lesson',
+          lang,
+          id: nextLesson.id,
+          title: nextLesson.title,
+          timeSec: nextLesson.timeSec,
+          nextLesson: getNextLesson(lang, nextLesson.id),
+          autoAdvance: true,
+        });
+        setLaunchTab('Lessons');
+        setTab('Type');
+      }
     }
   };
 

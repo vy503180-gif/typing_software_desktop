@@ -110,7 +110,7 @@ export default function DeveloperScreen({ onBack }) {
           {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+              <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
             </TouchableOpacity>
             <View style={styles.headerTextWrap}>
               <Text style={styles.title}>Developer</Text>
@@ -243,8 +243,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: 12,
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   headerTextWrap: { flex: 1 },
   title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },

@@ -183,7 +183,16 @@ function injectOverrides() {
   }
   const css = Array.from(hits.entries())
     .map(([sel, entry]) => `${sel} { ${entry.s || ''} ${entry.t || ''} }`)
-    .join('\n');
+    .join('\n') + `
+html, body, html *, body * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar, html *::-webkit-scrollbar, body *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}`;
   styleTag.id = 'antriksh-light-overrides';
   styleTag.textContent = css;
   if (!document.head.contains(styleTag)) document.head.appendChild(styleTag);

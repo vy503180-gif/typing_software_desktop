@@ -10,9 +10,15 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
+import { COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
+const COURSE_COLORS = {
+  teal: '#0f766e',
+  amber: '#a16207',
+  green: '#15803d',
+  rose: '#be123c',
+};
 
 const COURSES = [
   {
@@ -21,8 +27,8 @@ const COURSES = [
     totalDuration: '2:00 h',
     lessons: [
       {
-        id: 1, title: 'Focus on the home row', color: COLORS.teal,
-        bgColor: COLORS.cardBgSolid, borderColor: COLORS.teal + '50',
+        id: 1, title: 'Focus on the home row', color: COURSE_COLORS.teal,
+        bgColor: '#ffffff', borderColor: '#b7cbd3',
         subLessons: [
           { id: '1.1', title: 'Speed building course description', duration: null, text: 'welcome to the speed building course this course will help you type faster and more accurately practice every day for best results' },
           { id: '1.2', title: 'Review the home row', duration: '3 min', text: 'asdf jkl; asdf jkl; asdf jkl; fdsa ;lkj fdsa ;lkj fdsa ;lkj asdf jkl; asdf jkl; fdsa ;lkj fdsa ;lkj asdf jkl; asdf jkl; fdsa ;lkj fdsa ;lkj' },
@@ -33,8 +39,8 @@ const COURSES = [
         ],
       },
       {
-        id: 2, title: 'Focus on the index finger keys', color: COLORS.amber,
-        bgColor: COLORS.cardBgSolid, borderColor: COLORS.amber + '50',
+        id: 2, title: 'Focus on the index finger keys', color: COURSE_COLORS.amber,
+        bgColor: '#ffffff', borderColor: '#b7cbd3',
         subLessons: [
           { id: '2.1', title: 'Introduction to index finger keys', duration: '3 min', text: 'the index fingers control the letters r t f g v and b these are the strongest fingers and handle most of the typing work on the keyboard' },
           { id: '2.2', title: 'Right index finger practice', duration: '4 min', text: 'rtfgvb rtfgvb rtfgvb rtfgvb the the the the the the the the the the the the the the the the the the the the the the the the the the' },
@@ -44,8 +50,8 @@ const COURSES = [
         ],
       },
       {
-        id: 3, title: 'Focus on the middle finger keys', color: COLORS.green,
-        bgColor: COLORS.cardBgSolid, borderColor: COLORS.green + '50',
+        id: 3, title: 'Focus on the middle finger keys', color: COURSE_COLORS.green,
+        bgColor: '#ffffff', borderColor: '#b7cbd3',
         subLessons: [
           { id: '3.1', title: 'Middle finger key introduction', duration: '3 min', text: 'the middle fingers control the letters e d c i k and these are important for reaching the center of the keyboard effectively' },
           { id: '3.2', title: 'Middle finger practice', duration: '4 min', text: 'edcik edcik edcik edcik did did did did did did did did did did did did did did did did did did did did did did did did did did did did did did' },
@@ -54,8 +60,8 @@ const COURSES = [
         ],
       },
       {
-        id: 4, title: 'Focus on the ring finger keys', color: COLORS.teal,
-        bgColor: COLORS.cardBgSolid, borderColor: COLORS.teal + '50',
+        id: 4, title: 'Focus on the ring finger keys', color: COURSE_COLORS.teal,
+        bgColor: '#ffffff', borderColor: '#b7cbd3',
         subLessons: [
           { id: '4.1', title: 'Ring finger key introduction', duration: '3 min', text: 'the ring fingers control the letters w s x o l and these are weaker fingers that need extra practice to build strength and speed' },
           { id: '4.2', title: 'Ring finger practice', duration: '4 min', text: 'wsxol wsxol wsxol wsxol was was was was was was was was was was was was was was was was was was was was was was was was was was was was was' },
@@ -64,8 +70,8 @@ const COURSES = [
         ],
       },
       {
-        id: 5, title: 'Focus on the little finger keys', color: COLORS.rose,
-        bgColor: COLORS.cardBgSolid, borderColor: COLORS.rose + '50',
+        id: 5, title: 'Focus on the little finger keys', color: COURSE_COLORS.rose,
+        bgColor: '#ffffff', borderColor: '#b7cbd3',
         subLessons: [
           { id: '5.1', title: 'Little finger key introduction', duration: '3 min', text: 'the little fingers control the letters q z m p and these are the weakest fingers that need the most practice and attention to master' },
           { id: '5.2', title: 'Little finger practice', duration: '4 min', text: 'qzmp qzmp qzmp qzmp pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay pay' },
@@ -74,8 +80,8 @@ const COURSES = [
         ],
       },
       {
-        id: 6, title: 'Common words', color: COLORS.teal,
-        bgColor: COLORS.cardBgSolid, borderColor: COLORS.teal + '50',
+        id: 6, title: 'Common words', color: COURSE_COLORS.teal,
+        bgColor: '#ffffff', borderColor: '#b7cbd3',
         subLessons: [
           { id: '6.1', title: 'Top 50 common words', duration: '4 min', text: 'the and for are but not you all any can had her was one our out day has his how its may now old see two way who did get let say she too use would make like just over such take than when what so up out if about' },
           { id: '6.2', title: 'Common words practice', duration: '4 min', text: 'can you this that with have from they been will would make like just over such take than when what so up out if about who get which go me when make them some time very well when know just also back after use two how our work first' },
@@ -103,17 +109,17 @@ export default function CourseScreen({ onBack, onStartLesson, completedSubLesson
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <View style={styles.gradient}>
         <ScrollView contentContainerStyle={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
               <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+                <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
               </TouchableOpacity>
             )}
-            <Ionicons name="school" size={22} color={COLORS.teal} />
+            <Ionicons name="school" size={22} color={COURSE_COLORS.teal} />
             <Text style={styles.headerTitle}>Course</Text>
           </View>
 
@@ -125,14 +131,14 @@ export default function CourseScreen({ onBack, onStartLesson, completedSubLesson
             </View>
             <View style={styles.progressTrack}>
               <View
-                style={[styles.progressFill, { width: `${(completedLessons / selectedCourse.lessons.length) * 100}%`, backgroundColor: COLORS.teal }]}
+                style={[styles.progressFill, { width: `${(completedLessons / selectedCourse.lessons.length) * 100}%`, backgroundColor: COURSE_COLORS.teal }]}
               />
             </View>
             <Text style={styles.progressSub}>
               {allComplete ? 'Course Complete!' : `You are on Lesson ${currentLesson ? currentLesson.id : '-'}`}
             </Text>
             {allComplete && onViewResult && (
-              <TouchableOpacity style={[styles.viewResultBtn, { backgroundColor: COLORS.amber }]} onPress={onViewResult} activeOpacity={0.7}>
+              <TouchableOpacity style={[styles.viewResultBtn, { backgroundColor: COURSE_COLORS.amber }]} onPress={onViewResult} activeOpacity={0.7}>
                 <Ionicons name="bar-chart" size={14} color="#fff" />
                 <Text style={styles.viewResultBtnText}>View Result</Text>
               </TouchableOpacity>
@@ -152,16 +158,16 @@ export default function CourseScreen({ onBack, onStartLesson, completedSubLesson
                   onPress={() => handleStartLesson(lesson)}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.lessonIcon, { backgroundColor: complete ? COLORS.green + '20' : lesson.color + '20' }]}>
-                    <Ionicons name={complete ? 'checkmark-circle' : 'play-circle'} size={18} color={complete ? COLORS.green : lesson.color} />
+                  <View style={[styles.lessonIcon, { backgroundColor: complete ? COURSE_COLORS.green + '20' : lesson.color + '20' }]}>
+                    <Ionicons name={complete ? 'checkmark-circle' : 'play-circle'} size={18} color={complete ? COURSE_COLORS.green : lesson.color} />
                   </View>
                   <View style={styles.lessonTextWrap}>
                     <Text style={styles.lessonNum}>Lesson {lesson.id}</Text>
                     <Text style={[styles.lessonTitle, { color: lesson.color }]}>{lesson.title}</Text>
                   </View>
                   {complete && (
-                    <View style={[styles.doneBadge, { backgroundColor: COLORS.green + '20' }]}>
-                      <Text style={[styles.doneBadgeText, { color: COLORS.green }]}>Done</Text>
+                    <View style={[styles.doneBadge, { backgroundColor: COURSE_COLORS.green + '20' }]}>
+                      <Text style={[styles.doneBadgeText, { color: COURSE_COLORS.green }]}>Done</Text>
                     </View>
                   )}
                   {isCurrent && !complete && (
@@ -180,8 +186,8 @@ export default function CourseScreen({ onBack, onStartLesson, completedSubLesson
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: BG },
-  gradient: { flex: 1 },
+  safeArea: { flex: 1, backgroundColor: '#D5EEF2' },
+  gradient: { flex: 1, backgroundColor: '#D5EEF2' },
   container: { flexGrow: 1, padding: scaleSize(16), paddingBottom: scaleSize(20) },
   containerDesktop: {
     padding: 24,
@@ -195,22 +201,22 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
-  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: scaleFont(20), color: COLORS.textWhite, flex: 1 },
+  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: scaleFont(20), color: '#14212b', flex: 1 },
 
   progressCard: {
-    backgroundColor: COLORS.cardBg, borderRadius: scaleSize(14),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(14), marginBottom: scaleSize(12),
+    backgroundColor: '#ffffff', borderRadius: scaleSize(14),
+    borderWidth: 1.5, borderColor: '#b7cbd3', padding: scaleSize(14), marginBottom: scaleSize(12),
   },
   progressHeader: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8) },
-  progressTitle: { fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite },
+  progressTitle: { fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#14212b' },
   progressTrack: {
-    height: scaleSize(7), borderRadius: scaleSize(4), backgroundColor: 'rgba(255,255,255,0.08)',
+    height: scaleSize(7), borderRadius: scaleSize(4), backgroundColor: '#d8e7ec',
     marginTop: scaleSize(8), overflow: 'hidden',
   },
   progressFill: { height: '100%', borderRadius: scaleSize(4) },
-  progressSub: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textMuted, marginTop: scaleSize(6) },
+  progressSub: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#536775', marginTop: scaleSize(6) },
   viewResultBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: scaleSize(6),
     borderRadius: scaleSize(10), paddingVertical: scaleSize(8), marginTop: scaleSize(8),
@@ -218,21 +224,21 @@ const styles = StyleSheet.create({
   viewResultBtnText: { color: '#fff', fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 
   lessonsCard: {
-    backgroundColor: COLORS.cardBgSolid, borderRadius: scaleSize(14),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: scaleSize(12),
+    backgroundColor: '#ffffff', borderRadius: scaleSize(14),
+    borderWidth: 1.5, borderColor: '#b7cbd3', padding: scaleSize(12),
     marginTop: scaleSize(10),
   },
-  sectionTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },
+  sectionTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#14212b', marginBottom: scaleSize(8) },
   lessonItem: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: scaleSize(10),
-    borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder, gap: scaleSize(8),
+    borderBottomWidth: 1, borderBottomColor: '#d6e1e5', gap: scaleSize(8),
   },
   lessonIcon: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(10),
     alignItems: 'center', justifyContent: 'center',
   },
   lessonTextWrap: { flex: 1 },
-  lessonNum: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700'},
+  lessonNum: { fontSize: scaleFont(11), color: '#536775', fontFamily: 'Poppins_700Bold', fontWeight: '700'},
   lessonTitle: { fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700'},
   doneBadge: { borderRadius: scaleSize(6), paddingHorizontal: scaleSize(8), paddingVertical: scaleSize(3) },
   doneBadgeText: { fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700'},

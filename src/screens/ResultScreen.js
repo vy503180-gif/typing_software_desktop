@@ -41,7 +41,7 @@ export default function ResultScreen({ course, onBack }) {
           </View>
 
           <TouchableOpacity style={styles.btnPrimary} onPress={onBack} activeOpacity={0.85}>
-            <Ionicons name="arrow-back" size={17} color="#fff" />
+            <Ionicons name="arrow-back" size={17} color={COLORS.teal} />
             <Text style={styles.btnPrimaryText}>Back to Course</Text>
           </TouchableOpacity>
         </View>

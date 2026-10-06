@@ -281,7 +281,7 @@ export default function WordDrillScreen({ onBack }) {
           <View style={styles.header}>
             {onBack && (
               <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+                <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
               </TouchableOpacity>
             )}
             <Text style={styles.headerTitle}>Word Drill</Text>
@@ -316,7 +316,7 @@ export default function WordDrillScreen({ onBack }) {
               </TouchableOpacity>
               {onBack && (
                 <TouchableOpacity style={styles.backToReviewBtn} onPress={onBack} activeOpacity={0.85}>
-                  <Ionicons name="arrow-back" size={16} color={COLORS.textWhite} />
+                  <Ionicons name="arrow-back" size={16} color={COLORS.teal} />
                   <Text style={styles.backToReviewText}>Back to Review</Text>
                 </TouchableOpacity>
               )}
@@ -324,11 +324,10 @@ export default function WordDrillScreen({ onBack }) {
           ) : (
             <>
               {/* Stats row */}
-              <View style={styles.statsRow}>
+              <View style={styles.progressRow}>
                 <Text style={styles.statsText}>
                   Round {round}/{TOTAL_ROUNDS} • Word {wordIndex + 1}/{WORDS_PER_SET}
                 </Text>
-                <Text style={styles.statsText}>Speed: {liveWpm} WPM</Text>
               </View>
 
               {/* Word list - plain words, no boxes (jaise lesson mein) */}
@@ -453,7 +452,7 @@ const styles = StyleSheet.create({
     width: scaleSize(36),
     height: scaleSize(36),
     borderRadius: scaleSize(18),
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.backButtonBg,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: scaleSize(12),
@@ -479,7 +478,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_700Bold', fontWeight: '700'
   },
 
-  statsRow: {
+  progressRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: scaleSize(14),

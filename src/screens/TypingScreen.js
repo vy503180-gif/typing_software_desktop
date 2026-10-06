@@ -2,8 +2,7 @@
 // Professional typing workspace:
 // - Configurable practice options (language / difficulty / duration / mode)
 // - Large live typing area with char highlighting + auto-scroll
-// - Real-time WPM/CPM/Accuracy/Errors/Time/Progress
-// - Virtual keyboard with next-key, finger guide, press feedback
+// - Progress tracking
 // - Typing sound
 // - Timer with auto-stop + professional result dashboard
 
@@ -14,12 +13,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import VirtualKeyboard, { keyIdForChar, FINGERS, KRUTI_KEYCAPS } from '../components/VirtualKeyboard';
 import { playKeySound } from '../audio/keySound';
 import { LESSON_TEXTS, LESSON_DIFFICULTY } from '../data/lessons';
 import { generateTypingText, sentencesText, paragraphText, wordsText, rushWordList, certText } from '../data/typingTexts';
-import { krutiToUnicode, krutiKeyProgress, krutiSequenceProgress } from '../utils/krutiToUnicode';
-import { COLORS, BG, levelForWpm, scaleFont } from '../theme';
+import { krutiToUnicode, krutiSequenceProgress } from '../utils/krutiToUnicode';
+import { COLORS, levelForWpm, scaleFont } from '../theme';
 
 const getHistoryKey = () => `antriksh_typing_history`;
 
@@ -36,28 +34,6 @@ const PR_MODES = [
   { label: 'Sentences', value: 'sentences' },
   { label: 'Paragraph', value: 'paragraph' },
 ];
-
-function StatChip({ icon, value, label, color }) {
-  return (
-    <View style={styles.statChip}>
-      <Ionicons name={icon} size={14} color={color} />
-      <Text style={[styles.statChipValue, { color }]} numberOfLines={1} ellipsizeMode="tail">{value}</Text>
-      <Text style={styles.statChipLabel} numberOfLines={1} ellipsizeMode="tail">{label}</Text>
-    </View>
-  );
-}
-
-function LivePanelStat({ icon, value, label, color, big }) {
-  return (
-    <View style={[styles.liveStat, big && styles.liveStatBig]}>
-      <Text style={[styles.liveStatValue, { color }, big && styles.liveStatValueBig]}>{value}</Text>
-      <View style={styles.liveStatLabelRow}>
-        <Ionicons name={icon} size={12} color={color} />
-        <Text style={styles.liveStatLabel}>{label}</Text>
-      </View>
-    </View>
-  );
-}
 
 function OptionPills({ options, value, onChange, color = COLORS.blue, small }) {
   return (
@@ -143,14 +119,12 @@ export default function TypingScreen({
   hindiLayout = 'krutidev',
 }) {
   const { width: winW } = useWindowDimensions();
-  const isDesktop = winW >= 1000 && Platform.OS === 'web';
-  const rightPanelWidth = 250;
-
   const isKrutiLayout = config.lang === 'hindi' && hindiLayout === 'krutidev';
   const isPractice = config.type === 'practice';
   const isGame = config.type === 'game';
   const isTest = config.type === 'test';
   const isCert = config.type === 'cert';
+  const isNumberedLesson = config.type === 'lesson' && !config.courseSubId;
   const certTargetValid = (res) =>
     res && config.targetWpm ? res.wpm >= config.targetWpm : res && config.targetAcc ? res.accuracy >= config.targetAcc : null;
 
@@ -180,12 +154,9 @@ export default function TypingScreen({
   const [textWidth, setTextWidth] = useState(0);
   const [charW, setCharW] = useState(null);
 
-  // --- keyboard feedback state ---
-  const [pressedId, setPressedId] = useState(null);
-  const [wrongId, setWrongId] = useState(null);
-  const [correctId, setCorrectId] = useState(null);
-
   const timerRef = useRef(null);
+  const finishRef = useRef(false);
+  const lessonCompleteTimerRef = useRef(null);
   const certCloseRef = useRef(null);
   const onBackRef = useRef(onBack);
   const inputRef = useRef(null);
@@ -200,9 +171,6 @@ export default function TypingScreen({
 
   // ---- sound + settings ----
   const soundEnabled = settings.keyboardSound !== false;
-  const showVKeyboard = settings.virtualKeyboard !== false;
-  const showFingerGuide = settings.fingerGuide === true;
-  const showNextKey = settings.nextKeyHighlight !== false;
   const fontSize = settings.fontSize || 22;
   const typeSize = Math.max(15, Math.round(fontSize * 0.8));
   const charLineH = Math.max(22, Math.round(typeSize * 1.32));
@@ -229,6 +197,7 @@ export default function TypingScreen({
   // Jab config change ho (jaise "Next Lesson" dabane par naya lesson load ho)
   // toh purani typing/finish state reset karo aur naye lesson se start karo.
   useEffect(() => {
+    finishRef.current = false;
     setDuration(config.timeSec || 0);
     setMode(config.mode || 'paragraph');
     setDifficulty(config.difficulty || 'Easy');
@@ -243,8 +212,6 @@ export default function TypingScreen({
     setIsFinished(false);
     setIsTimedOut(false);
     setResult(null);
-    setWrongId(null);
-    setCorrectId(null);
     lastScrollRow.current = 0;
     if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
       scrollRef.current.scrollTo({ y: 0, animated: false });
@@ -267,6 +234,7 @@ export default function TypingScreen({
 
   useEffect(() => () => {
     if (certCloseRef.current) clearTimeout(certCloseRef.current);
+    if (lessonCompleteTimerRef.current) clearTimeout(lessonCompleteTimerRef.current);
   }, []);
 
   // ESC = go back (web)
@@ -338,6 +306,8 @@ export default function TypingScreen({
 
   const resetTest = (nextText) => {
     if (certCloseRef.current) { clearTimeout(certCloseRef.current); certCloseRef.current = null; }
+    if (lessonCompleteTimerRef.current) { clearTimeout(lessonCompleteTimerRef.current); lessonCompleteTimerRef.current = null; }
+    finishRef.current = false;
     if (nextText) setCurrentText(nextText);
     setRawInput('');
     setUserInput('');
@@ -350,8 +320,6 @@ export default function TypingScreen({
     setIsFinished(false);
     setIsTimedOut(false);
     setResult(null);
-    setWrongId(null);
-    setCorrectId(null);
     focusInput();
   };
 
@@ -374,8 +342,11 @@ export default function TypingScreen({
   };
 
   const finishTest = (timedOut = false) => {
+    if (finishRef.current) return;
+    finishRef.current = true;
+    const didTimeOut = timedOut || (useTimed && countdown <= 0);
     setIsFinished(true);
-    setIsTimedOut(timedOut);
+    setIsTimedOut(didTimeOut);
     clearInterval(timerRef.current);
     if (inputRef.current && typeof inputRef.current.blur === 'function') inputRef.current.blur();
 
@@ -396,7 +367,7 @@ export default function TypingScreen({
     const accuracy = userInput.length > 0 ? Math.round((correctChars / userInput.length) * 100) : 100;
     const mistakes = userInput.length - correctChars;
     const score = Math.round(Math.max(0, (wpm * accuracy) / 100) * 1.5 + accuracy * 0.2);
-    const res = { wpm, cpm, accuracy, mistakes, seconds, score, timedOut: timedOut };
+    const res = { wpm, cpm, accuracy, mistakes, seconds, score, timedOut: didTimeOut };
     setResult(res);
     const historyPromise = saveHistory(res);
 
@@ -406,11 +377,14 @@ export default function TypingScreen({
         historyPromise
           .then(() => { if (onBack) onBack(); })
           .catch(() => { if (onBack) onBack(); });
-      }, timedOut ? 400 : 1400);
+      }, didTimeOut ? 400 : 1400);
     }
 
-    if (!timedOut && config.type === 'lesson' && onComplete) {
-      setTimeout(() => onComplete(config.lang, config.id), 400);
+    if (!didTimeOut && config.type === 'lesson' && onComplete && userInput.length === currentText.length) {
+      lessonCompleteTimerRef.current = setTimeout(() => {
+        lessonCompleteTimerRef.current = null;
+        onComplete(config.lang, config.id);
+      }, 400);
     }
   };
 
@@ -455,51 +429,7 @@ export default function TypingScreen({
   };
   const isCharCorrect = (typed, target) => getCharStatus(typed, target) === 'correct';
 
-  // Incremental counters: har keystroke par poora text scan karne ke bajaye
-  // sirf naye chars count hote hain. Text badalne par cache reset ho jata hai.
-  const scanRef = useRef({ text: null, len: 0, correct: 0, words: 0 });
-  const scan = (input, target) => {
-    const c = scanRef.current;
-    const stale = c.text !== target || input.length < c.len;
-    let correct = stale ? 0 : c.correct;
-    const from = stale ? 0 : c.len;
-    let words = stale ? 0 : c.words;
-    let prevWasSpace = from > 0 ? /\s/.test(input[from - 1]) : true;
-    for (let i = from; i < input.length; i++) {
-      const ch = input[i];
-      if (isCharCorrect(ch, target[i])) correct++;
-      if (!/\s/.test(ch) && prevWasSpace) words++;
-      prevWasSpace = /\s/.test(ch);
-    }
-    c.text = target;
-    c.len = input.length;
-    c.correct = correct;
-    c.words = words;
-    return { correct, words: input.trim() ? words : 0 };
-  };
-
-  // live stats
-  const stats = useMemo(() => {
-    const elapsed = seconds > 0 ? seconds : 1;
-    let correct = 0;
-    let effLen = userInput.length;
-    let wordsTyped = 0;
-    if (isKrutiLayout) {
-      const sp = krutiSequenceProgress(rawInput || rawRef.current, currentText);
-      correct = sp.ok;
-      if (sp.pending) effLen = sp.ok;
-    } else {
-      const s = scan(userInput, currentText);
-      correct = s.correct;
-      wordsTyped = s.words;
-    }
-    const wpm = isStarted ? Math.round((wordsTyped / elapsed) * 60) : 0;
-    const cpm = isStarted ? Math.round((userInput.length / elapsed) * 60) : 0;
-    const accuracy = effLen > 0 ? Math.round((correct / effLen) * 100) : 100;
-    const mistakes = effLen - correct;
-    const progress = currentText.length > 0 ? Math.min(1, userInput.length / currentText.length) : 0;
-    return { wpm, cpm, accuracy, mistakes, correct, progress };
-  }, [seconds, isStarted, userInput, currentText, isKrutiLayout, rawInput]);
+  const progress = currentText.length > 0 ? Math.min(1, userInput.length / currentText.length) : 0;
 
   // next char guidance
   const kpLive = useMemo(
@@ -507,10 +437,6 @@ export default function TypingScreen({
     [isKrutiLayout, rawInput, currentText]
   );
   const progressCursor = isKrutiLayout ? (kpLive ? kpLive.ok : 0) : userInput.length;
-  const nextChar = !isFinished && isStarted && progressCursor < currentText.length ? currentText[progressCursor] : null;
-  const nextKeyId = nextChar ? keyIdForChar(nextChar) : null;
-  const nextFinger = nextChar ? FINGERS[nextKeyId || (nextChar.toLowerCase().match(/[a-z]/) ? nextChar.toLowerCase() : null)] : null;
-
   const handlePause = () => {
     if (isFinished) return;
     setIsPaused((prev) => {
@@ -529,27 +455,11 @@ export default function TypingScreen({
     if (!isStarted) setIsStarted(true);
   };
 
-  // Keyboard flash: pehle ka timer clear karke naya set karo. Isse har
-  // keystroke par 3 pending timers ki jagah sirf 3 re-render hote hain,
-  // aur same value par setState skip ho jaata hai.
-  const flashTimers = useRef({});
-  const flash = useCallback((setter, value, ms) => {
-    setter(value);
-    const t = flashTimers.current[value];
-    if (t) clearTimeout(t);
-    flashTimers.current[value] = setTimeout(() => setter(null), ms);
-  }, []);
-
-  useEffect(() => () => {
-    Object.values(flashTimers.current).forEach(clearTimeout);
-  }, []);
-
   const handleKeyPress = (e) => {
     if (!isStarted || isPaused || isFinished) return;
     const key = e.nativeEvent && e.nativeEvent.key;
     if (!key) return;
     const kId = keyIdForChar(key) || (key === 'Backspace' ? 'backspace' : null);
-    if (kId) flash(setPressedId, kId, 140);
     if (key === 'Backspace') {
       if (soundEnabled) playKeySound('key');
       return;
@@ -563,12 +473,10 @@ export default function TypingScreen({
       const rawNow = (rawRef.current || '') + key;
       const sp = krutiSequenceProgress(rawNow, currentText);
       if (sp.ok > 0 && !sp.pending) {
-        flash(setCorrectId, kId, 180);
         if (soundEnabled) playKeySound('correct');
       } else if (sp.pending) {
         if (soundEnabled) playKeySound('key');
       } else if (kId) {
-        flash(setWrongId, kId, 200);
         if (soundEnabled) playKeySound('wrong');
       }
       return;
@@ -580,51 +488,11 @@ export default function TypingScreen({
       ((key.toLowerCase && key.toLowerCase() === String(expected).toLowerCase()) ||
         (key === ' ' && expected === ' '));
     if (isCorrectKey) {
-      flash(setCorrectId, kId, 180);
       if (soundEnabled) playKeySound('correct');
     } else if (kId) {
-      flash(setWrongId, kId, 200);
       if (soundEnabled) playKeySound('wrong');
     }
   };
-
-  // Stable callback: VirtualKeyboard memoized hai, isliye har render par naya
-  // function dene se uska memo toot jata tha aur keyboard bhi rerender hota tha.
-  const simulateKey = useCallback((id) => {
-    if (isFinished || isPaused) return;
-    if (id === 'backspace') {
-      rawRef.current = rawRef.current.slice(0, -1);
-      setRawInput(rawRef.current);
-      if (!isStarted) setIsStarted(true);
-      focusInput();
-      return;
-    }
-    if (id === 'enter' || id === 'tab' || id === 'caps' || id === 'shift_l' || id === 'shift_r') return;
-    let ch = id === 'space' ? ' ' : id;
-    if (!ch) return;
-    if (!isStarted) setIsStarted(true);
-    rawRef.current = rawRef.current + ch;
-    setRawInput(rawRef.current);
-    if (isKrutiLayout) {
-      const kp = krutiKeyProgress(rawRef.current, currentText);
-      if (kp.ok > 0) {
-        if (soundEnabled) playKeySound('correct');
-      } else if (kp.pending) {
-        if (soundEnabled) playKeySound('key');
-      } else {
-        if (soundEnabled) playKeySound('wrong');
-      }
-    } else {
-      const expected = currentText[userInput.length];
-      if (soundEnabled) playKeySound(expected !== undefined && expected === ch ? 'correct' : 'wrong');
-    }
-    focusInput();
-  }, [isFinished, isPaused, isStarted, isKrutiLayout, currentText, soundEnabled, userInput.length, focusInput]);
-
-  const timerStr = useMemo(() => {
-    const v = useTimed ? countdown : seconds;
-    return `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`;
-  }, [countdown, seconds, useTimed]);
 
   const renderControls = () => {
     if (!isPractice) return null;
@@ -650,16 +518,6 @@ export default function TypingScreen({
     );
   };
 
-  const renderLiveStats = () => (
-    <>
-      <LivePanelStat big icon="speedometer" value={`${stats.wpm}`} label="WPM" color={COLORS.blueBright} />
-      <LivePanelStat icon="pulse" value={`${stats.cpm}`} label="CPM" color={COLORS.cyan} />
-      <LivePanelStat icon="checkmark-circle" value={`${stats.accuracy}%`} label="Accuracy" color={COLORS.green} />
-      <LivePanelStat icon="warning" value={`${stats.mistakes}`} label="Errors" color={COLORS.rose} />
-      <LivePanelStat icon="time" value={timerStr} label={useTimed ? 'Time Left' : 'Elapsed'} color={useTimed && countdown <= 15 && !isFinished ? COLORS.rose : COLORS.amber} />
-    </>
-  );
-
   const renderResult = () => {
     if (!result) return null;
     const level = levelForWpm(result.wpm);
@@ -672,7 +530,7 @@ export default function TypingScreen({
               <Ionicons name={result.timedOut ? 'time' : 'trophy'} size={34} color={result.timedOut ? COLORS.amber : COLORS.green} />
             </View>
             <Text style={styles.resultTitle}>{isCert ? (passed ? 'Certificate Earned!' : 'So Close — Try Again') : result.timedOut ? 'Time Up!' : 'Test Complete!'}</Text>
-            <Text style={styles.resultSub}>{config.title || (isTest ? 'Typing Test' : 'Practice')} â€” {level.name}</Text>
+            <Text style={styles.resultSub}>{config.title || (isTest ? 'Typing Test' : 'Practice')} - {level.name}</Text>
             {isCert && certTargetLabel && (
               <View style={[styles.certVerdict, passed ? styles.certVerdictPass : styles.certVerdictFail]}>
                 <Ionicons name={passed ? 'checkmark-circle' : 'flag'} size={14} color={passed ? COLORS.green : COLORS.amber} />
@@ -718,7 +576,7 @@ export default function TypingScreen({
           </View>
 
           <View style={styles.resultActions}>
-            {config.type === 'lesson' && config.nextLesson && onNextLesson && (
+            {config.type === 'lesson' && !config.autoAdvance && config.nextLesson && onNextLesson && (
               <TouchableOpacity
                 style={[styles.resultBtn, styles.resultNextBtn]}
                 onPress={() => onNextLesson(config.lang, config.id, config.nextLesson)}
@@ -729,7 +587,7 @@ export default function TypingScreen({
                   <Text style={styles.resultBtnText}>Next Lesson</Text>
                 </View>
                 <Text style={styles.resultNextName} numberOfLines={1} ellipsizeMode="tail">
-                  {config.nextLesson.label} Â· {config.nextLesson.title}
+                  {config.nextLesson.label} - {config.nextLesson.title}
                 </Text>
               </TouchableOpacity>
             )}
@@ -738,8 +596,8 @@ export default function TypingScreen({
               <Text style={styles.resultBtnText}>Retry</Text>
             </TouchableOpacity>
             {onBack && (
-              <TouchableOpacity style={[styles.resultBtn, { backgroundColor: '#0f1830', borderWidth: 1.5, borderColor: COLORS.cardBorder }]} onPress={onBack} activeOpacity={0.8}>
-                <Ionicons name="arrow-back" size={15} color={COLORS.textLight} />
+              <TouchableOpacity style={[styles.resultBtn, { backgroundColor: '#0e9488' }]} onPress={onBack} activeOpacity={0.8}>
+                <Ionicons name="arrow-back" size={15} color="#fff" />
                 <Text style={styles.resultBtnText}>Exit</Text>
               </TouchableOpacity>
             )}
@@ -752,7 +610,7 @@ export default function TypingScreen({
   // ---- Text layout: word ranges + soft-wrap rows (memoized) ----
   // Ye renderTextArea ke andar nahi, component body me hai — warna hooks
   // rule toot jaata (early return par hook count change hota).
-  const areaW = textWidth || (isDesktop ? winW - rightPanelWidth - 80 : winW - 40);
+  const areaW = textWidth || winW - 80;
   const effCharW = charW || typeSize * 0.6;
   const cols = Math.max(4, Math.floor(areaW / (effCharW * 1.05)));
 
@@ -829,14 +687,15 @@ const renderTextArea = () => {
       <ScrollView
         ref={scrollRef}
         style={styles.textScroll}
+        contentContainerStyle={styles.textScrollContent}
         onLayout={() => {}}
       >
         <TouchableOpacity
           ref={textBoxRef}
           onPress={() => { if (!isPaused && !isFinished) focusInput(); }}
           activeOpacity={1}
-          style={styles.textBox}
-          onLayout={(e) => setTextWidth(Math.max(0, e.nativeEvent.layout.width - 24))}
+          style={[styles.textBox, winW < 600 && styles.textBoxSmall]}
+          onLayout={(e) => setTextWidth(Math.max(0, e.nativeEvent.layout.width - (winW < 600 ? 34 : 50)))}
         >
           <View style={styles.measureRow} pointerEvents="none">
             <Text
@@ -975,76 +834,24 @@ const renderTextArea = () => {
     );
   };
 
-  const leftPanel = isDesktop && isPractice ? (
-    <View style={[styles.leftPanel, { width: 250 }]}>
-      <Text style={styles.leftTitle}>Practice Options</Text>
-      {renderControls()}
-    </View>
-  ) : null;
-
-  const rightPanel = isDesktop ? (
-    <View style={[styles.rightPanel, { width: rightPanelWidth }]}>
-      <Text style={styles.rightTitle}>Live Statistics</Text>
-      <View style={styles.liveStats}>{renderLiveStats()}</View>
-
-      <View style={styles.guideCard}>
-        <Text style={styles.guideTitle}>Next Key</Text>
-        {showNextKey && nextKeyId ? (
-          <>
-            <View style={styles.nextKeyDisplay}>
-              <Text style={styles.nextKeyBig}>{nextChar === ' ' ? 'â£' : nextChar}</Text>
-            </View>
-            <Text style={styles.guideKeyName}>{nextKeyId === 'space' ? 'Space Bar' : nextKeyId.toUpperCase()}</Text>
-          </>
-        ) : (
-          <Text style={styles.guideEmpty}>
-            {!isStarted ? 'Start typing to begin' : isFinished ? 'Test finished' : 'â€”'}
-          </Text>
-        )}
-        {showFingerGuide && nextFinger && (
-          <View style={styles.fingerChip}>
-            <Ionicons name="hand-left" size={14} color={COLORS.cyan} />
-            <Text style={styles.fingerChipText}>{nextFinger}</Text>
-          </View>
-        )}
-      </View>
-
-      <View style={styles.guideCard}>
-        <Text style={styles.guideTitle}>Progress</Text>
-        <View style={styles.rightProgressTrack}>
-          <View
-            style={[styles.rightProgressFill, { width: `${stats.progress * 100}%` }]}
-          />
-        </View>
-        <Text style={styles.rightProgressText}>
-          {userInput.length} / {currentText.length} characters
-        </Text>
-        <Text style={styles.rightProgressPct}>{Math.round(stats.progress * 100)}%</Text>
-      </View>
-    </View>
-  ) : null;
-
   return (
     <View style={styles.root}>
       <View style={styles.workspaceRow}>
-        {leftPanel}
         <View style={styles.mainCol}>
           {/* Top bar */}
           <View style={styles.topBar}>
             <View style={styles.topBarLeft}>
               {onBack ? (
                 <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                  <Ionicons name="arrow-back" size={18} color={COLORS.textLight} />
+                  <Ionicons name="arrow-back" size={18} color={COLORS.cyan} />
                 </TouchableOpacity>
               ) : null}
-              {onBack && Platform.OS === 'web' ? (
-                <Text style={styles.escHint}>Esc</Text>
-              ) : null}
               <View>
-                <Text style={styles.title}>{config.title || (isTest ? 'Typing Test' : isGame ? 'Typing Game' : 'Typing Practice')}</Text>
+                <Text style={styles.title}>{isNumberedLesson ? `Lesson ${config.id}` : config.title || (isTest ? 'Typing Test' : isGame ? 'Typing Game' : 'Typing Practice')}</Text>
                 <Text style={styles.subtitle}>
+                  {isNumberedLesson ? `${config.title} \u2022 ` : ''}
                   {config.difficulty ? `${config.difficulty} \u2022 ` : ''}
-                  {duration ? `${Math.round(duration / 60)} min â€¢ ` : ''}
+                  {duration ? `${Math.round(duration / 60)} min - ` : ''}
                   {mode ? mode : ''}
                 </Text>
               </View>
@@ -1056,32 +863,27 @@ const renderTextArea = () => {
                 </View>
               )}
               <TouchableOpacity style={styles.topBtn} onPress={handlePause} disabled={isFinished} activeOpacity={0.7}>
-                <Ionicons name={isPaused ? 'play' : 'pause'} size={17} color={isFinished ? COLORS.textDim : COLORS.textLight} />
+                <Ionicons name={isPaused ? 'play' : 'pause'} size={17} color={isFinished ? '#94a3b8' : '#334155'} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.topBtn} onPress={startNewTest} activeOpacity={0.7}>
-                <Ionicons name="refresh" size={17} color={COLORS.textLight} />
+                <Ionicons name="refresh" size={17} color="#334155" />
               </TouchableOpacity>
             </View>
           </View>
 
-          <ScrollView style={styles.scrollMain} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-            {!isDesktop && renderControls()}
-
-            {/* Status chips */}
-            <View style={styles.chipRow}>
-              {isCert && certTargetLabel && (
-                <StatChip icon="flag" value={certTargetLabel} label="Target" color={COLORS.amber} />
-              )}
-              <StatChip icon="speedometer" value={`${stats.wpm}`} label="WPM" color={COLORS.blueBright} />
-              <StatChip icon="pulse" value={`${stats.cpm}`} label="CPM" color={COLORS.cyan} />
-              <StatChip icon="checkmark-circle" value={`${stats.accuracy}%`} label="Accuracy" color={COLORS.green} />
-              <StatChip icon="warning" value={`${stats.mistakes}`} label="Errors" color={COLORS.rose} />
-              <StatChip icon="time" value={timerStr} label={useTimed ? 'Time Left' : 'Elapsed'} color={useTimed && countdown <= 15 && !isFinished ? COLORS.rose : COLORS.amber} />
-            </View>
+          <ScrollView
+            style={styles.scrollMain}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingHorizontal: winW < 600 ? 14 : winW < 900 ? 20 : 28 },
+            ]}
+            keyboardShouldPersistTaps="handled"
+          >
+            {renderControls()}
 
             {/* Progress */}
             <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${stats.progress * 100}%` }]} />
+              <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
             </View>
 
             {renderTextArea()}
@@ -1105,17 +907,17 @@ const renderTextArea = () => {
             {/* Actions */}
             {!isFinished && (
               <View style={styles.actionsRow}>
-                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: 'rgba(37,99,235,0.25)', borderColor: 'rgba(59,130,246,0.5)' }]} onPress={handlePause} activeOpacity={0.8}>
-                  <Ionicons name={isPaused ? 'play' : 'pause'} size={15} color={COLORS.blueBright} />
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#e9f4f8', borderColor: '#c9e0e9' }]} onPress={handlePause} activeOpacity={0.8}>
+                  <Ionicons name={isPaused ? 'play' : 'pause'} size={15} color={COLORS.cyan} />
                   <Text style={styles.actionBtnText}>{isPaused ? 'Resume' : 'Pause'}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: 'rgba(14,116,144,0.15)', borderColor: 'rgba(14,116,144,0.5)' }]} onPress={startNewTest} activeOpacity={0.8}>
+                <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#eef7fa', borderColor: '#c9e0e9' }]} onPress={startNewTest} activeOpacity={0.8}>
                   <Ionicons name="refresh" size={15} color={COLORS.cyan} />
                   <Text style={styles.actionBtnText}>Restart</Text>
                 </TouchableOpacity>
                 {onBack && (
-                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: 'rgba(244,63,94,0.12)', borderColor: 'rgba(244,63,94,0.45)' }]} onPress={onBack} activeOpacity={0.8}>
-                    <Ionicons name="close" size={15} color={COLORS.rose} />
+                  <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#e2f4f4', borderColor: '#b9dedf' }]} onPress={onBack} activeOpacity={0.8}>
+                    <Ionicons name="close" size={15} color={COLORS.cyan} />
                     <Text style={styles.actionBtnText}>Exit</Text>
                   </TouchableOpacity>
                 )}
@@ -1127,47 +929,11 @@ const renderTextArea = () => {
                 Click on the text and start typing to begin
               </Text>
             )}
-            {isPaused && !isFinished && <Text style={styles.pausedHint}>Paused â€” click Resume or press any key to continue</Text>}
+            {isPaused && !isFinished && <Text style={styles.pausedHint}>Paused - click Resume or press any key to continue</Text>}
           </ScrollView>
 
-          {showVKeyboard && (
-            <View style={styles.keyboardDock}>
-              <View style={styles.nextKeyBar}>
-                <Ionicons name="locate" size={14} color={COLORS.cyan} />
-                <Text style={styles.nextKeyBarLabel}>Next Key</Text>
-                {showNextKey && nextKeyId ? (
-                  <View style={styles.nextKeyBarKey}>
-                    <Text style={styles.nextKeyBarKeyText}>{nextChar === ' ' ? 'â£' : nextChar}</Text>
-                  </View>
-                ) : (
-                  <Text style={styles.nextKeyBarEmpty}>
-                    {isStarted ? 'Keep typingâ€¦' : 'Click the text and start typing'}
-                  </Text>
-                )}
-                {showFingerGuide && nextFinger ? (
-                  <View style={styles.nextFingerChip}>
-                    <Ionicons name="hand-left" size={12} color={COLORS.cyan} />
-                    <Text style={styles.nextFingerText}>{nextFinger}</Text>
-                  </View>
-                ) : null}
-              </View>
-              <VirtualKeyboard
-                pressedId={pressedId}
-                nextId={showNextKey ? nextKeyId : null}
-                wrongId={wrongId}
-                correctId={correctId}
-                showKeyboard={showVKeyboard}
-                showFingerGuide={showFingerGuide}
-                showNextKey={showNextKey}
-                size="sm"
-                onKeyPress={simulateKey}
-                keyLabels={isKrutiLayout ? KRUTI_KEYCAPS : null}
-              />
-            </View>
-          )}
         </View>
 
-        {rightPanel}
       </View>
     </View>
   );
@@ -1176,12 +942,11 @@ const renderTextArea = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: BG,
+    backgroundColor: '#eaf5fa',
     overflow: 'hidden',
   },
   workspaceRow: {
     flex: 1,
-    flexDirection: 'row',
     overflow: 'hidden',
   },
   mainCol: {
@@ -1190,51 +955,41 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    gap: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.headerBorder,
-    backgroundColor: COLORS.headerBg,
+    borderBottomColor: '#d4e6ee',
+    backgroundColor: '#f8fcfe',
   },
-  topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1, minWidth: 160 },
   backBtn: {
     width: 36,
     height: 36,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: COLORS.backButtonBg,
     borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
-  },
-  escHint: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    fontSize: 10.5,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderColor: COLORS.backButtonBorder,
   },
   title: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
-    color: '#fff',
+    color: '#172b36',
     fontSize: 17,
   },
   subtitle: {
     fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
-    color: COLORS.textMuted,
+    color: '#647b87',
     fontSize: 11.5,
     marginTop: 1,
   },
-  topBarRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  topBarRight: { flexDirection: 'row', alignItems: 'center', gap: 7, marginLeft: 'auto' },
   difficultyBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -1252,25 +1007,31 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#ffffff',
     borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
+    borderColor: '#d5e3e9',
   },
   scrollMain: { flex: 1 },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 24,
-    maxWidth: 1060,
+    flexGrow: 1,
+    paddingTop: 22,
+    paddingBottom: 28,
+    maxWidth: 1480,
     width: '100%',
     alignSelf: 'center',
   },
   controlsBar: {
-    backgroundColor: COLORS.cardBgSolid,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
-    padding: 12,
-    marginBottom: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#d5e7ee',
+    padding: 14,
+    marginBottom: 16,
+    shadowColor: '#315c70',
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 10,
+    elevation: 2,
   },
   controlRow: {
     flexDirection: 'row',
@@ -1282,7 +1043,7 @@ const styles = StyleSheet.create({
   controlLabel: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
-    color: COLORS.textMuted,
+    color: '#526b77',
     fontSize: 12,
     width: 70,
   },
@@ -1291,13 +1052,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     paddingVertical: 7,
     borderRadius: 9,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: '#f8fbfc',
     borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
+    borderColor: '#d5e3e9',
   },
   pillSmall: { paddingHorizontal: 10, paddingVertical: 5 },
   pillText: {
-    color: COLORS.textLight,
+    color: '#334b57',
     fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
     fontSize: 12.5,
@@ -1324,48 +1085,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 13,
   },
-  chipRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 10,
-    flexWrap: 'wrap',
-  },
-  statChip: {
-    flex: 1,
-    minWidth: 86,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-    backgroundColor: COLORS.cardBg,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    overflow: 'hidden',
-  },
-  statChipValue: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 15,
-    flexShrink: 1,
-  },
-  statChipLabel: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    fontSize: 9.5,
-    textTransform: 'uppercase',
-    flexShrink: 1,
-  },
   progressTrack: {
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.08)',
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#d5e6ec',
     overflow: 'hidden',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   progressFill: {
     height: '100%',
@@ -1375,24 +1100,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 4,
   },
-  textScroll: {
-    maxHeight: 210,
-    marginBottom: 4,
-  },
+  textScroll: { flex: 1, minHeight: 340, marginBottom: 12 },
+  textScrollContent: { flexGrow: 1 },
   textBox: {
-    backgroundColor: COLORS.cardBgSolid,
-    borderRadius: 12,
+    flexGrow: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(59,130,246,0.35)',
-    padding: 12,
-    minHeight: 84,
-    shadowColor: '#14b8a6',
-    shadowOpacity: 0.12,
+    borderColor: '#c9e0e9',
+    padding: 24,
+    minHeight: 420,
+    shadowColor: '#315c70',
+    shadowOpacity: 0.07,
     shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 14,
-    elevation: 3,
+    shadowRadius: 16,
+    elevation: 2,
     cursor: 'text',
   },
+  textBoxSmall: { minHeight: 300, padding: 16 },
   charRow: {
     flexDirection: 'row',
     flexWrap: 'nowrap',
@@ -1453,9 +1178,13 @@ const styles = StyleSheet.create({
   },
   actionsRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
-    marginTop: 10,
-    marginBottom: 14,
+    marginTop: 4,
+    marginBottom: 16,
+    width: '100%',
+    maxWidth: 900,
+    alignSelf: 'center',
   },
   actionBtn: {
     flexDirection: 'row',
@@ -1464,18 +1193,20 @@ const styles = StyleSheet.create({
     gap: 6,
     borderRadius: 10,
     borderWidth: 1,
-    paddingVertical: 10,
+    minWidth: 100,
+    paddingVertical: 12,
     flex: 1,
+    cursor: 'pointer',
   },
   actionBtnText: {
-    color: COLORS.textLight,
+    color: '#334b57',
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     fontSize: 13,
   },
   hint: {
     fontFamily: 'Poppins_400Regular',
-    color: COLORS.textMuted,
+    color: '#647b87',
     textAlign: 'center',
     fontSize: 12,
     marginVertical: 10,
@@ -1488,253 +1219,18 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontWeight: '700',
   },
-  keyboardDock: {
-    borderTopWidth: 1,
-    borderTopColor: COLORS.headerBorder,
-    backgroundColor: 'rgba(8,12,24,0.96)',
-    paddingTop: 4,
-    paddingHorizontal: 10,
-    paddingBottom: 6,
-  },
-  nextKeyBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    marginBottom: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    backgroundColor: 'rgba(14,116,144,0.08)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(14,116,144,0.25)',
-    alignSelf: 'center',
-  },
-  nextKeyBarLabel: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 11,
-    letterSpacing: 0.8,
-    color: COLORS.cyan,
-  },
-  nextKeyBarKey: {
-    minWidth: 26,
-    height: 26,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: '#0e7490',
-    backgroundColor: 'rgba(14,116,144,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-  },
-  nextKeyBarKeyText: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 15,
-    color: '#e8f7ff',
-  },
-  nextKeyBarEmpty: {
-    fontFamily: 'Poppins_400Regular',
-    fontSize: 11,
-    color: COLORS.textMuted,
-  },
-  nextFingerChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(14,116,144,0.14)',
-    borderRadius: 16,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  nextFingerText: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 11,
-    color: COLORS.cyan,
-  },
-
-  // Right panel
-  rightPanel: {
-    borderLeftWidth: 1,
-    borderLeftColor: COLORS.headerBorder,
-    backgroundColor: COLORS.headerBg,
-    padding: 16,
-    overflowY: 'auto' ,
-  },
-
-  // Left panel (practice options)
-  leftPanel: {
-    borderRightWidth: 1,
-    borderRightColor: COLORS.headerBorder,
-    backgroundColor: COLORS.headerBg,
-    padding: 16,
-    overflowY: 'auto' ,
-  },
-  leftTitle: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    fontSize: 11,
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
-    marginBottom: 12,
-  },
-  rightTitle: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    fontSize: 11,
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
-    marginBottom: 12,
-  },
-  liveStats: { gap: 8, marginBottom: 14 },
-  liveStat: {
-    backgroundColor: COLORS.cardBg,
-    borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
-    borderRadius: 12,
-    padding: 12,
-    alignItems: 'center',
-    overflow: 'hidden',
-  },
-  liveStatBig: {
-    backgroundColor: 'rgba(37,99,235,0.18)',
-    borderColor: 'rgba(59,130,246,0.5)',
-  },
-  liveStatValue: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 22,
-    flexShrink: 1,
-    textAlign: 'center',
-  },
-  liveStatValueBig: {
-    fontSize: 42,
-  },
-  liveStatLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 3,
-  },
-  liveStatLabel: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    fontSize: 10.5,
-    textTransform: 'uppercase',
-    flexShrink: 1,
-    textAlign: 'center',
-  },
-  guideCard: {
-    backgroundColor: COLORS.cardBg,
-    borderWidth: 1.5,
-    borderColor: COLORS.cardBorder,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 14,
-    alignItems: 'center',
-  },
-  guideTitle: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    fontSize: 10.5,
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  nextKeyDisplay: {
-    width: 54,
-    height: 54,
-    borderRadius: 12,
-    backgroundColor: 'rgba(14,116,144,0.14)',
-    borderWidth: 1,
-    borderColor: '#0e7490',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#0e7490',
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-  },
-  nextKeyBig: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    fontSize: 28,
-    color: '#0e7490',
-  },
-  guideKeyName: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.textLight,
-    fontSize: 13,
-    marginTop: 8,
-  },
-  guideEmpty: {
-    fontFamily: 'Poppins_400Regular',
-    color: COLORS.textDim,
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  fingerChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(14,116,144,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(14,116,144,0.4)',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    marginTop: 10,
-  },
-  fingerChipText: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.cyan,
-    fontSize: 11.5,
-  },
-  rightProgressTrack: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    overflow: 'hidden',
-    width: '100%',
-  },
-  rightProgressFill: {
-    height: '100%',
-    borderRadius: 4,
-    backgroundColor: '#0e7490',
-  },
-  rightProgressText: {
-    fontFamily: 'Poppins_400Regular',
-    color: COLORS.textMuted,
-    fontSize: 10.5,
-    marginTop: 8,
-  },
-  rightProgressPct: {
-    fontFamily: 'Poppins_700Bold',
-    fontWeight: '700',
-    color: COLORS.cyan,
-    fontSize: 20,
-    marginTop: 8,
-  },
-
   // Result
   resultOverlay: {
     marginBottom: 12,
   },
   resultCard: {
-    backgroundColor: COLORS.cardBgSolid,
+    backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: 'rgba(59,130,246,0.4)',
+    borderColor: '#c9e0e9',
     borderRadius: 16,
     padding: 22,
-    shadowColor: '#14b8a6',
-    shadowOpacity: 0.2,
+    shadowColor: '#315c70',
+    shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 6 },
     shadowRadius: 18,
     elevation: 6,
@@ -1751,13 +1247,13 @@ const styles = StyleSheet.create({
   resultTitle: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
-    color: '#fff',
+    color: '#172b36',
     fontSize: 22,
   },
   resultSub: {
     fontFamily: 'Poppins_600SemiBold',
     fontWeight: '600',
-    color: COLORS.textMuted,
+    color: '#647b87',
     fontSize: 12.5,
     marginTop: 3,
   },
@@ -1780,7 +1276,7 @@ const styles = StyleSheet.create({
   resultBigLabel: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
-    color: COLORS.textMuted,
+    color: '#647b87',
     fontSize: 11,
     textTransform: 'uppercase',
     marginTop: 2,
@@ -1798,18 +1294,18 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 90,
     maxWidth: '100%',
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: '#f2f7f9',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 8,
     alignItems: 'center',
     overflow: 'hidden',
   },
-  resultGridVal: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight, fontSize: 16, flexShrink: 1, textAlign: 'center' },
+  resultGridVal: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#334b57', fontSize: 16, flexShrink: 1, textAlign: 'center' },
   resultGridLabel: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
-    color: COLORS.textMuted,
+    color: '#647b87',
     fontSize: 9.5,
     textTransform: 'uppercase',
     marginTop: 2,

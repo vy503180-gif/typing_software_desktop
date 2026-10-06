@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BG, COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
+import { COLORS, scaleFont, scaleSize, SCREEN, IS_DESKTOP, CONTENT_MAX_WIDTH } from '../theme';
 
 const SCREEN_W = SCREEN.width;
 
@@ -17,26 +17,24 @@ export default function LessonDetailScreen({ lesson, course, onStartSubLesson, o
   const lessonIndex = course.lessons.findIndex((l) => l.id === lesson.id);
 
   const isLessonComplete = (l) => l.subLessons.every((s) => completedSubLessons.includes(s.id));
-  const isLessonUnlocked = (i) => i === 0 || course.lessons.slice(0, i).every(isLessonComplete);
 
   const prevLesson = course.lessons[lessonIndex - 1] || null;
   const nextLesson = course.lessons[lessonIndex + 1] || null;
   const lessonComplete = isLessonComplete(lesson);
-  const lessonLocked = !lessonComplete && !isLessonUnlocked(lessonIndex);
   const lessonColor = lesson.color || COLORS.teal;
   const lessonBg = lesson.bgColor || COLORS.cardBgSolid;
   const lessonBorder = lesson.borderColor || COLORS.cardBorder;
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: BG }]}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
       <View style={styles.gradient}>
         <View style={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
               <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+                <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
               </TouchableOpacity>
             )}
             <Text style={styles.headerTitle}>Lesson {lesson.id}</Text>
@@ -69,8 +67,8 @@ export default function LessonDetailScreen({ lesson, course, onStartSubLesson, o
 
           {lessonComplete && (
             <View style={[styles.lessonDoneBanner, { backgroundColor: COLORS.green + '15' }]}>
-              <Ionicons name="checkmark-circle" size={16} color={COLORS.green} />
-              <Text style={[styles.lessonDoneText, { color: COLORS.green }]}>Lesson Complete! Next lesson unlocked.</Text>
+              <Ionicons name="checkmark-circle" size={16} color="#15803d" />
+              <Text style={[styles.lessonDoneText, { color: '#15803d' }]}>Lesson Complete!</Text>
             </View>
           )}
 
@@ -97,40 +95,28 @@ export default function LessonDetailScreen({ lesson, course, onStartSubLesson, o
           {/* Sub Lessons */}
           <ScrollView style={styles.subLessonsScroll} contentContainerStyle={styles.subLessonsCardWrap}>
             <View style={[styles.subLessonsCard, { backgroundColor: lessonBg, borderColor: lessonBorder }]}>
-              {lessonLocked && (
-                <View style={styles.lockBox}>
-                  <Ionicons name="lock-closed" size={28} color={COLORS.textDim} />
-                  <Text style={styles.lockBoxTitle}>Lesson {lesson.id} is Locked</Text>
-                  <Text style={styles.lockBoxSub}>
-                    Complete Lesson {course.lessons[lessonIndex - 1] ? course.lessons[lessonIndex - 1].id : ''} first to unlock
-                  </Text>
-                </View>
-              )}
               {lesson.subLessons.map((sub) => {
                 const subComplete = completedSubLessons.includes(sub.id);
                 return (
                   <TouchableOpacity
                     key={sub.id}
                     style={[styles.subLessonItem, subComplete && styles.subLessonItemDone]}
-                    onPress={() => !lessonLocked && onStartSubLesson(sub)}
+                    onPress={() => onStartSubLesson(sub)}
                     activeOpacity={0.7}
-                    disabled={lessonLocked}
                   >
                     <View style={styles.subLessonLeft}>
                       {subComplete ? (
-                        <Ionicons name="checkmark-circle" size={18} color={COLORS.green} />
-                      ) : lessonLocked ? (
-                        <Ionicons name="lock-closed" size={14} color={COLORS.textDim} />
+                        <Ionicons name="checkmark-circle" size={18} color="#15803d" />
                       ) : (
                         <View style={[styles.radio, { borderColor: lessonColor }]}>
                           <View style={[styles.radioInner, { backgroundColor: lessonColor + '40' }]} />
                         </View>
                       )}
-                      <Text style={[styles.subLessonNum, subComplete && { color: COLORS.green }, lessonLocked && { color: COLORS.textDim }]}>{sub.id}</Text>
-                      <Text style={[styles.subLessonTitle, { color: lessonColor }, subComplete && { color: COLORS.green }, lessonLocked && { color: COLORS.textDim }]}>{sub.title}</Text>
+                      <Text style={[styles.subLessonNum, subComplete && { color: '#15803d' }]}>{sub.id}</Text>
+                      <Text style={[styles.subLessonTitle, { color: lessonColor }, subComplete && { color: '#15803d' }]}>{sub.title}</Text>
                     </View>
                     {sub.duration && (
-                      <Text style={[styles.subLessonDuration, lessonLocked && { color: COLORS.textDim }]}>{sub.duration}</Text>
+                      <Text style={styles.subLessonDuration}>{sub.duration}</Text>
                     )}
                   </TouchableOpacity>
                 );
@@ -144,8 +130,8 @@ export default function LessonDetailScreen({ lesson, course, onStartSubLesson, o
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: BG },
-  gradient: { flex: 1 },
+  safeArea: { flex: 1, backgroundColor: '#D5EEF2' },
+  gradient: { flex: 1, backgroundColor: '#D5EEF2' },
   container: { flex: 1, paddingHorizontal: scaleSize(16), paddingTop: scaleSize(8) },
   containerDesktop: {
     paddingHorizontal: 24,
@@ -159,20 +145,20 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, marginRight: scaleSize(8),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: scaleSize(8),
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
-  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: scaleFont(18), color: COLORS.textWhite, flex: 1 },
+  headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: scaleFont(18), color: '#14212b', flex: 1 },
 
   tabRow: { flexDirection: 'row', gap: scaleSize(5), marginBottom: scaleSize(8), marginTop: scaleSize(8) },
   tab: {
     width: scaleSize(28), height: scaleSize(28), borderRadius: scaleSize(6),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: '#ffffff', borderWidth: 1.5, borderColor: '#b7cbd3',
   },
-  tabText: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700'},
+  tabText: { fontSize: scaleFont(11), color: '#536775', fontFamily: 'Poppins_700Bold', fontWeight: '700'},
 
-  lessonTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, marginBottom: scaleSize(8) },
+  lessonTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#14212b', marginBottom: scaleSize(8) },
 
   lessonDoneBanner: {
     flexDirection: 'row', alignItems: 'center', gap: 6,
@@ -183,29 +169,25 @@ const styles = StyleSheet.create({
   sideNavBtn: {
     position: 'absolute', width: scaleSize(52), height: scaleSize(52), borderRadius: scaleSize(26),
     borderWidth: 2, alignItems: 'center', justifyContent: 'center',
-    zIndex: 10, backgroundColor: '#0f0c29',
+    zIndex: 10, backgroundColor: '#ffffff',
   },
   sideNavLeft: { left: 20, top: 460 },
   sideNavRight: { right: 20, top: 460 },
   sideNavDisabled: { opacity: 0.3 },
   sideNavLabel: { fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: scaleSize(2) },
 
-  subLessonsCard: { flex: 1, borderRadius: scaleSize(12), borderWidth: 2, padding: scaleSize(10) },
+  subLessonsCard: { flex: 1, backgroundColor: '#ffffff', borderColor: '#b7cbd3', borderRadius: scaleSize(12), borderWidth: 1.5, padding: scaleSize(10) },
   subLessonsScroll: { flex: 1 },
   subLessonsCardWrap: { paddingBottom: scaleSize(60) },
-  lockBox: { alignItems: 'center', paddingVertical: scaleSize(18), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder, marginBottom: scaleSize(4) },
-  lockBoxTitle: { fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight, marginTop: scaleSize(6) },
-  lockBoxSub: { fontSize: scaleFont(11), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(4) },
-
   subLessonItem: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingVertical: scaleSize(8), borderBottomWidth: 1, borderBottomColor: COLORS.cardBorder,
+    paddingVertical: scaleSize(8), borderBottomWidth: 1, borderBottomColor: '#d6e1e5',
   },
   subLessonItemDone: { opacity: 0.85 },
   subLessonLeft: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: scaleSize(6) },
   radio: { width: scaleSize(16), height: scaleSize(16), borderRadius: scaleSize(8), borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   radioInner: { width: scaleSize(8), height: scaleSize(8), borderRadius: scaleSize(4) },
-  subLessonNum: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textLight, width: scaleSize(24) },
+  subLessonNum: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#14212b', width: scaleSize(24) },
   subLessonTitle: { fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', textDecorationLine: 'underline', flex: 1 },
-  subLessonDuration: { fontSize: scaleFont(10), color: COLORS.textMuted, fontFamily: 'Poppins_700Bold', fontWeight: '700', marginLeft: scaleSize(4) },
+  subLessonDuration: { fontSize: scaleFont(10), color: '#536775', fontFamily: 'Poppins_700Bold', fontWeight: '700', marginLeft: scaleSize(4) },
 });

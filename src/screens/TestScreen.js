@@ -60,7 +60,7 @@ export default function TestScreen({ onBack, onStartTest, studentName = '' }) {
         <View style={styles.header}>
           {onBack && (
             <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={18} color={COLORS.textLight} />
+              <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
             </TouchableOpacity>
           )}
           <View>
@@ -147,8 +147,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: 12,
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },
   subtitle: { fontFamily: 'Poppins_600SemiBold', fontWeight: '600', color: COLORS.textMuted, fontSize: 12, marginTop: 2 },

@@ -1,5 +1,5 @@
 // src/screens/HomeScreen.js
-// Professional dashboard: progress, live stats, quick links.
+// Professional dashboard: progress, typing history, quick links.
 
 import React, { useEffect, useMemo, useState } from 'react';
 import {
@@ -187,7 +187,6 @@ export default function HomeScreen({
         <Text style={styles.sectionTitle}>More</Text>
         <View style={styles.moreRow}>
           {[
-            { label: 'Professional Course', icon: 'school', color: COLORS.blue, onPress: onCourse },
             { label: 'Review & Drills', icon: 'repeat', color: COLORS.green, onPress: onReview },
             { label: 'Daily Challenge', icon: 'sparkles', color: COLORS.purple, onPress: onExplore },
             { label: 'About', icon: 'information-circle', color: COLORS.amber, onPress: onInfo },

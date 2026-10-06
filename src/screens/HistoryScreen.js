@@ -62,7 +62,7 @@ export default function HistoryScreen({ studentName, onBack }) {
         <View style={styles.header}>
           {onBack ? (
             <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+              <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
             </TouchableOpacity>
           ) : null}
           <View style={styles.headerTextWrap}>
@@ -163,8 +163,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, marginRight: scaleSize(8),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: scaleSize(8),
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   clearBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),

@@ -234,7 +234,7 @@ export default function ReviewDrillScreen({ onBack, keyOption = 'Difficult Keys'
           <View style={styles.header}>
             {onBack && (
               <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+                <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
               </TouchableOpacity>
             )}
             <Text style={styles.headerTitle}>Keyboard Drill</Text>
@@ -261,7 +261,7 @@ export default function ReviewDrillScreen({ onBack, keyOption = 'Difficult Keys'
               </TouchableOpacity>
               {onBack && (
                 <TouchableOpacity style={styles.backToReviewBtn} onPress={onBack} activeOpacity={0.85}>
-                  <Ionicons name="arrow-back" size={16} color={COLORS.textWhite} />
+                  <Ionicons name="arrow-back" size={16} color={COLORS.teal} />
                   <Text style={styles.backToReviewText}>Back to Review</Text>
                 </TouchableOpacity>
               )}
@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     borderRadius: scaleSize(15),
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.backButtonBg,
     marginRight: 8,
   },
   headerTitle: { fontFamily: 'Poppins_400Regular', fontSize: scaleFont(18),

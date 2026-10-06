@@ -1,0 +1,20 @@
+# Ignore project files not needed by the packaged runtime
+.git/**
+.github/**
+.idea/**
+.vscode/**
+.expo/**
+node_modules/**
+src/**
+scripts/**
+public/**
+release/**
+**/*.map
+**/*.log
+**/*.md
+**/*.txt
+**/*.bak
+**/*.tmp
+**/.git/**
+**/.github/**
+**/.expo/**

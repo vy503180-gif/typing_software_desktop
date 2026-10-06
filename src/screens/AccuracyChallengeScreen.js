@@ -167,7 +167,7 @@ export default function AccuracyChallengeScreen({ onBack }) {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+            <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Accuracy Challenge</Text>
           <View style={[styles.targetChip, aboveTarget && started && styles.targetHit]}>
@@ -216,7 +216,7 @@ export default function AccuracyChallengeScreen({ onBack }) {
               <Text style={styles.restartBtnText}>Play Again</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.exitBtn} onPress={onBack} activeOpacity={0.85}>
-              <Ionicons name="arrow-back" size={16} color={COLORS.textWhite} />
+              <Ionicons name="arrow-back" size={16} color={COLORS.teal} />
               <Text style={styles.exitBtnText}>Back to Games</Text>
             </TouchableOpacity>
           </View>
@@ -237,26 +237,6 @@ export default function AccuracyChallengeScreen({ onBack }) {
           </View>
         ) : (
           <>
-            {/* Live stats */}
-            <View style={styles.statsRow}>
-              <View style={[styles.statBox, aboveTarget ? styles.statBoxGood : styles.statBoxWarn]}>
-                <Text style={[styles.statVal, { color: aboveTarget ? COLORS.green : COLORS.amber }]}>{accuracy}%</Text>
-                <Text style={styles.statLabel}>Accuracy</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.cyan }]}>{g.mistakes}</Text>
-                <Text style={styles.statLabel}>Mistakes</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.amber }]}>{liveWpm}</Text>
-                <Text style={styles.statLabel}>WPM</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.purple }]}>{g.totalChars}/{g.text.length}</Text>
-                <Text style={styles.statLabel}>Chars</Text>
-              </View>
-            </View>
-
             {/* Accuracy gauge */}
             <View style={styles.gaugeWrap}>
               <View style={styles.gaugeHeader}>
@@ -348,7 +328,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(14) },
   backBtn: {
     width: scaleSize(36), height: scaleSize(36), borderRadius: scaleSize(18),
-    backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLORS.backButtonBg, alignItems: 'center', justifyContent: 'center',
     marginRight: scaleSize(12),
   },
   headerTitle: {
@@ -362,7 +342,6 @@ const styles = StyleSheet.create({
   targetHit: { backgroundColor: 'rgba(34,197,94,0.2)', borderWidth: 1, borderColor: 'rgba(34,197,94,0.5)' },
   targetText: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
-  statsRow: { flexDirection: 'row', gap: scaleSize(8), marginBottom: scaleSize(10) },
   statBox: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(12),
@@ -471,8 +450,8 @@ const styles = StyleSheet.create({
   restartBtnText: { color: '#fff', fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   exitBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(12),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, borderRadius: scaleSize(12),
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
     paddingVertical: scaleSize(11), paddingHorizontal: scaleSize(24), marginTop: scaleSize(10),
   },
   exitBtnText: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },

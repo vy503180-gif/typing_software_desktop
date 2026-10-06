@@ -66,7 +66,7 @@ export default function InfoScreen({ onBack }) {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+            <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
           </TouchableOpacity>
           <View style={styles.headerTextWrap}>
             <Text style={styles.title}>Information</Text>
@@ -191,8 +191,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(19),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, marginRight: scaleSize(10),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: scaleSize(10),
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   headerTextWrap: { flex: 1 },
   title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(24) },

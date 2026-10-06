@@ -90,7 +90,7 @@ export default function GamesMenuScreen({
         <View style={styles.headerRow}>
           {onBack && (
             <TouchableOpacity onPress={onBack} style={styles.backIconBtn} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+              <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
             </TouchableOpacity>
           )}
           <View style={styles.headerText}>
@@ -228,8 +228,8 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(8), marginTop: scaleSize(8), marginBottom: scaleSize(16) },
   backIconBtn: {
     width: scaleSize(34), height: scaleSize(34), borderRadius: scaleSize(17),
-    backgroundColor: COLORS.cardBg, alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: COLORS.cardBorder, marginRight: scaleSize(6),
+    backgroundColor: COLORS.backButtonBg, alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder, marginRight: scaleSize(6),
   },
   headerText: { flex: 1 },
   headerTitle: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(22) },

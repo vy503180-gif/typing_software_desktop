@@ -88,7 +88,7 @@ export default function ProfileScreen({ studentName = '', onBack, onSwitchUser, 
         <View style={styles.header}>
           {onBack && (
             <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={18} color={COLORS.textLight} />
+              <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
             </TouchableOpacity>
           )}
           <View style={styles.headerText}>
@@ -200,7 +200,7 @@ export default function ProfileScreen({ studentName = '', onBack, onSwitchUser, 
           {recent.length === 0 ? (
             <View style={styles.emptyCard}>
               <Ionicons name="time-outline" size={26} color={COLORS.textDim} />
-              <Text style={styles.emptyText}>No activity yet â€” take your first test!</Text>
+              <Text style={styles.emptyText}>No activity yet - take your first test!</Text>
             </View>
           ) : (
             <View style={styles.recentCard}>
@@ -247,8 +247,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: 12,
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   headerText: { flex: 1 },
   title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },

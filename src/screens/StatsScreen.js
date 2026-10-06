@@ -138,7 +138,7 @@ export default function StatsScreen({ studentName, onBack }) {
           <View style={styles.header}>
             {onBack && (
               <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+                <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
               </TouchableOpacity>
             )}
             <Ionicons name="stats-chart" size={22} color={COLORS.teal} />
@@ -260,7 +260,7 @@ export default function StatsScreen({ studentName, onBack }) {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   gradient: { flex: 1 },
-  container: { flexGrow: 1, padding: scaleFont(16), paddingBottom: 40 },
+  container: { flexGrow: 1, padding: scaleFont(16), paddingBottom: 120 },
   containerDesktop: {
     padding: 24,
     paddingBottom: 24,
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(19),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   headerTitle: { fontSize: scaleFont(22), fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, flex: 1 },
 

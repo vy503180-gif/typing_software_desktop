@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, scaleFont, scaleSize, IS_DESKTOP, SIDEBAR_WIDTH, HEADER_HEIGHT } from '../theme';
 
@@ -147,7 +147,7 @@ const sidebarStyles = StyleSheet.create({
 
 // Mobile bottom tab navigation (existing)
 export default function BottomNav({ activeTab, onTabPress }) {
-  if (IS_DESKTOP) return null;
+  if (Platform.OS === 'web' || IS_DESKTOP) return null;
 
   return (
     <View style={styles.wrapper} pointerEvents="box-none">

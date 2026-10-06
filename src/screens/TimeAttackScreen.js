@@ -173,7 +173,7 @@ export default function TimeAttackScreen({ onBack }) {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+            <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Time Attack</Text>
           <View style={[styles.clockChip, danger && started && styles.clockDanger]}>
@@ -224,7 +224,7 @@ export default function TimeAttackScreen({ onBack }) {
               <Text style={styles.restartBtnText}>Play Again</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.exitBtn} onPress={onBack} activeOpacity={0.85}>
-              <Ionicons name="arrow-back" size={16} color={COLORS.textWhite} />
+              <Ionicons name="arrow-back" size={16} color={COLORS.teal} />
               <Text style={styles.exitBtnText}>Back to Games</Text>
             </TouchableOpacity>
           </View>
@@ -261,22 +261,6 @@ export default function TimeAttackScreen({ onBack }) {
                     },
                   ]}
                 />
-              </View>
-            </View>
-
-            {/* Live stats */}
-            <View style={styles.statsRow}>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.cyan }]}>{liveWpm}</Text>
-                <Text style={styles.statLabel}>WPM</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.green }]}>{accuracy}%</Text>
-                <Text style={styles.statLabel}>Accuracy</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.amber }]}>{progress}%</Text>
-                <Text style={styles.statLabel}>Paragraph</Text>
               </View>
             </View>
 
@@ -331,7 +315,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(10) },
   backBtn: {
     width: scaleSize(36), height: scaleSize(36), borderRadius: scaleSize(18),
-    backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLORS.backButtonBg, alignItems: 'center', justifyContent: 'center',
     marginRight: scaleSize(12),
   },
   headerTitle: {
@@ -361,7 +345,6 @@ const styles = StyleSheet.create({
   },
   clockFill: { height: 8, borderRadius: 4 },
 
-  statsRow: { flexDirection: 'row', gap: scaleSize(8), marginBottom: scaleSize(12) },
   statBox: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(12),
@@ -433,8 +416,8 @@ const styles = StyleSheet.create({
   restartBtnText: { color: '#fff', fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   exitBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(12),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, borderRadius: scaleSize(12),
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
     paddingVertical: scaleSize(11), paddingHorizontal: scaleSize(24), marginTop: scaleSize(10),
   },
   exitBtnText: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },

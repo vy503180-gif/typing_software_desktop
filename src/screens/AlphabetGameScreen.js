@@ -247,7 +247,7 @@ export default function AlphabetGameScreen({ onBack, mode: initialMode }) {
             </TouchableOpacity>
             {onBack && (
               <TouchableOpacity style={styles.backBtn} onPress={onBack} activeOpacity={0.85}>
-                <Ionicons name="arrow-back" size={16} color={COLORS.textWhite} />
+                <Ionicons name="arrow-back" size={16} color={COLORS.teal} />
                 <Text style={styles.backBtnText}>Home</Text>
               </TouchableOpacity>
             )}
@@ -258,7 +258,7 @@ export default function AlphabetGameScreen({ onBack, mode: initialMode }) {
             <View style={styles.headerRow}>
               {onBack && (
                 <TouchableOpacity onPress={onBack} style={styles.backIconBtn} activeOpacity={0.7}>
-                  <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+                  <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
                 </TouchableOpacity>
               )}
               <Text style={[styles.headerTitle, { color: accent }]} numberOfLines={1}>{MODES.find((m) => m.id === mode).label} Circle</Text>
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     width: scaleSize(34),
     height: scaleSize(34),
     borderRadius: scaleSize(17),
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.backButtonBg,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: scaleSize(10),
@@ -692,7 +692,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: scaleSize(8),
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.backButtonBg,
     borderRadius: scaleSize(24),
     paddingVertical: scaleSize(12),
     paddingHorizontal: scaleSize(36),

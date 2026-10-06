@@ -5,6 +5,10 @@ copyright: Copyright © 2024 Antriksh
 compression: maximum
 electronLanguages: ["en-US"]
 electronDist: node_modules/electron/dist
+asar: true
+
+buildDependenciesFromSource: false
+nodeGypRebuild: false
 
 directories:
   output: release
@@ -15,8 +19,20 @@ extraMetadata:
 files:
   - "dist/**/*"
   - "electron.js"
-  - "assets/icon.ico"
-  - "assets/icon.png"
+  - "package.json"
+  - "assets/**/*"
+  - "!**/*.map"
+  - "!**/*.log"
+  - "!**/*.md"
+  - "!**/*.txt"
+  - "!src/**"
+  - "!scripts/**"
+  - "!public/**"
+  - "!node_modules/**"
+  - "!**/.git/**"
+  - "!**/.github/**"
+  - "!**/release/**"
+  - "!**/.expo/**"
 
 asarUnpack:
   - "assets/icon.ico"

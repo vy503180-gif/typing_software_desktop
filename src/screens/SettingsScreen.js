@@ -121,7 +121,7 @@ export default function SettingsScreen({
         <View style={styles.headerRow}>
           {onBack && (
             <TouchableOpacity onPress={onBack} style={styles.backIconBtn} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+              <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
             </TouchableOpacity>
           )}
           <View style={styles.headerText}>
@@ -169,35 +169,6 @@ export default function SettingsScreen({
             <Toggle value={settings.keyboardSound !== false} onChange={(v) => set('keyboardSound', v)} color={COLORS.amber} />
           </View>
 
-          <View style={styles.divider} />
-          <View style={styles.settingRow}>
-            <View style={styles.settingIcon}><Ionicons name="keypad" size={17} color={COLORS.teal} /></View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.dataTitle}>Virtual keyboard</Text>
-              <Text style={styles.dataSub}>Show the on-screen keyboard with finger guides</Text>
-            </View>
-            <Toggle value={settings.virtualKeyboard !== false} onChange={(v) => set('virtualKeyboard', v)} color={COLORS.teal} />
-          </View>
-
-          <View style={styles.divider} />
-          <View style={styles.settingRow}>
-            <View style={styles.settingIcon}><Ionicons name="hand-left" size={17} color={COLORS.blue} /></View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.dataTitle}>Finger guide</Text>
-              <Text style={styles.dataSub}>Show which finger to use for the next key</Text>
-            </View>
-            <Toggle value={settings.fingerGuide === true} onChange={(v) => set('fingerGuide', v)} color={COLORS.blue} />
-          </View>
-
-          <View style={styles.divider} />
-          <View style={styles.settingRow}>
-            <View style={styles.settingIcon}><Ionicons name="flash" size={17} color={COLORS.purple} /></View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.dataTitle}>Highlight next key</Text>
-              <Text style={styles.dataSub}>Highlight the next key on the virtual keyboard</Text>
-            </View>
-            <Toggle value={settings.nextKeyHighlight !== false} onChange={(v) => set('nextKeyHighlight', v)} color={COLORS.purple} />
-          </View>
         </View>
 
         {/* Text size */}
@@ -281,7 +252,7 @@ export default function SettingsScreen({
           </View>
           <Text style={styles.layoutHint}>
             {hindiLayout === 'krutidev'
-              ? 'Type using the Kruti Dev (Remington) layout â€” the app converts it to Unicode Devanagari (Mangal) automatically.'
+              ? 'Type using the Kruti Dev (Remington) layout - the app converts it to Unicode Devanagari (Mangal) automatically.'
               : 'Type using a normal Unicode Devanagari keyboard (Mangal), like the standard Hindi keyboard.'}
           </Text>
         </View>
@@ -291,7 +262,7 @@ export default function SettingsScreen({
         <View style={styles.card}>
           {renderDataRow('history', 'time-outline', COLORS.teal, 'Clear typing history', 'Remove all saved test results', clearHistory)}
           {renderDataRow('progress', 'refresh-outline', COLORS.amber, 'Reset lesson progress', 'Re-unlock all lessons', resetProgress)}
-          {renderDataRow('all', 'trash-outline', COLORS.red, 'Reset all data', 'Name, progress and history â€” everything', resetAll)}
+          {renderDataRow('all', 'trash-outline', COLORS.red, 'Reset all data', 'Name, progress and history - everything', resetAll)}
         </View>
 
         {/* About */}
@@ -306,7 +277,7 @@ export default function SettingsScreen({
             </View>
           </View>
           <Text style={styles.aboutText}>
-            Learn typing with lessons, games and speed tests â€” English and Hindi.
+            Learn typing with lessons, games and speed tests - English and Hindi.
           </Text>
         </View>
 
@@ -328,9 +299,9 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6, marginTop: 4 },
   backIconBtn: {
     width: 38, height: 38, borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.backButtonBg,
     alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
     marginRight: 12,
   },
   headerText: { flex: 1 },

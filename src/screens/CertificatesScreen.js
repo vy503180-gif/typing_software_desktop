@@ -140,7 +140,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#eef2f7;display:flex
         <View style={styles.header}>
           {onBack && (
             <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-              <Ionicons name="arrow-back" size={18} color={COLORS.textLight} />
+              <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
             </TouchableOpacity>
           )}
           <View style={styles.headerText}>
@@ -206,7 +206,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#eef2f7;display:flex
                 onStartCert && (
                   <TouchableOpacity style={[styles.challengeBtn, { backgroundColor: c.color, borderColor: c.color }]} onPress={() => onStartCert(c)} activeOpacity={0.85}>
                     <Ionicons name="timer" size={15} color="#fff" />
-                    <Text style={styles.challengeText}>Take Challenge Â· 1 min</Text>
+                    <Text style={styles.challengeText}>Take Challenge - 1 min</Text>
                   </TouchableOpacity>
                 )
               )}
@@ -231,8 +231,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: 12,
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   headerText: { flex: 1 },
   title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },

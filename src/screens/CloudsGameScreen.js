@@ -347,7 +347,7 @@ export default function CloudsGameScreen({ onBack }) {
             </TouchableOpacity>
             {onBack && (
               <TouchableOpacity style={styles.backToReviewBtn} onPress={onBack} activeOpacity={0.85}>
-                <Ionicons name="arrow-back" size={16} color={COLORS.textWhite} />
+                <Ionicons name="arrow-back" size={16} color={COLORS.teal} />
                 <Text style={styles.backToReviewText}>Back to Review</Text>
               </TouchableOpacity>
             )}
@@ -358,7 +358,7 @@ export default function CloudsGameScreen({ onBack }) {
             <View style={styles.headerRow}>
               {onBack && (
                 <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                  <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+                  <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
                 </TouchableOpacity>
               )}
               <Text style={styles.headerTitle} numberOfLines={1}>Clouds Pop</Text>
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     width: scaleSize(34),
     height: scaleSize(34),
     borderRadius: scaleSize(17),
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: COLORS.backButtonBg,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: scaleSize(8),

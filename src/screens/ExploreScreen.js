@@ -1,5 +1,5 @@
 // src/screens/ExploreScreen.js
-// Explore screen: Speed Test, Keyboard Guide, Daily Challenge, Best Scores
+// Explore screen: Speed Test, Daily Challenge, Best Scores
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
@@ -23,7 +23,7 @@ import { wordUnits } from '../utils/wordUnits';
 const SCREEN_W = SCREEN.width;
 const getHistoryKey = () => `antriksh_typing_history`;
 
-// â”€â”€ Speed Test Data (duration wise) â”€â”€
+// -- Speed Test Data (duration wise) --
 const SPEED_SHORT = [
   'The quick brown fox jumps over the lazy dog.',
   'Pack my box with five dozen liquor jugs.',
@@ -57,7 +57,7 @@ const getSPEED_POOL = (dur) => {
   return SPEED_LONG;
 };
 
-// â”€â”€ Daily Challenge Data â”€â”€
+// -- Daily Challenge Data --
 const DAILY_PARAGRAPHS = [
   'Technology has changed the way we live our daily lives in so many ways. From the moment we wake up to the time we sleep, we are surrounded by devices that make our tasks easier. Smartphones help us stay connected with friends, manage work schedules, and track our health. The internet has opened a world of information at our fingertips.',
   'Reading books is one of the most valuable habits a person can develop. When you read regularly, you improve your vocabulary and expand your understanding of different cultures and ideas. Books can transport you to different worlds and teach you lessons you might never learn from experience.',
@@ -74,37 +74,7 @@ const getDailyIndex = () => {
   return (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate()) % DAILY_PARAGRAPHS.length;
 };
 
-// â”€â”€ Keyboard Layout Data â”€â”€
-const QWERTY_ROWS = [
-  ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='],
-  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'],
-  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', "'"],
-  ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/'],
-];
-
-const HOME_ROW = { left: ['A', 'S', 'D', 'F'], right: ['J', 'K', 'L', ';'] };
-const FINGER_MAP = {
-  '`': 'LP', '1': 'LP', '2': 'LR', '3': 'LM', '4': 'LI', '5': 'LI',
-  '6': 'RI', '7': 'RI', '8': 'RM', '9': 'RR', '0': 'RP', '-': 'RP', '=': 'RP',
-  'Q': 'LP', 'W': 'LR', 'E': 'LM', 'R': 'LI', 'T': 'LI',
-  'Y': 'RI', 'U': 'RI', 'I': 'RM', 'O': 'RR', 'P': 'RP', '[': 'RP', ']': 'RP', '\\': 'RP',
-  'A': 'LP', 'S': 'LR', 'D': 'LM', 'F': 'LI', 'G': 'LI',
-  'H': 'RI', 'J': 'RI', 'K': 'RM', 'L': 'RR', ';': 'RR', "'": 'RP',
-  'Z': 'LP', 'X': 'LR', 'C': 'LM', 'V': 'LI', 'B': 'LI',
-  'N': 'RI', 'M': 'RI', ',': 'RM', '.': 'RR', '/': 'RP',
-};
-
-const FINGER_COLORS = {
-  LP: '#fb7185', LR: '#fbbf24', LM: '#4ade80', LI: '#2dd4bf',
-  RI: '#2dd4bf', RM: '#4ade80', RR: '#fbbf24', RP: '#fb7185',
-};
-
-const FINGER_LABELS = {
-  LP: 'Little', LR: 'Ring', LM: 'Middle', LI: 'Index',
-  RI: 'Index', RM: 'Middle', RR: 'Ring', RP: 'Little',
-};
-
-// â”€â”€ Sub-components â”€â”€
+// -- Sub-components --
 
 function SectionHeader({ icon, color, title, subtitle }) {
   return (
@@ -130,7 +100,7 @@ function SpeedTestCard({ onStart }) {
 
   return (
     <View style={styles.card}>
-      <SectionHeader icon="flash" color={COLORS.amber} title="Speed Test" subtitle="Quick typing test â€” apna WPM check karo" />
+      <SectionHeader icon="flash" color={COLORS.amber} title="Speed Test" subtitle="Quick typing test - apna WPM check karo" />
       <View style={styles.durRow}>
         {DURATIONS.map((d) => {
           const sel = duration === d.value;
@@ -177,7 +147,7 @@ function DailyChallengeCard({ studentName, onStart }) {
 
   return (
     <View style={styles.card}>
-      <SectionHeader icon="calendar" color={COLORS.green} title="Daily Challenge" subtitle="Aaj ka fixed paragraph â€” har din naya" />
+      <SectionHeader icon="calendar" color={COLORS.green} title="Daily Challenge" subtitle="Aaj ka fixed paragraph - har din naya" />
       <View style={styles.dailyPreview}>
         <Text style={styles.dailyText} numberOfLines={3}>{dailyText}</Text>
         <Text style={styles.dailyLen}>{dailyText.length} characters</Text>
@@ -204,50 +174,6 @@ function DailyChallengeCard({ studentName, onStart }) {
         <Ionicons name="play" size={16} color="#fff" />
         <Text style={styles.startBtnText}>{todayScore ? 'Try Again' : 'Start Challenge'}</Text>
       </TouchableOpacity>
-    </View>
-  );
-}
-
-function KeyboardGuideCard() {
-  return (
-    <View style={styles.card}>
-      <SectionHeader icon="finger-print" color={COLORS.teal} title="Keyboard Layout" subtitle="QWERTY home row finger positions" />
-      <View style={styles.kbContainer}>
-        {QWERTY_ROWS.map((row, ri) => (
-          <View key={ri} style={styles.kbRow}>
-            {row.map((key) => {
-              const finger = FINGER_MAP[key] || 'LI';
-              const isHome = HOME_ROW.left.includes(key) || HOME_ROW.right.includes(key);
-              return (
-                <View
-                  key={key}
-                  style={[
-                    styles.kbKey,
-                    { borderColor: FINGER_COLORS[finger] + '60' },
-                    isHome && { backgroundColor: FINGER_COLORS[finger] + '20', borderColor: FINGER_COLORS[finger] },
-                  ]}
-                >
-                  <Text style={[styles.kbKeyText, isHome && { color: FINGER_COLORS[finger] }]}>{key}</Text>
-                </View>
-              );
-            })}
-          </View>
-        ))}
-      </View>
-      <View style={styles.fingerLegend}>
-        {[
-          { label: 'Little', color: '#fb7185' },
-          { label: 'Ring', color: '#fbbf24' },
-          { label: 'Middle', color: '#4ade80' },
-          { label: 'Index', color: '#2dd4bf' },
-        ].map((f) => (
-          <View key={f.label} style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: f.color }]} />
-            <Text style={styles.legendText}>{f.label}</Text>
-          </View>
-        ))}
-      </View>
-      <Text style={styles.kbNote}>Green highlighted keys = home row (ASDF JKL;)</Text>
     </View>
   );
 }
@@ -308,13 +234,13 @@ function BestScoresCard({ studentName }) {
         </View>
       </View>
       {best.totalTests === 0 && (
-        <Text style={styles.noData}>Abhi tak koi test nahi hua â€” pehla speed test karo!</Text>
+        <Text style={styles.noData}>Abhi tak koi test nahi hua - pehla speed test karo!</Text>
       )}
     </View>
   );
 }
 
-// â”€â”€ Inline Speed Test (mini typing test) â”€â”€
+// -- Inline Speed Test (mini typing test) --
 function InlineSpeedTest({ duration, text, onDone, onBack }) {
   const [currentText] = useState(text || (() => {
     const pool = getSPEED_POOL(duration);
@@ -394,7 +320,7 @@ function InlineSpeedTest({ duration, text, onDone, onBack }) {
     <View style={styles.testContainer}>
       <View style={styles.testHeader}>
         <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+          <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.testTitle}>Speed Test</Text>
@@ -476,7 +402,7 @@ function InlineSpeedTest({ duration, text, onDone, onBack }) {
   );
 }
 
-// â”€â”€ Main ExploreScreen â”€â”€
+// -- Main ExploreScreen --
 export default function ExploreScreen({ studentName, onBack }) {
   const [testMode, setTestMode] = useState(null); // { duration, text }
   const [dailyMode, setDailyMode] = useState(false);
@@ -515,7 +441,7 @@ export default function ExploreScreen({ studentName, onBack }) {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={20} color={COLORS.textWhite} />
+            <Ionicons name="arrow-back" size={20} color={COLORS.teal} />
           </TouchableOpacity>
           <View style={styles.headerTextWrap}>
             <Text style={styles.title}>Explore</Text>
@@ -526,7 +452,6 @@ export default function ExploreScreen({ studentName, onBack }) {
         <ScrollView contentContainerStyle={styles.scroll}>
           <SpeedTestCard onStart={startSpeedTest} />
           <DailyChallengeCard studentName={studentName} onStart={startDailyChallenge} />
-          <KeyboardGuideCard />
           <BestScoresCard studentName={studentName} />
           <View style={{ height: scaleSize(40) }} />
         </ScrollView>
@@ -535,7 +460,7 @@ export default function ExploreScreen({ studentName, onBack }) {
   );
 }
 
-// â”€â”€ Styles â”€â”€
+// -- Styles --
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
   container: { flex: 1, padding: scaleSize(16) },
@@ -549,8 +474,8 @@ const styles = StyleSheet.create({
   backBtn: {
     width: scaleSize(38), height: scaleSize(38), borderRadius: scaleSize(19),
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: COLORS.cardBg, marginRight: scaleSize(10),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: scaleSize(10),
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   headerTextWrap: { flex: 1 },
   title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: COLORS.textWhite, fontSize: scaleFont(24) },
@@ -604,22 +529,6 @@ const styles = StyleSheet.create({
   dailyScoreLabel: { color: COLORS.textMuted, fontSize: scaleFont(9), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   dailyDone: { color: COLORS.green, fontSize: scaleFont(12), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
-  // Keyboard Guide
-  kbContainer: { alignItems: 'center', marginBottom: scaleSize(12) },
-  kbRow: { flexDirection: 'row', gap: scaleSize(3), marginBottom: scaleSize(3) },
-  kbKey: {
-    width: scaleSize(28), height: scaleSize(28), borderRadius: scaleSize(5),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
-    alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-  },
-  kbKeyText: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
-  fingerLegend: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(10), marginBottom: scaleSize(6) },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: scaleSize(4) },
-  legendDot: { width: scaleSize(8), height: scaleSize(8), borderRadius: scaleSize(4) },
-  legendText: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
-  kbNote: { color: COLORS.textDim, fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700', marginTop: scaleSize(4) },
-
   // Best Scores
   scoreGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: scaleSize(8) },
   scoreItem: {
@@ -630,7 +539,7 @@ const styles = StyleSheet.create({
   scoreLabel: { color: COLORS.textMuted, fontSize: scaleFont(10), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   noData: { color: COLORS.textDim, fontSize: scaleFont(11), fontFamily: 'Poppins_700Bold', fontWeight: '700', textAlign: 'center', marginTop: scaleSize(8) },
 
-  // â”€â”€ Inline Test â”€â”€
+  // -- Inline Test --
   testContainer: {
     flex: 1, padding: IS_DESKTOP ? 24 : scaleSize(16),
     maxWidth: IS_DESKTOP ? CONTENT_MAX_WIDTH : undefined,

@@ -1,0 +1,77 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Optimize NSIS build",
+			"type": "shell",
+			"command": "npm.cmd run dist:nsis",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Optimized Windows build",
+			"type": "shell",
+			"command": "npm.cmd run dist:nsis",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Check installer size",
+			"type": "shell",
+			"command": "powershell -NoProfile -Command \"Get-Item 'd:\\data\\typing app\\release\\AntrikshTypingMaster-Setup-1.0.0-win.exe' | Select-Object Name,Length,LastWriteTime | Format-List\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Check 7z size",
+			"type": "shell",
+			"command": "7za l \"d:\\data\\typing app\\release\\AntrikshTypingMaster-Setup-1.0.0-win.exe\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Check dir size",
+			"type": "shell",
+			"command": "cmd /c dir /a /-c \"d:\\data\\typing app\\release\\AntrikshTypingMaster-Setup-1.0.0-win.exe\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Release listing",
+			"type": "shell",
+			"command": "powershell -NoProfile -Command \"Set-Location \\\"d:\\data\\typing app\\\"; Get-ChildItem .\\release | Select-Object Name,Length,LastWriteTime | Format-Table -AutoSize\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Inspect packaged app sizes",
+			"type": "shell",
+			"command": "powershell -NoProfile -Command \"Set-Location 'd:\\data\\typing app'; Get-ChildItem .\\release\\win-unpacked -Recurse | Select-Object Name,Length | Sort-Object Length -Descending | Select-Object -First 20 | Format-Table -AutoSize\"",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "none"
+		},
+		{
+			"label": "Validate build after back button styling",
+			"type": "shell",
+			"command": "npm.cmd run build:web",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

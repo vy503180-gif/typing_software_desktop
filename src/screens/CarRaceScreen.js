@@ -217,7 +217,7 @@ export default function CarRaceScreen({ onBack }) {
       <View style={[styles.container, IS_DESKTOP && styles.containerDesktop]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-            <Ionicons name="arrow-back" size={18} color={COLORS.textWhite} />
+            <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Car Race</Text>
           <View style={[styles.gapChip, finished && { backgroundColor: won ? 'rgba(34,197,94,0.25)' : 'rgba(244,63,94,0.25)' }]}>
@@ -276,7 +276,7 @@ export default function CarRaceScreen({ onBack }) {
               <Text style={styles.restartBtnText}>Race Again</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.exitBtn} onPress={onBack} activeOpacity={0.85}>
-              <Ionicons name="arrow-back" size={16} color={COLORS.textWhite} />
+              <Ionicons name="arrow-back" size={16} color={COLORS.teal} />
               <Text style={styles.exitBtnText}>Back</Text>
             </TouchableOpacity>
           </View>
@@ -332,21 +332,6 @@ export default function CarRaceScreen({ onBack }) {
           <>
             {renderLane('YOU', g.player, ACCENT)}
             {renderLane(`RIVAL · ${speed.label.toUpperCase()}`, g.rival, RIVAL_COLOR)}
-
-            <View style={styles.statsRow}>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: ACCENT }]}>{liveWpm}</Text>
-                <Text style={styles.statLabel}>WPM</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.green }]}>{accuracy}%</Text>
-                <Text style={styles.statLabel}>Accuracy</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={[styles.statVal, { color: COLORS.amber }]}>{g.wordsDone}</Text>
-                <Text style={styles.statLabel}>Words</Text>
-              </View>
-            </View>
 
             <View style={styles.lineCard}>
               <Text style={styles.lineLabel}>TYPE THE SCROLLING LINE</Text>
@@ -406,7 +391,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: scaleSize(14) },
   backBtn: {
     width: scaleSize(36), height: scaleSize(36), borderRadius: scaleSize(18),
-    backgroundColor: 'rgba(255,255,255,0.06)', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLORS.backButtonBg, alignItems: 'center', justifyContent: 'center',
     marginRight: scaleSize(12),
   },
   headerTitle: {
@@ -441,7 +426,6 @@ const styles = StyleSheet.create({
   finishCell: { width: scaleSize(7), height: scaleSize(7.25) },
   carWrap: { position: 'absolute', top: scaleSize(13) },
 
-  statsRow: { flexDirection: 'row', gap: scaleSize(8), marginBottom: scaleSize(12) },
   statBox: {
     flex: 1, alignItems: 'center',
     backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: scaleSize(12),
@@ -559,8 +543,8 @@ const styles = StyleSheet.create({
   restartBtnText: { color: ACCENT, fontSize: scaleFont(14), fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   exitBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: scaleSize(12),
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, borderRadius: scaleSize(12),
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
     paddingVertical: scaleSize(11), paddingHorizontal: scaleSize(24), marginTop: scaleSize(10),
   },
   exitBtnText: { color: COLORS.textWhite, fontSize: scaleFont(13), fontFamily: 'Poppins_700Bold', fontWeight: '700' },

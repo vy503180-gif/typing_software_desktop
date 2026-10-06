@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, ScrollView,
-  SafeAreaView, StatusBar, Modal,
+  SafeAreaView, StatusBar, Modal, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -136,8 +136,8 @@ export default function LessonsScreen({
   onStartLesson,
   onBack,
   studentName = '',
-  unlockedLessons = { english: [1], hindi: [1] },
-  completedLessons = { english: [], hindi: [] },
+  unlockedLessons = { english: [1] },
+  completedLessons = { english: [] },
   hindiLayout = 'krutidev',
   onChangeHindiLayout,
   selectedLang = 'english',
@@ -160,10 +160,9 @@ export default function LessonsScreen({
   }, [studentName]);
 
   const lessons = LESSONS[selectedLang];
-  const unlocked = unlockedLessons[selectedLang] || [];
   const activeCat = CATEGORIES.find((c) => c.id === category);
   const catLessons = lessons.filter((l) => activeCat.ids.includes(l.id));
-  const countUnlocked = lessons.length;
+  const countAvailable = lessons.length;
 
   const statsForLesson = (title) => {
     const recs = history.filter((r) => r.lesson === title);
@@ -179,12 +178,16 @@ export default function LessonsScreen({
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
       <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={Platform.OS === 'web' ? styles.hiddenScrollbar : undefined}
+          contentContainerStyle={[styles.scroll, IS_DESKTOP && styles.scrollDesktop]}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header */}
           <View style={styles.header}>
             {onBack && (
               <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
-                <Ionicons name="arrow-back" size={18} color={COLORS.textLight} />
+                <Ionicons name="arrow-back" size={18} color={COLORS.teal} />
               </TouchableOpacity>
             )}
             <View style={styles.headerTextWrap}>
@@ -197,7 +200,6 @@ export default function LessonsScreen({
           <View style={styles.langToggle}>
             {[
               { label: 'English', value: 'english', icon: 'globe' },
-              { label: 'हिंदी', value: 'hindi', icon: 'language' },
             ].map((d) => (
               <TouchableOpacity
                 key={d.value}
@@ -211,46 +213,17 @@ export default function LessonsScreen({
             ))}
           </View>
 
-          {/* Hindi layout */}
-          {selectedLang === 'hindi' && (
-            <View style={styles.layoutRow}>
-              <View style={styles.segment}>
-                {[{ label: 'Mangal', value: 'mangal' }, { label: 'Kruti Dev', value: 'krutidev' }].map((l) => {
-                  const sel = hindiLayout === l.value;
-                  return (
-                    <TouchableOpacity
-                      key={l.value}
-                      style={[styles.segmentItem, sel && styles.segmentItemActive]}
-                      onPress={() => onChangeHindiLayout && onChangeHindiLayout(l.value)}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={[styles.segmentText, sel && styles.segmentTextActive]}>{l.label}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-              <TouchableOpacity
-                style={styles.charMapBtn}
-                onPress={() => { setCharMapTab(hindiLayout); setShowCharMap(true); }}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="grid" size={14} color={COLORS.cyan} />
-                <Text style={styles.charMapBtnText}>Character Map</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
           {/* Overall progress */}
           <View style={styles.progressCard}>
             <View style={styles.progressHeader}>
               <View style={styles.progressLeft}>
                 <Ionicons name="trophy" size={17} color={COLORS.amber} />
-                <Text style={styles.progressTitle}>{countUnlocked}/{lessons.length} lessons unlocked</Text>
+                <Text style={styles.progressTitle}>{countAvailable}/{lessons.length} lessons available</Text>
               </View>
-              <Text style={styles.progressPct}>{Math.round((countUnlocked / lessons.length) * 100)}%</Text>
+              <Text style={styles.progressPct}>{Math.round((countAvailable / lessons.length) * 100)}%</Text>
             </View>
             <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${(countUnlocked / lessons.length) * 100}%` }]} />
+              <View style={[styles.progressFill, { width: `${(countAvailable / lessons.length) * 100}%` }]} />
             </View>
           </View>
 
@@ -282,7 +255,7 @@ export default function LessonsScreen({
               <TouchableOpacity
                 key={lesson.id}
                 style={[styles.lessonCard, locked && styles.lessonCardLocked]}
-                onPress={locked ? undefined : () => onStartLesson(selectedLang, lesson.id, lesson.title, parseInt(lesson.time) * 60)}
+                onPress={locked ? undefined : () => onStartLesson(selectedLang, lesson.id, lesson.title, parseInt(lesson.time) * 60, !isCompleted)}
                 activeOpacity={0.85}
                 disabled={locked}
               >
@@ -420,19 +393,21 @@ export default function LessonsScreen({
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: BG },
+  hiddenScrollbar: { scrollbarWidth: 'none', msOverflowStyle: 'none' },
   scroll: {
     padding: 20,
     paddingBottom: 30,
-    maxWidth: 1180,
+    maxWidth: 900,
     width: '100%',
     alignSelf: 'center',
   },
+  scrollDesktop: { alignSelf: 'flex-start', marginLeft: 32 },
   header: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
   backBtn: {
     width: 38, height: 38, borderRadius: 11,
     alignItems: 'center', justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.05)', marginRight: 12,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    backgroundColor: COLORS.backButtonBg, marginRight: 12,
+    borderWidth: 1.5, borderColor: COLORS.backButtonBorder,
   },
   headerTextWrap: { flex: 1 },
   title: { fontFamily: 'Poppins_700Bold', fontWeight: '700', color: '#fff', fontSize: 24 },
@@ -440,15 +415,16 @@ const styles = StyleSheet.create({
 
   langToggle: {
     flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 12, padding: 4, marginBottom: 12,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder,
+    borderRadius: 8, padding: 2, marginBottom: 8,
+    borderWidth: 1.2, borderColor: COLORS.cardBorder,
+    width: '100%',
   },
   langBtn: {
-    flex: 1, paddingVertical: 9, borderRadius: 9, alignItems: 'center',
-    flexDirection: 'row', justifyContent: 'center', gap: 6,
+    flex: 1, paddingVertical: 5, borderRadius: 6, alignItems: 'center',
+    flexDirection: 'row', justifyContent: 'center', gap: 4,
   },
   langBtnActive: { backgroundColor: '#0e9488' },
-  langBtnText: { color: COLORS.textMuted, fontSize: 13.5, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  langBtnText: { color: COLORS.textMuted, fontSize: 11, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   langBtnTextActive: { color: '#fff' },
 
   layoutRow: {
@@ -473,16 +449,17 @@ const styles = StyleSheet.create({
   charMapBtnText: { color: COLORS.cyan, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
 
   progressCard: {
-    backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: 14,
-    borderWidth: 1.5, borderColor: COLORS.cardBorder, padding: 14, marginBottom: 14,
+    backgroundColor: 'rgba(30,46,84,0.45)', borderRadius: 10,
+    borderWidth: 1.2, borderColor: COLORS.cardBorder, padding: 8, marginBottom: 8,
+    width: '100%',
   },
   progressHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  progressLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  progressTitle: { color: COLORS.textLight, fontSize: 13, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
-  progressPct: { color: COLORS.cyan, fontSize: 15, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  progressLeft: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  progressTitle: { color: COLORS.textLight, fontSize: 11.5, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
+  progressPct: { color: COLORS.cyan, fontSize: 12, fontFamily: 'Poppins_700Bold', fontWeight: '700' },
   progressTrack: {
-    height: 7, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)',
-    marginTop: 10, overflow: 'hidden',
+    height: 5, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.08)',
+    marginTop: 6, overflow: 'hidden',
   },
   progressFill: { height: '100%', borderRadius: 4, backgroundColor: '#0e9488' },
 
