@@ -15,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { playKeySound } from '../audio/keySound';
 import { LESSON_TEXTS, LESSON_DIFFICULTY } from '../data/lessons';
-import { generateTypingText, sentencesText, paragraphText, wordsText, rushWordList, certText } from '../data/typingTexts';
+import { generateTypingText, wordsText, certText, fitTextToDuration } from '../data/typingTexts';
 import { krutiToUnicode, krutiSequenceProgress } from '../utils/krutiToUnicode';
 import { COLORS, levelForWpm, scaleFont } from '../theme';
 
@@ -115,10 +115,11 @@ export default function TypingScreen({
   onComplete = null,
   onNextLesson = null,
   studentName = null,
+  bestWpm = 0,
   onBack = null,
   hindiLayout = 'krutidev',
 }) {
-  const { width: winW } = useWindowDimensions();
+  const { width: winW, height: winH } = useWindowDimensions();
   const isKrutiLayout = config.lang === 'hindi' && hindiLayout === 'krutidev';
   const isPractice = config.type === 'practice';
   const isGame = config.type === 'game';
@@ -171,20 +172,26 @@ export default function TypingScreen({
 
   // ---- sound + settings ----
   const soundEnabled = settings.keyboardSound !== false;
+  const bestWpmRef = useRef(bestWpm);
+  bestWpmRef.current = bestWpm;
   const fontSize = settings.fontSize || 22;
   const typeSize = Math.max(15, Math.round(fontSize * 0.8));
   const charLineH = Math.max(22, Math.round(typeSize * 1.32));
   const rowH = charLineH + 6;
 
   const buildInitialText = useCallback(() => {
-    if (config.text) return config.text;
-    if (config.lessonText) return config.lessonText;
-    if (config.type === 'lesson' && config.lang && config.id) {
-      return LESSON_TEXTS[config.lang]?.[config.id] || null;
+    let text = config.text || config.lessonText || null;
+    if (!text && config.type === 'lesson' && config.lang && config.id) {
+      text = LESSON_TEXTS[config.lang]?.[config.id] || null;
     }
-    if (config.type === 'rare') return null;
-    if (config.type === 'cert') return certText(config.targetWpm || 15);
-    return generateTypingText({ mode: config.mode || 'paragraph', difficulty: config.difficulty || 'Easy', timeSec: config.timeSec || 60, lang: config.lang || 'english' });
+    if (!text && config.type === 'rare') return null;
+    if (!text && config.type === 'cert') text = certText(config.targetWpm || 15);
+    if (!text) {
+      text = generateTypingText({ mode: config.mode || 'paragraph', difficulty: config.difficulty || 'Easy', timeSec: config.timeSec || 60, lang: config.lang || 'english', targetWpm: bestWpmRef.current });
+    }
+    return config.type === 'lesson'
+      ? fitTextToDuration(text, config.timeSec || 60, bestWpmRef.current)
+      : text;
   }, [config]);
 
   useEffect(() => {
@@ -329,7 +336,10 @@ export default function TypingScreen({
       if (config.type === 'lesson') next = LESSON_TEXTS[config.lang]?.[config.id];
       else if (config.type === 'cert') next = certText(config.targetWpm || 15);
       else if (config.type === 'game' && mode === 'words') next = wordsText(60, 'medium');
-      else next = generateTypingText({ mode, difficulty, timeSec: duration });
+      else next = generateTypingText({ mode, difficulty, timeSec: duration, targetWpm: bestWpm });
+    }
+    if (config.type === 'lesson') {
+      next = fitTextToDuration(next, config.timeSec || duration, bestWpm);
     }
     resetTest(next);
   };
@@ -337,7 +347,7 @@ export default function TypingScreen({
   const handleRegenerate = () => {
     const next = config.type === 'cert'
       ? certText(config.targetWpm || 15)
-      : generateTypingText({ mode, difficulty, timeSec: duration, lang: config.lang || 'english' });
+      : generateTypingText({ mode, difficulty, timeSec: duration, lang: config.lang || 'english', targetWpm: bestWpm });
     resetTest(next);
   };
 
@@ -429,6 +439,9 @@ export default function TypingScreen({
   };
   const isCharCorrect = (typed, target) => getCharStatus(typed, target) === 'correct';
 
+  const liveWpm = useMemo(() => (
+    seconds > 0 ? Math.round((userInput.length / 5) / (seconds / 60)) : 0
+  ), [seconds, userInput.length]);
   const progress = currentText.length > 0 ? Math.min(1, userInput.length / currentText.length) : 0;
 
   // next char guidance
@@ -610,7 +623,7 @@ export default function TypingScreen({
   // ---- Text layout: word ranges + soft-wrap rows (memoized) ----
   // Ye renderTextArea ke andar nahi, component body me hai — warna hooks
   // rule toot jaata (early return par hook count change hota).
-  const areaW = textWidth || winW - 80;
+  const areaW = textWidth || Math.min(1100, winW - 80);
   const effCharW = charW || typeSize * 0.6;
   const cols = Math.max(4, Math.floor(areaW / (effCharW * 1.05)));
 
@@ -686,8 +699,7 @@ const renderTextArea = () => {
     return (
       <ScrollView
         ref={scrollRef}
-        style={styles.textScroll}
-        contentContainerStyle={styles.textScrollContent}
+        style={[styles.textScroll, { maxHeight: Math.min(420, Math.max(180, winH * 0.52)) }]}
         onLayout={() => {}}
       >
         <TouchableOpacity
@@ -695,7 +707,7 @@ const renderTextArea = () => {
           onPress={() => { if (!isPaused && !isFinished) focusInput(); }}
           activeOpacity={1}
           style={[styles.textBox, winW < 600 && styles.textBoxSmall]}
-          onLayout={(e) => setTextWidth(Math.max(0, e.nativeEvent.layout.width - (winW < 600 ? 34 : 50)))}
+          onLayout={(e) => setTextWidth(Math.max(0, e.nativeEvent.layout.width - (winW < 600 ? 34 : 46)))}
         >
           <View style={styles.measureRow} pointerEvents="none">
             <Text
@@ -850,13 +862,17 @@ const renderTextArea = () => {
                 <Text style={styles.title}>{isNumberedLesson ? `Lesson ${config.id}` : config.title || (isTest ? 'Typing Test' : isGame ? 'Typing Game' : 'Typing Practice')}</Text>
                 <Text style={styles.subtitle}>
                   {isNumberedLesson ? `${config.title} \u2022 ` : ''}
-                  {config.difficulty ? `${config.difficulty} \u2022 ` : ''}
+                  {difficulty ? `${difficulty} \u2022 ` : ''}
                   {duration ? `${Math.round(duration / 60)} min - ` : ''}
                   {mode ? mode : ''}
                 </Text>
               </View>
             </View>
             <View style={styles.topBarRight}>
+              <View style={styles.speedBadge} accessibilityLabel={`Typing speed ${liveWpm} words per minute`}>
+                <Ionicons name="speedometer" size={14} color={COLORS.cyan} />
+                <Text style={styles.speedBadgeText}>{liveWpm} WPM</Text>
+              </View>
               {!isPractice && (
                 <View style={[styles.difficultyBadge, { borderColor: (COLORS.green) + '55' }]}>
                   <Text style={[styles.difficultyBadgeText, { color: COLORS.green }]}>{difficulty}</Text>
@@ -990,6 +1006,18 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   topBarRight: { flexDirection: 'row', alignItems: 'center', gap: 7, marginLeft: 'auto' },
+  speedBadge: {
+    minHeight: 36,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 9,
+    borderRadius: 10,
+    backgroundColor: '#e9f4f8',
+    borderWidth: 1,
+    borderColor: '#c9e0e9',
+  },
+  speedBadgeText: { color: '#0e7490', fontFamily: 'Poppins_700Bold', fontWeight: '700', fontSize: 11.5 },
   difficultyBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -1014,9 +1042,10 @@ const styles = StyleSheet.create({
   scrollMain: { flex: 1 },
   scrollContent: {
     flexGrow: 1,
-    paddingTop: 22,
-    paddingBottom: 28,
-    maxWidth: 1480,
+    justifyContent: 'flex-start',
+    paddingTop: 18,
+    paddingBottom: 34,
+    maxWidth: 1260,
     width: '100%',
     alignSelf: 'center',
   },
@@ -1100,16 +1129,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 4,
   },
-  textScroll: { flex: 1, minHeight: 340, marginBottom: 12 },
-  textScrollContent: { flexGrow: 1 },
+  textScroll: { width: '100%', maxWidth: 1100, minHeight: 180, flexGrow: 0, flexShrink: 1, alignSelf: 'center', marginBottom: 14 },
   textBox: {
-    flexGrow: 1,
+    width: '100%',
+    alignSelf: 'center',
     backgroundColor: '#ffffff',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#c9e0e9',
-    padding: 24,
-    minHeight: 420,
+    padding: 22,
+    minHeight: 180,
     shadowColor: '#315c70',
     shadowOpacity: 0.07,
     shadowOffset: { width: 0, height: 4 },
@@ -1117,7 +1146,7 @@ const styles = StyleSheet.create({
     elevation: 2,
     cursor: 'text',
   },
-  textBoxSmall: { minHeight: 300, padding: 16 },
+  textBoxSmall: { minHeight: 160, padding: 16 },
   charRow: {
     flexDirection: 'row',
     flexWrap: 'nowrap',
@@ -1180,7 +1209,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginTop: 4,
+    marginTop: 'auto',
     marginBottom: 16,
     width: '100%',
     maxWidth: 900,

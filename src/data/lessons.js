@@ -7,7 +7,7 @@
 // English - 30 lessons, पहले आसान (letters) फिर कठिन (words/sentences/paragraphs)
 export const LESSON_TEXTS = {
   english: {
-    1: 'asdf jkl; asdf jkl; asdf jkl; asdf jkl; asdf jkl asdf',
+    1: 'asdf jkl; asdf jkl; a sad lad asks dad; a lass asks a lad; all lads ask dad; a flask falls; a lass adds salad; dad asks a lass; a lad asks a lass; a flask falls; all lads ask dad; a lad falls; a lass falls; a sad lad asks; all lads ask; asdf jkl; asdf jkl;',
     2: 'sad lad fall add flag sad lad fall add flag flag',
     3: 'ask all jazz salad lass dad ask all jazz salad fall',
     4: 'gh gh gh asdfghjkl asdfghjkl asdfghjkl asdfghjkl',

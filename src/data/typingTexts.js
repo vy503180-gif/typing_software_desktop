@@ -2,6 +2,17 @@
 // Text generators used by Typing Practice, Tests and Games.
 // All generators produce real, normal English content.
 
+export const fitTextToDuration = (text, timeSec, targetWpm = 30) => {
+  const source = typeof text === 'string' ? text.trim() : '';
+  const duration = Number(timeSec) || 0;
+  if (!source || duration <= 0) return source;
+
+  const wpm = Math.min(60, Math.max(15, Number(targetWpm) || 30));
+  const targetWords = Math.max(1, Math.ceil((duration / 60) * wpm));
+  const words = source.split(/\s+/);
+  return Array.from({ length: targetWords }, (_, index) => words[index % words.length]).join(' ');
+};
+
 // --- Word pools by difficulty ---
 const EASY_WORDS = [
   'the', 'and', 'for', 'you', 'are', 'can', 'was', 'not', 'but', 'all',
@@ -119,14 +130,30 @@ const pickRandom = (arr, n) => {
   return out;
 };
 
+const pickRepeated = (pool, count) => {
+  const out = [];
+  let previous = null;
+  while (out.length < count && pool.length > 0) {
+    const batch = pickRandom(pool, pool.length);
+    if (batch.length > 1 && batch[0] === previous) {
+      [batch[0], batch[1]] = [batch[1], batch[0]];
+    }
+    const next = batch.slice(0, count - out.length);
+    out.push(...next);
+    previous = next[next.length - 1] || previous;
+  }
+  return out;
+};
+
 // Generate a word list string with punctuation for words mode
 export const wordsText = (count = 60, difficulty = 'easy') => {
-  const pool = difficulty === 'hard'
+  const level = String(difficulty).toLowerCase();
+  const pool = level === 'hard'
     ? HARD_WORDS
-    : difficulty === 'medium'
+    : level === 'medium'
       ? [...MEDIUM_WORDS, ...EASY_WORDS]
       : EASY_WORDS;
-  const chosen = pickRandom(pool, count);
+  const chosen = pickRepeated(pool, count);
   const separators = [',', '.', ';', '!'];
   return chosen
     .map((w, i) => {
@@ -139,22 +166,41 @@ export const wordsText = (count = 60, difficulty = 'easy') => {
 };
 
 export const sentencesText = (count = 5, difficulty = 'easy') => {
-  const pool = difficulty === 'hard'
+  const level = String(difficulty).toLowerCase();
+  const pool = level === 'hard'
     ? HARD_SENTENCES
-    : difficulty === 'medium'
+    : level === 'medium'
       ? MEDIUM_SENTENCES
       : EASY_SENTENCES;
-  const chosen = pickRandom(pool, count);
+  const chosen = pickRepeated(pool, count);
   return chosen.join(' ');
 };
 
-export const paragraphText = (difficulty = 'easy') => {
-  const pool = difficulty === 'hard'
+export const paragraphText = (difficulty = 'easy', timeSec = 60, targetWpm = 30) => {
+  const level = String(difficulty).toLowerCase();
+  const pool = level === 'hard'
     ? HARD_PARAGRAPHS
-    : difficulty === 'medium'
+    : level === 'medium'
       ? MEDIUM_PARAGRAPHS
       : EASY_PARAGRAPHS;
-  return pool[Math.floor(Math.random() * pool.length)];
+  const wpm = Math.min(60, Math.max(15, Number(targetWpm) || 30));
+  const targetWords = Math.max(20, Math.ceil((Math.max(0, timeSec) / 60) * wpm));
+  const paragraphs = [];
+  let wordCount = 0;
+  let candidates = pickRandom(pool, pool.length);
+  let index = 0;
+
+  while (wordCount < targetWords) {
+    if (index >= candidates.length) {
+      candidates = pickRandom(pool, pool.length);
+      index = 0;
+    }
+    const next = candidates[index++];
+    paragraphs.push(next);
+    wordCount += next.split(/\s+/).filter(Boolean).length;
+  }
+
+  return paragraphs.join(' ');
 };
 
 // Certificate challenge text: fresh every call, sized to the target speed
@@ -182,10 +228,11 @@ const ENGLISH_HOME_ROW = 'asdfjkl;';
 
 // Generate a letter-groups string for Letters mode
 export const lettersText = (count = 120, difficulty = 'easy', lang = 'english') => {
+  const level = String(difficulty).toLowerCase();
   let pool;
   if (lang === 'hindi') pool = HINDI_LETTERS;
-  else if (difficulty === 'easy') pool = ENGLISH_HOME_ROW;
-  else if (difficulty === 'hard') pool = `${ENGLISH_LETTERS},.;`;
+  else if (level === 'easy') pool = ENGLISH_HOME_ROW;
+  else if (level === 'hard') pool = `${ENGLISH_LETTERS},.;`;
   else pool = ENGLISH_LETTERS;
 
   const chunkLen = lang === 'hindi' ? 4 : 5;
@@ -201,17 +248,19 @@ export const lettersText = (count = 120, difficulty = 'easy', lang = 'english') 
 };
 
 // Build text for practice/test based on mode + difficulty + duration
-export const generateTypingText = ({ mode = 'paragraph', difficulty = 'easy', timeSec = 60, lang = 'english' }) => {
+export const generateTypingText = ({ mode = 'paragraph', difficulty = 'easy', timeSec = 60, lang = 'english', targetWpm = 30 }) => {
+  const wpm = Math.min(60, Math.max(15, Number(targetWpm) || 30));
+  const targetWords = Math.max(20, Math.ceil((Math.max(0, timeSec) / 60) * wpm));
   if (mode === 'words') {
-    return wordsText(Math.max(20, Math.round(timeSec / 2.2)), difficulty);
+    return wordsText(targetWords, difficulty);
   }
   if (mode === 'sentences') {
-    return sentencesText(Math.max(3, Math.round(timeSec / 18)), difficulty);
+    return sentencesText(Math.max(3, Math.ceil(targetWords / 12)), difficulty);
   }
   if (mode === 'letters') {
-    return lettersText(Math.max(40, Math.round(timeSec * 2.2)), difficulty, lang);
+    return lettersText(Math.max(40, targetWords * 5), difficulty, lang);
   }
-  return paragraphText(difficulty);
+  return paragraphText(difficulty, timeSec, wpm);
 };
 
 // Word list for Word Rush game (very common short words)

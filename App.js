@@ -475,6 +475,7 @@ export default function App() {
           <TypingScreen
             config={typingConfig || {}}
             settings={settings}
+            bestWpm={bestWpm}
             onComplete={handleTypingComplete}
             onNextLesson={handleNextLesson}
             studentName={studentName}
