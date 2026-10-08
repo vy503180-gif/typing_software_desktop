@@ -61,7 +61,9 @@ export default function WordRushScreen({ onBack }) {
 
   const focusInput = () => {
     if (Platform.OS === 'web') return;
-    setTimeout(() => inputRef.current && inputRef.current.focus(), 15);
+    if (inputRef.current) {
+      try { inputRef.current.blur(); } catch (e) {}
+    }
   };
 
   useEffect(() => {
@@ -283,7 +285,7 @@ export default function WordRushScreen({ onBack }) {
         )}
 
         {Platform.OS !== 'web' && (
-          <TextInput
+          <TextInput showSoftInputOnFocus={false} inputMode="none"
             ref={inputRef}
             style={styles.hiddenInput}
             defaultValue=""
@@ -293,7 +295,6 @@ export default function WordRushScreen({ onBack }) {
             editable
             autoCapitalize="none"
             autoCorrect={false}
-            autoFocus={started}
             caretHidden
             spellCheck={false}
           />

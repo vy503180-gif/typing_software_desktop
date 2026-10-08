@@ -69,7 +69,7 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
               <Text style={s.mobileFormTitle}>Get Started</Text>
               <Text style={s.mobileFormSubtitle}>Enter your name to begin</Text>
 
-              <TextInput
+              <TextInput showSoftInputOnFocus={false} inputMode="none"
                 style={s.mobileInput}
                 placeholder="Your name"
                 placeholderTextColor="#555"
@@ -146,7 +146,7 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
               size={18}
               color={focused ? COLORS.teal : '#666'}
             />
-            <TextInput
+            <TextInput showSoftInputOnFocus={false} inputMode="none"
               style={s.desktopInput}
               placeholder="Type your name here"
               placeholderTextColor="#555"
@@ -159,7 +159,6 @@ export default function NameEntryScreen({ onSubmit, onCancel, users = [] }) {
               returnKeyType="done"
               onSubmitEditing={handleSubmit}
               maxLength={40}
-              autoFocus
             />
             {name.length > 0 && (
               <TouchableOpacity onPress={() => setName('')} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>

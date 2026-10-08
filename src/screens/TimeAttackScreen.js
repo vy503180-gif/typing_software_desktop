@@ -58,7 +58,9 @@ export default function TimeAttackScreen({ onBack }) {
 
   const focusInput = () => {
     if (Platform.OS === 'web') return;
-    setTimeout(() => inputRef.current && inputRef.current.focus(), 15);
+    if (inputRef.current) {
+      try { inputRef.current.blur(); } catch (e) {}
+    }
   };
 
   // Timer: har second reduce; word completion par bonus add
@@ -281,7 +283,7 @@ export default function TimeAttackScreen({ onBack }) {
         )}
 
         {Platform.OS !== 'web' && (
-          <TextInput
+          <TextInput showSoftInputOnFocus={false} inputMode="none"
             ref={inputRef}
             style={styles.hiddenInput}
             defaultValue=""
@@ -291,7 +293,6 @@ export default function TimeAttackScreen({ onBack }) {
             editable
             autoCapitalize="none"
             autoCorrect={false}
-            autoFocus={started}
             caretHidden
             spellCheck={false}
           />

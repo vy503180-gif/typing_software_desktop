@@ -98,15 +98,7 @@ export default function ReviewDrillScreen({ onBack, keyOption = 'Difficult Keys'
   const phaseLabel = phase === 'single' ? 'Single' : `${phase}-letter`;
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {});
-    return () => Keyboard.removeAllListeners('keyboardDidShow');
+    return undefined;
   }, []);
 
   const handleChange = (text) => {
@@ -344,24 +336,15 @@ export default function ReviewDrillScreen({ onBack, keyOption = 'Difficult Keys'
               </View>
 
               {/* Hidden input to capture keyboard */}
-              <TextInput
+              <TextInput showSoftInputOnFocus={false} inputMode="none"
                 ref={inputRef}
                 style={styles.hiddenInput}
                 value={input}
                 onChangeText={handleChange}
                 autoCapitalize="none"
                 autoCorrect={false}
-                autoFocus
               />
 
-              {/* Small keyboard hint */}
-              <View style={styles.keyboardHint}>
-                <Text style={styles.keyboardHintText}>
-                  {phase === 'single'
-                    ? 'Use your keyboard and type the letter shown above.'
-                    : `Type all ${phase} letters of the ${phaseLabel} group, one by one.`}
-                </Text>
-              </View>
             </>
           )}
         </View>
@@ -511,16 +494,6 @@ const styles = StyleSheet.create({
     opacity: 0,
     height: 1,
     width: 1,
-  },
-
-  keyboardHint: {
-    alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 20,
-  },
-  keyboardHintText: { fontFamily: 'Poppins_400Regular', color: 'rgba(255,255,255,0.6)',
-    fontSize: scaleFont(12),
-    textAlign: 'center',
   },
 
   doneCard: {

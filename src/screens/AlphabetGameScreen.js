@@ -110,19 +110,12 @@ export default function AlphabetGameScreen({ onBack, mode: initialMode }) {
     return () => clearInterval(timerRef.current);
   }, [started, finished]);
 
-  // Native par autofocus
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-    const t = setTimeout(() => inputRef.current && inputRef.current.focus(), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Native focus guard - keyboard na chhute
+  // Soft keyboard ko open hone se rokne ke liye native autofocusing disabled.
   useEffect(() => {
     if (Platform.OS === 'web') return;
     const guard = setInterval(() => {
-      if (!finished && inputRef.current && !inputRef.current.isFocused()) {
-        inputRef.current.focus();
+      if (!finished && inputRef.current) {
+        try { inputRef.current.blur(); } catch (e) {}
       }
     }, 1200);
     return () => clearInterval(guard);
@@ -375,14 +368,13 @@ export default function AlphabetGameScreen({ onBack, mode: initialMode }) {
 
             {/* Native hidden input */}
             {Platform.OS !== 'web' && (
-              <TextInput
+              <TextInput showSoftInputOnFocus={false} inputMode="none"
                 ref={inputRef}
                 style={styles.hiddenInput}
                 defaultValue=""
                 onChangeText={handleChange}
                 autoCapitalize="none"
                 autoCorrect={false}
-                autoFocus
                 caretHidden
                 spellCheck={false}
               />

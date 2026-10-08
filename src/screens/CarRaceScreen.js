@@ -62,7 +62,9 @@ export default function CarRaceScreen({ onBack }) {
 
   const focusInput = () => {
     if (Platform.OS === 'web') return;
-    setTimeout(() => inputRef.current && inputRef.current.focus(), 15);
+    if (inputRef.current) {
+      try { inputRef.current.blur(); } catch (e) {}
+    }
   };
 
   const endRace = (didWin) => {
@@ -357,7 +359,7 @@ export default function CarRaceScreen({ onBack }) {
         )}
 
         {Platform.OS !== 'web' && (
-          <TextInput
+          <TextInput showSoftInputOnFocus={false} inputMode="none"
             ref={inputRef}
             style={styles.hiddenInput}
             defaultValue=""
@@ -367,7 +369,6 @@ export default function CarRaceScreen({ onBack }) {
             editable
             autoCapitalize="none"
             autoCorrect={false}
-            autoFocus={started && !finished}
             caretHidden
             spellCheck={false}
           />

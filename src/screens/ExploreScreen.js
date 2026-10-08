@@ -311,7 +311,9 @@ function InlineSpeedTest({ duration, text, onDone, onBack }) {
   };
 
   const handleCharPress = () => {
-    if (inputRef.current && !isFinished) inputRef.current.focus();
+    if (inputRef.current && !isFinished) {
+      try { inputRef.current.blur(); } catch (e) {}
+    }
   };
 
   const remaining = duration - seconds;
@@ -381,14 +383,13 @@ function InlineSpeedTest({ duration, text, onDone, onBack }) {
             </View>
           </TouchableOpacity>
 
-          <TextInput
+          <TextInput showSoftInputOnFocus={false} inputMode="none"
             ref={inputRef}
             style={styles.hiddenInput}
             value={userInput}
             onChangeText={(t) => { if (!isStarted) setIsStarted(true); setUserInput(t); }}
             autoCapitalize="none"
             autoCorrect={false}
-            autoFocus
             editable={!isFinished}
           />
 

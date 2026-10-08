@@ -250,7 +250,7 @@ export const lettersText = (count = 120, difficulty = 'easy', lang = 'english') 
 // Build text for practice/test based on mode + difficulty + duration
 export const generateTypingText = ({ mode = 'paragraph', difficulty = 'easy', timeSec = 60, lang = 'english', targetWpm = 30 }) => {
   const wpm = Math.min(60, Math.max(15, Number(targetWpm) || 30));
-  const targetWords = Math.max(20, Math.ceil((Math.max(0, timeSec) / 60) * wpm));
+  const targetWords = Math.max(1, Math.ceil((Math.max(0, timeSec) / 60) * wpm));
   if (mode === 'words') {
     return wordsText(targetWords, difficulty);
   }
@@ -258,7 +258,7 @@ export const generateTypingText = ({ mode = 'paragraph', difficulty = 'easy', ti
     return sentencesText(Math.max(3, Math.ceil(targetWords / 12)), difficulty);
   }
   if (mode === 'letters') {
-    return lettersText(Math.max(40, targetWords * 5), difficulty, lang);
+    return lettersText(Math.max(1, targetWords * 5), difficulty, lang);
   }
   return paragraphText(difficulty, timeSec, wpm);
 };

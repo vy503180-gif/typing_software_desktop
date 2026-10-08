@@ -314,19 +314,12 @@ export default function WordTrisGameScreen({ onBack }) {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [gameOver]);
 
-  // Native focus
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-    const t = setTimeout(() => inputRef.current && inputRef.current.focus(), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Native focus guard - keyboard na chhute
+  // Native focus block: soft keyboard ko open hone se prevent karne ke liye auto focus disabled.
   useEffect(() => {
     if (Platform.OS === 'web') return;
     const focusGuard = setInterval(() => {
-      if (!gameOver && inputRef.current && !inputRef.current.isFocused()) {
-        inputRef.current.focus();
+      if (!gameOver && inputRef.current) {
+        try { inputRef.current.blur(); } catch (e) {}
       }
     }, 1200);
     return () => clearInterval(focusGuard);
@@ -534,7 +527,7 @@ export default function WordTrisGameScreen({ onBack }) {
 
             {/* Input - native par visible (phone keyboard ke liye), web par hidden */}
             {Platform.OS !== 'web' ? (
-              <TextInput
+              <TextInput showSoftInputOnFocus={false} inputMode="none"
                 ref={inputRef}
                 style={styles.nativeInput}
                 defaultValue=""
@@ -545,7 +538,6 @@ export default function WordTrisGameScreen({ onBack }) {
                 editable
                 autoCapitalize="none"
                 autoCorrect={false}
-                autoFocus
                 caretHidden={false}
                 spellCheck={false}
                 placeholder="Type the word here..."
@@ -553,7 +545,7 @@ export default function WordTrisGameScreen({ onBack }) {
                 selectionColor={COLORS.teal}
               />
             ) : (
-              <TextInput
+              <TextInput showSoftInputOnFocus={false} inputMode="none"
                 ref={inputRef}
                 style={styles.hiddenInput}
                 defaultValue=""

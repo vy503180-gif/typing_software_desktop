@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, LogBox, Dimensions, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, LogBox, Dimensions, TouchableOpacity, Platform, TextInput, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+
+TextInput.defaultProps = {
+  ...(TextInput.defaultProps || {}),
+  showSoftInputOnFocus: false,
+};
 
 import HomeScreen from './src/screens/HomeScreen';
 import LessonsScreen from './src/screens/LessonsScreen';
@@ -164,6 +169,7 @@ export default function App() {
   useEffect(() => {
     // Project ka fixed background #D5EEF2 hai - sirf light theme.
     applyLightTheme();
+    Keyboard.dismiss();
   }, []);
 
   const isDesktop = dimensions.width >= 900;
@@ -244,6 +250,7 @@ export default function App() {
     if (!safe) return;
     setStudentName(safe);
     setShowNameEntry(false);
+    setTab('Home');
     loadLessonProgress(safe).catch(() => {
       setCompletedLessons({ english: [], hindi: [] });
       setUnlockedLessons(DEFAULT_UNLOCKED);
@@ -753,7 +760,11 @@ export default function App() {
               )}
             </View>
             <View style={styles.fsBody}>
-              {renderScreen()}
+              {tab === 'Type' ? (
+                <View style={styles.typingViewAt100}>
+                  {renderScreen()}
+                </View>
+              ) : renderScreen()}
             </View>
           </View>
         </View>
@@ -843,5 +854,13 @@ const styles = StyleSheet.create({
   fsBody: {
     flex: 1,
     overflow: 'hidden',
+  },
+  typingViewAt100: {
+    position: 'absolute',
+    left: '-5.555%',
+    top: '-5.555%',
+    width: '111.111%',
+    height: '111.111%',
+    transform: [{ scale: 0.9 }],
   },
 });

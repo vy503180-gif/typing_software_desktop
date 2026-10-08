@@ -36,6 +36,5 @@ npm run build:electron
 - Profile page fix: `levelForWpm` ek object return karta hai isliye `{level.name}` se render hota hai.
 - Practice tab ab real launcher hai jo TypingScreen kholta hai (blank placeholder hataya).
 - Settings toggles **ON par green** hote hain.
-- Virtual keyboard bottom-docked (ScrollView ke bahar), upar **Next Key + finger guide** bar ke saath — typing session me hamesha dikhta hai.
 
 Shukriya! 🙏 — dev + build dono verified (`Exported: dist` ✅, Metro bundle HTTP 200 ✅).

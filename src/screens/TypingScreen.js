@@ -34,6 +34,62 @@ const PR_MODES = [
   { label: 'Sentences', value: 'sentences' },
   { label: 'Paragraph', value: 'paragraph' },
 ];
+const VIRTUAL_KEY_ROWS = [
+  ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace'],
+  ['Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']', '\\'],
+  ['Caps', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ';', "'", 'Enter'],
+  ['Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/', 'Shift'],
+  ['Ctrl', 'Win', 'Alt', 'Space', 'Alt', 'Menu', 'Ctrl'],
+];
+const WIDE_KEY_FLEX = { Backspace: 2.1, Tab: 1.35, Caps: 1.65, Enter: 1.8, Shift: 2.15, Ctrl: 1.25, Win: 1.15, Alt: 1.15, Space: 5.2, Menu: 1.15 };
+
+const virtualKeyId = (event) => {
+  const key = event.key;
+  if (!key) return null;
+  if (key === ' ') return 'Space';
+  if (key === 'Escape') return 'Esc';
+  if (key === 'CapsLock') return 'Caps';
+  if (key === 'Control') return 'Ctrl';
+  if (key === 'Meta') return 'Win';
+  if (key === 'ContextMenu') return 'Menu';
+  if (key === 'AltGraph') return 'Alt';
+  return key.length === 1 ? key.toUpperCase() : key;
+};
+
+function VirtualKeyboard({ pressedKeys, nextKey }) {
+  return (
+    <View style={styles.keyboardCard}>
+      <View style={styles.keyboardHeader}>
+        <Text style={styles.keyboardTitle}>Keyboard</Text>
+        <View style={styles.nextKeyBadge}>
+          <Text style={styles.nextKeyLabel}>NEXT KEY</Text>
+          <Text style={styles.nextKeyValue}>{nextKey || '—'}</Text>
+        </View>
+      </View>
+      {VIRTUAL_KEY_ROWS.map((row, rowIndex) => (
+        <View key={rowIndex} style={styles.keyboardRow}>
+          {row.map((key, keyIndex) => {
+            const pressed = pressedKeys.includes(key);
+            const expected = nextKey === key;
+            return (
+              <View
+                key={`${key}-${keyIndex}`}
+                style={[
+                  styles.virtualKey,
+                  { flex: WIDE_KEY_FLEX[key] || 1 },
+                  expected && styles.virtualKeyExpected,
+                  pressed && (expected ? styles.virtualKeyCorrect : styles.virtualKeyPressed),
+                ]}
+              >
+                {key !== 'Space' && <Text style={[styles.virtualKeyText, pressed && styles.virtualKeyTextPressed]}>{key}</Text>}
+              </View>
+            );
+          })}
+        </View>
+      ))}
+    </View>
+  );
+}
 
 function OptionPills({ options, value, onChange, color = COLORS.blue, small }) {
   return (
@@ -152,6 +208,7 @@ export default function TypingScreen({
   const [countdown, setCountdown] = useState(config.timeSec || 60);
   const [useTimed, setUseTimed] = useState((config.timeSec || 0) > 0);
   const [result, setResult] = useState(null);
+  const [pressedKeys, setPressedKeys] = useState([]);
   const [textWidth, setTextWidth] = useState(0);
   const [charW, setCharW] = useState(null);
 
@@ -224,7 +281,16 @@ export default function TypingScreen({
       scrollRef.current.scrollTo({ y: 0, animated: false });
     }
     if (inputRef.current && typeof inputRef.current.focus === 'function') {
-      setTimeout(() => inputRef.current.focus(), 50);
+      setTimeout(() => {
+        if (inputRef.current && typeof inputRef.current.focus === 'function') {
+          try {
+            inputRef.current.focus();
+            if (typeof inputRef.current.setSelectionRange === 'function') {
+              inputRef.current.setSelectionRange(rawRef.current.length, rawRef.current.length);
+            }
+          } catch (e) {}
+        }
+      }, 50);
     }
   }, [config.id, config.type]);
 
@@ -248,12 +314,25 @@ export default function TypingScreen({
   useEffect(() => {
     if (Platform.OS !== 'web') return;
     const onKeyDown = (e) => {
+      const keyId = virtualKeyId(e);
+      if (keyId) setPressedKeys((current) => current.includes(keyId) ? current : [...current, keyId]);
       if (e.key === 'Escape' && onBackRef.current) {
         onBackRef.current();
       }
     };
+    const onKeyUp = (e) => {
+      const keyId = virtualKeyId(e);
+      if (keyId) setPressedKeys((current) => current.filter((key) => key !== keyId));
+    };
+    const clearPressedKeys = () => setPressedKeys([]);
     document.addEventListener('keydown', onKeyDown);
-    return () => document.removeEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+    window.addEventListener('blur', clearPressedKeys);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', clearPressedKeys);
+    };
   }, []);
 
   // timer
@@ -276,7 +355,7 @@ export default function TypingScreen({
   }, [countdown, isStarted, isPaused, isFinished, useTimed]);
 
   useEffect(() => {
-    if (isStarted && !isPaused && !isFinished && currentText && userInput.length === currentText.length) {
+    if (isStarted && !isPaused && !isFinished && currentText && userInput.length >= currentText.length) {
       finishTest(false);
     }
   }, [userInput, isPaused, isFinished, isStarted, currentText]);
@@ -301,15 +380,15 @@ export default function TypingScreen({
   const focusInput = useCallback(() => {
     requestAnimationFrame(() => {
       if (inputRef.current) {
-        inputRef.current.focus();
         try {
+          inputRef.current.focus();
           if (typeof inputRef.current.setSelectionRange === 'function') {
-            inputRef.current.setSelectionRange(rawInput.length, rawInput.length);
+            inputRef.current.setSelectionRange(rawRef.current.length, rawRef.current.length);
           }
         } catch (e) {}
       }
     });
-  }, [rawInput.length]);
+  }, []);
 
   const resetTest = (nextText) => {
     if (certCloseRef.current) { clearTimeout(certCloseRef.current); certCloseRef.current = null; }
@@ -322,7 +401,7 @@ export default function TypingScreen({
     if (scrollRef.current) scrollRef.current.scrollTo({ y: 0, animated: false });
     setSeconds(0);
     setCountdown(useTimed ? duration : 0);
-    setIsStarted(true);
+    setIsStarted(false);
     setIsPaused(false);
     setIsFinished(false);
     setIsTimedOut(false);
@@ -360,11 +439,8 @@ export default function TypingScreen({
     clearInterval(timerRef.current);
     if (inputRef.current && typeof inputRef.current.blur === 'function') inputRef.current.blur();
 
-    const wordsBase = currentText.trim().split(/\s+/).filter((w) => w).length;
     const elapsed = Math.max(1, seconds);
-    const typedWords = userInput.trim() ? userInput.trim().split(/\s+/).filter(Boolean).length : 0;
-    const words = isCert ? typedWords : wordsBase;
-    const wpm = Math.round((words / elapsed) * 60);
+    const wpm = Math.round(((userInput.length / 5) / elapsed) * 60);
     const cpm = Math.round((userInput.length / elapsed) * 60);
     let correctChars = 0;
     if (isKrutiLayout) {
@@ -377,7 +453,12 @@ export default function TypingScreen({
     const accuracy = userInput.length > 0 ? Math.round((correctChars / userInput.length) * 100) : 100;
     const mistakes = userInput.length - correctChars;
     const score = Math.round(Math.max(0, (wpm * accuracy) / 100) * 1.5 + accuracy * 0.2);
-    const res = { wpm, cpm, accuracy, mistakes, seconds, score, timedOut: didTimeOut };
+    const res = {
+      wpm, cpm, accuracy, mistakes, seconds, score, timedOut: didTimeOut,
+      correctChars,
+      incorrectChars: mistakes,
+      completion: currentText.length ? Math.min(1, userInput.length / currentText.length) : 0,
+    };
     setResult(res);
     const historyPromise = saveHistory(res);
 
@@ -390,7 +471,7 @@ export default function TypingScreen({
       }, didTimeOut ? 400 : 1400);
     }
 
-    if (!didTimeOut && config.type === 'lesson' && onComplete && userInput.length === currentText.length) {
+    if (!didTimeOut && config.type === 'lesson' && onComplete && userInput.length >= currentText.length) {
       lessonCompleteTimerRef.current = setTimeout(() => {
         lessonCompleteTimerRef.current = null;
         onComplete(config.lang, config.id);
@@ -440,9 +521,8 @@ export default function TypingScreen({
   const isCharCorrect = (typed, target) => getCharStatus(typed, target) === 'correct';
 
   const liveWpm = useMemo(() => (
-    seconds > 0 ? Math.round((userInput.length / 5) / (seconds / 60)) : 0
+    seconds > 0 ? Math.round(((userInput.length / 5) / seconds) * 60) : 0
   ), [seconds, userInput.length]);
-  const progress = currentText.length > 0 ? Math.min(1, userInput.length / currentText.length) : 0;
 
   // next char guidance
   const kpLive = useMemo(
@@ -450,6 +530,65 @@ export default function TypingScreen({
     [isKrutiLayout, rawInput, currentText]
   );
   const progressCursor = isKrutiLayout ? (kpLive ? kpLive.ok : 0) : userInput.length;
+  const liveCorrectChars = useMemo(() => {
+    if (isKrutiLayout) return Math.min(userInput.length, kpLive ? kpLive.ok : 0);
+    let count = 0;
+    const limit = Math.min(userInput.length, currentText.length);
+    for (let i = 0; i < limit; i++) {
+      if (isCharCorrect(userInput[i], currentText[i])) count++;
+    }
+    return count;
+  }, [isKrutiLayout, kpLive, userInput, currentText]);
+  const liveErrors = Math.max(0, userInput.length - liveCorrectChars);
+  const liveAccuracy = userInput.length ? Math.round((liveCorrectChars / userInput.length) * 100) : 100;
+  const progress = currentText.length > 0 ? Math.min(1, userInput.length / currentText.length) : 0;
+  const nextChar = currentText[progressCursor] || '';
+  const nextKey = nextChar === ' ' ? 'Space' : nextChar === '\n' ? 'Enter' : nextChar.length === 1 ? nextChar.toUpperCase() : nextChar;
+  const timerColor = isStarted && useTimed && countdown <= 10
+    ? '#e11d48'
+    : isStarted && useTimed && countdown <= 20
+      ? '#d97706'
+      : '#0e9488';
+  const timerText = isFinished && isTimedOut
+    ? 'TIME UP'
+    : useTimed
+      ? `${String(Math.floor(Math.max(0, countdown) / 60)).padStart(2, '0')}:${String(Math.max(0, countdown) % 60).padStart(2, '0')}`
+      : 'UNTIMED';
+
+  const renderStatsBar = () => (
+    <View style={styles.statsBar}>
+      <View style={[styles.statCell, styles.timerStatCell]}>
+        <Text style={styles.statLabel}>TIME LEFT</Text>
+        <Text style={[styles.statValue, { color: timerColor }]}>{timerText}</Text>
+      </View>
+      <View style={styles.statCell}>
+        <Text style={styles.statLabel}>WPM</Text>
+        <Text style={styles.statValue}>{liveWpm}</Text>
+      </View>
+      <View style={styles.statCell}>
+        <Text style={styles.statLabel}>ACCURACY</Text>
+        <Text style={[styles.statValue, { color: '#16a34a' }]}>{liveAccuracy}%</Text>
+      </View>
+      <View style={styles.statCell}>
+        <Text style={styles.statLabel}>ERRORS</Text>
+        <Text style={[styles.statValue, { color: liveErrors ? '#e11d48' : '#334b57' }]}>{liveErrors}</Text>
+      </View>
+      <View style={styles.statCell}>
+        <View style={styles.progressStatHeading}>
+          <Text style={styles.statLabel}>PROGRESS</Text>
+          <Text style={styles.progressStatValue}>{Math.round(progress * 100)}%</Text>
+        </View>
+        <View style={styles.statProgressTrack}>
+          <View style={[styles.statProgressFill, { width: `${Math.round(progress * 100)}%` }]} />
+        </View>
+      </View>
+    </View>
+  );
+
+  const renderVirtualKeyboard = () => (
+    <VirtualKeyboard pressedKeys={pressedKeys} nextKey={nextKey} />
+  );
+
   const handlePause = () => {
     if (isFinished) return;
     setIsPaused((prev) => {
@@ -461,18 +600,18 @@ export default function TypingScreen({
   };
 
   const handleInputChange = (text) => {
+    const wasTypingMore = text.length > rawRef.current.length;
     setRawInput(text);
     rawRef.current = text;
     const converted = isKrutiLayout ? krutiToUnicode(text) : text;
     setUserInput(converted);
-    if (!isStarted) setIsStarted(true);
+    if (!isStarted && wasTypingMore) setIsStarted(true);
   };
 
   const handleKeyPress = (e) => {
     if (!isStarted || isPaused || isFinished) return;
     const key = e.nativeEvent && e.nativeEvent.key;
     if (!key) return;
-    const kId = keyIdForChar(key) || (key === 'Backspace' ? 'backspace' : null);
     if (key === 'Backspace') {
       if (soundEnabled) playKeySound('key');
       return;
@@ -489,7 +628,7 @@ export default function TypingScreen({
         if (soundEnabled) playKeySound('correct');
       } else if (sp.pending) {
         if (soundEnabled) playKeySound('key');
-      } else if (kId) {
+      } else if (key.length === 1) {
         if (soundEnabled) playKeySound('wrong');
       }
       return;
@@ -502,9 +641,45 @@ export default function TypingScreen({
         (key === ' ' && expected === ' '));
     if (isCorrectKey) {
       if (soundEnabled) playKeySound('correct');
-    } else if (kId) {
+    } else if (key.length === 1) {
       if (soundEnabled) playKeySound('wrong');
     }
+  };
+
+  const updatePracticeOptions = (changes) => {
+    const nextMode = changes.mode ?? mode;
+    const nextDuration = changes.duration ?? duration;
+    const nextDifficulty = changes.difficulty ?? difficulty;
+    setMode(nextMode);
+    setDuration(nextDuration);
+    setDifficulty(nextDifficulty);
+
+    const nextText = generateTypingText({
+      mode: nextMode,
+      difficulty: nextDifficulty,
+      timeSec: nextDuration,
+      lang: config.lang || 'english',
+      targetWpm: bestWpmRef.current,
+    });
+    finishRef.current = false;
+    clearInterval(timerRef.current);
+    setCurrentText(nextText);
+    setRawInput('');
+    setUserInput('');
+    rawRef.current = '';
+    setSeconds(0);
+    setCountdown(nextDuration);
+    setUseTimed(nextDuration > 0);
+    setIsStarted(false);
+    setIsPaused(false);
+    setIsFinished(false);
+    setIsTimedOut(false);
+    setResult(null);
+    lastScrollRow.current = 0;
+    if (scrollRef.current && typeof scrollRef.current.scrollTo === 'function') {
+      scrollRef.current.scrollTo({ y: 0, animated: false });
+    }
+    focusInput();
   };
 
   const renderControls = () => {
@@ -513,15 +688,15 @@ export default function TypingScreen({
       <View style={styles.controlsBar}>
         <View style={styles.controlRow}>
           <Text style={styles.controlLabel}>Difficulty</Text>
-          <OptionPills options={DIFFICULTIES} value={difficulty} onChange={setDifficulty} />
+          <OptionPills options={DIFFICULTIES} value={difficulty} onChange={(value) => updatePracticeOptions({ difficulty: value })} />
         </View>
         <View style={styles.controlRow}>
           <Text style={styles.controlLabel}>Duration</Text>
-          <OptionPills options={DURATIONS} value={duration} onChange={setDuration} />
+          <OptionPills options={DURATIONS} value={duration} onChange={(value) => updatePracticeOptions({ duration: value })} />
         </View>
         <View style={styles.controlRow}>
           <Text style={styles.controlLabel}>Mode</Text>
-          <OptionPills options={PR_MODES} value={mode} onChange={setMode} />
+          <OptionPills options={PR_MODES} value={mode} onChange={(value) => updatePracticeOptions({ mode: value })} />
         </View>
         <TouchableOpacity style={styles.newTextBtn} onPress={handleRegenerate} activeOpacity={0.75}>
           <Ionicons name="refresh" size={15} color="#fff" />
@@ -699,7 +874,7 @@ const renderTextArea = () => {
     return (
       <ScrollView
         ref={scrollRef}
-        style={[styles.textScroll, { maxHeight: Math.min(420, Math.max(180, winH * 0.52)) }]}
+        style={[styles.textScroll, { maxHeight: Math.min(520, Math.max(180, winH - 400)) }]}
         onLayout={() => {}}
       >
         <TouchableOpacity
@@ -896,17 +1071,13 @@ const renderTextArea = () => {
             keyboardShouldPersistTaps="handled"
           >
             {renderControls()}
-
-            {/* Progress */}
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-            </View>
-
+            {renderStatsBar()}
             {renderTextArea()}
+            {renderVirtualKeyboard()}
             {renderResult()}
 
             {/* Hidden input */}
-            <TextInput
+            <TextInput showSoftInputOnFocus={false} inputMode="none" autoFocus
               ref={inputRef}
               style={styles.hiddenInput}
               value={rawInput}
@@ -916,7 +1087,6 @@ const renderTextArea = () => {
               autoCorrect={false}
               autoComplete="off"
               spellCheck={false}
-              autoFocus
               editable={!isFinished && !isPaused}
             />
 
@@ -1043,19 +1213,20 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'flex-start',
-    paddingTop: 18,
-    paddingBottom: 34,
+    paddingTop: 10,
+    paddingBottom: 12,
     maxWidth: 1260,
     width: '100%',
     alignSelf: 'center',
   },
   controlsBar: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#d5e7ee',
-    padding: 14,
-    marginBottom: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 10,
     shadowColor: '#315c70',
     shadowOpacity: 0.06,
     shadowOffset: { width: 0, height: 3 },
@@ -1066,24 +1237,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom: 8,
+    marginBottom: 6,
     flexWrap: 'wrap',
   },
   controlLabel: {
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     color: '#526b77',
-    fontSize: 12,
-    width: 70,
+    fontSize: 11.5,
+    width: 72,
   },
-  pillGroup: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 },
+  pillGroup: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1, alignItems: 'center' },
   pill: {
-    paddingHorizontal: 13,
-    paddingVertical: 7,
+    minHeight: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     borderRadius: 9,
-    backgroundColor: '#f8fbfc',
-    borderWidth: 1.5,
-    borderColor: '#d5e3e9',
+    backgroundColor: '#f7fafb',
+    borderWidth: 1,
+    borderColor: '#d8e5e9',
   },
   pillSmall: { paddingHorizontal: 10, paddingVertical: 5 },
   pillText: {
@@ -1100,8 +1274,8 @@ const styles = StyleSheet.create({
     gap: 6,
     backgroundColor: '#0e9488',
     borderRadius: 9,
-    paddingVertical: 9,
-    marginTop: 4,
+    marginTop: 2,
+    paddingVertical: 8,
     shadowColor: '#0e9488',
     shadowOpacity: 0.4,
     shadowOffset: { width: 0, height: 3 },
@@ -1113,6 +1287,165 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_700Bold',
     fontWeight: '700',
     fontSize: 13,
+  },
+  statsBar: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  statCell: {
+    flex: 1,
+    minWidth: 112,
+    minHeight: 66,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#d5e7ee',
+    borderRadius: 12,
+    shadowColor: '#315c70',
+    shadowOpacity: 0.04,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 1,
+  },
+  timerStatCell: {
+    backgroundColor: '#f0faf8',
+    borderColor: '#bfe5dd',
+    transition: 'background-color 180ms ease, border-color 180ms ease',
+  },
+  statLabel: {
+    color: '#71858e',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    fontSize: 9,
+    letterSpacing: 0.7,
+  },
+  statValue: {
+    color: '#243f4a',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    fontSize: 20,
+    lineHeight: 25,
+    transition: 'color 180ms ease',
+  },
+  progressStatHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 4,
+  },
+  progressStatValue: {
+    color: '#0e9488',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  statProgressTrack: {
+    height: 6,
+    overflow: 'hidden',
+    marginTop: 7,
+    backgroundColor: '#e2ecef',
+    borderRadius: 6,
+  },
+  statProgressFill: {
+    height: '100%',
+    backgroundColor: '#0e9488',
+    borderRadius: 6,
+    transition: 'width 180ms ease',
+  },
+  keyboardCard: {
+    width: '100%',
+    maxWidth: 1100,
+    alignSelf: 'center',
+    marginTop: 2,
+    marginBottom: 12,
+    padding: 10,
+    backgroundColor: '#eaf2f5',
+    borderWidth: 1,
+    borderColor: '#cbdde3',
+    borderRadius: 14,
+  },
+  keyboardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  keyboardTitle: {
+    color: '#415d68',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    fontSize: 11,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  nextKeyBadge: {
+    minWidth: 90,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#d4e2e6',
+    borderRadius: 8,
+  },
+  nextKeyLabel: {
+    color: '#71858e',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    fontSize: 8,
+    letterSpacing: 0.4,
+  },
+  nextKeyValue: {
+    color: '#0e9488',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  keyboardRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
+    marginBottom: 4,
+  },
+  virtualKey: {
+    minWidth: 0,
+    minHeight: 29,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderBottomWidth: 2,
+    borderColor: '#cfdee3',
+    borderRadius: 6,
+    transition: 'background-color 100ms ease, border-color 100ms ease, transform 100ms ease',
+  },
+  virtualKeyText: {
+    color: '#354e59',
+    fontFamily: 'Poppins_700Bold',
+    fontWeight: '700',
+    fontSize: 9,
+  },
+  virtualKeyExpected: {
+    borderColor: '#0e9488',
+    backgroundColor: '#e4f6f3',
+  },
+  virtualKeyPressed: {
+    backgroundColor: '#c8e9e4',
+    borderColor: '#0e9488',
+    transform: [{ translateY: 1 }],
+  },
+  virtualKeyCorrect: {
+    backgroundColor: '#bbf7d0',
+    borderColor: '#16a34a',
+    transform: [{ translateY: 1 }],
   },
   progressTrack: {
     height: 6,
@@ -1129,7 +1462,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 4,
   },
-  textScroll: { width: '100%', maxWidth: 1100, minHeight: 180, flexGrow: 0, flexShrink: 1, alignSelf: 'center', marginBottom: 14 },
+  textScroll: { width: '100%', maxWidth: 1100, minHeight: 160, flexGrow: 0, flexShrink: 1, alignSelf: 'center', marginBottom: 10 },
   textBox: {
     width: '100%',
     alignSelf: 'center',

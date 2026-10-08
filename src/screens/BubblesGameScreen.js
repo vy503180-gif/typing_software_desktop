@@ -263,19 +263,12 @@ export default function BubblesGameScreen({ onBack, mode: initialMode }) {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [gameOver]);
 
-  // Native focus
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-    const t = setTimeout(() => inputRef.current && inputRef.current.focus(), 100);
-    return () => clearTimeout(t);
-  }, []);
-
-  // Native focus guard
+  // Soft keyboard ko open hone se rokne ke liye native autofocusing disabled.
   useEffect(() => {
     if (Platform.OS === 'web') return;
     const guard = setInterval(() => {
-      if (!gameOver && inputRef.current && !inputRef.current.isFocused()) {
-        inputRef.current.focus();
+      if (!gameOver && inputRef.current) {
+        try { inputRef.current.blur(); } catch (e) {}
       }
     }, 1200);
     return () => clearInterval(guard);
@@ -457,14 +450,13 @@ export default function BubblesGameScreen({ onBack, mode: initialMode }) {
 
             {/* Native hidden input */}
             {Platform.OS !== 'web' && (
-              <TextInput
+              <TextInput showSoftInputOnFocus={false} inputMode="none"
                 ref={inputRef}
                 style={styles.hiddenInput}
                 defaultValue=""
                 onChangeText={handleChange}
                 autoCapitalize="none"
                 autoCorrect={false}
-                autoFocus
                 caretHidden
                 spellCheck={false}
               />

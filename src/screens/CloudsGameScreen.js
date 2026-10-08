@@ -280,8 +280,7 @@ export default function CloudsGameScreen({ onBack }) {
   // Native focus
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    const t = setTimeout(() => inputRef.current && inputRef.current.focus(), 100);
-    return () => clearTimeout(t);
+    return undefined;
   }, []);
 
   const restart = () => {
@@ -422,7 +421,7 @@ export default function CloudsGameScreen({ onBack }) {
 
             {/* Hidden input - native only */}
             {Platform.OS !== 'web' && (
-              <TextInput
+              <TextInput showSoftInputOnFocus={false} inputMode="none"
                 ref={inputRef}
                 style={styles.hiddenInput}
                 defaultValue=""
@@ -430,7 +429,6 @@ export default function CloudsGameScreen({ onBack }) {
                 editable
                 autoCapitalize="none"
                 autoCorrect={false}
-                autoFocus
                 caretHidden
                 spellCheck={false}
               />

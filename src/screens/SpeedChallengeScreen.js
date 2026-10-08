@@ -74,7 +74,9 @@ export default function SpeedChallengeScreen({ onBack }) {
 
   const focusInput = () => {
     if (Platform.OS === 'web') return;
-    setTimeout(() => inputRef.current && inputRef.current.focus(), 15);
+    if (inputRef.current) {
+      try { inputRef.current.blur(); } catch (e) {}
+    }
   };
 
   // Timer
@@ -298,7 +300,7 @@ export default function SpeedChallengeScreen({ onBack }) {
 
         {/* Hidden input - sirf NATIVE (App) ke liye */}
         {Platform.OS !== 'web' && (
-          <TextInput
+          <TextInput showSoftInputOnFocus={false} inputMode="none"
             ref={inputRef}
             style={styles.hiddenInput}
             defaultValue=""
@@ -308,7 +310,6 @@ export default function SpeedChallengeScreen({ onBack }) {
             editable
             autoCapitalize="none"
             autoCorrect={false}
-            autoFocus={started}
             caretHidden
             spellCheck={false}
           />

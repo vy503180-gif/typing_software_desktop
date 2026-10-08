@@ -88,10 +88,7 @@ export default function WordDrillScreen({ onBack }) {
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    const t = setTimeout(() => {
-      if (inputRef.current) inputRef.current.focus();
-    }, 100);
-    return () => clearTimeout(t);
+    return undefined;
   }, []);
 
   // 4 minute countdown
@@ -114,26 +111,21 @@ export default function WordDrillScreen({ onBack }) {
     if (Platform.OS === 'web') return;
     const focusGuard = setInterval(() => {
       if (!isFinished && inputRef.current) {
-        const doc = typeof document !== 'undefined' ? document : null;
-        if (doc && doc.activeElement !== inputRef.current) {
-          inputRef.current.focus();
-        }
+        try { inputRef.current.blur(); } catch (e) {}
       }
     }, 1500);
     return () => clearInterval(focusGuard);
   }, [isFinished]);
 
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {});
     return () => {
-      Keyboard.removeAllListeners('keyboardDidShow');
       if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
     };
   }, []);
 
   const finishFocus = () => {
     if (Platform.OS !== 'web') {
-      setTimeout(() => inputRef.current && inputRef.current.focus(), 15);
+      try { inputRef.current && inputRef.current.blur(); } catch (e) {}
     }
   };
 
@@ -397,7 +389,7 @@ export default function WordDrillScreen({ onBack }) {
 
               {/* Hidden input - sirf NATIVE (App) ke liye. Web par sirf document keydown chalega */}
               {Platform.OS !== 'web' && (
-                <TextInput
+                <TextInput showSoftInputOnFocus={false} inputMode="none"
                   ref={inputRef}
                   style={styles.hiddenInput}
                   defaultValue=""
@@ -410,20 +402,11 @@ export default function WordDrillScreen({ onBack }) {
                   editable
                   autoCapitalize="none"
                   autoCorrect={false}
-                  autoFocus
                   caretHidden
                   spellCheck={false}
                 />
               )}
 
-              {/* Bottom hint */}
-              <View style={styles.keyboardHint}>
-                <Text style={styles.keyboardHintText}>
-                  {roundComplete
-                    ? 'Press Enter or click Next Round to continue.'
-                    : 'Type the highlighted word - one letter at a time.'}
-                </Text>
-              </View>
             </>
           )}
         </View>
@@ -584,16 +567,6 @@ const styles = StyleSheet.create({
     fontSize: scaleFont(11),
     fontFamily: 'Poppins_700Bold', fontWeight: '700',
     marginTop: scaleSize(8),
-  },
-
-  keyboardHint: {
-    alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 20,
-  },
-  keyboardHintText: { fontFamily: 'Poppins_400Regular', color: 'rgba(255,255,255,0.6)',
-    fontSize: scaleFont(12),
-    textAlign: 'center',
   },
 
   doneCard: {

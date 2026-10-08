@@ -84,17 +84,6 @@ export const COLORS = {
   headerBg: '#0d1424',
   headerBorder: 'rgba(148, 163, 184, 0.5)',
 
-  // Keyboard
-  keyBg: '#1a2542',
-  keyBgAlt: '#141d36',
-  keyBorder: 'rgba(148, 163, 184, 0.45)',
-  keyText: '#cdd9f0',
-  keyPressed: '#14b8a6',
-  keyNext: '#0e7490',
-  keyCorrect: '#22c55e',
-  keyWrong: '#f43f5e',
-  keyRowBg: 'rgba(10, 16, 30, 0.6)',
-
   // Misc
   glow: '#14b8a6',
   online: '#22c55e',
